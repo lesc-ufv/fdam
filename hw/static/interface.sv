@@ -93,31 +93,59 @@ module app_afu(
     
     typedef enum logic[2:0]{
       CFG_REG,
-      ADDR_WORKSPACE_BASE
+      ADDR_WORKSPACE_BASE,
+      WORKSPACE_SIZE,
+      START_INTERFACES,
+      RST_INTERFACES,
+      RST_BUFFER_INDEX
     }CSR_WR;
     
     t_byteAddr workspace_addr_base;
+    logic [63:0] workspace_size;
+    logic [63:0] start_interfaces;
+    logic [63:0] rst_interfaces;
+    logic [14-1:0] rst_buffers;
+    logic update_workspace;
     logic start_acc;
-    logic reset_parc;
+
     always_ff @(posedge clk)
     begin
         if(reset)
         begin
             start_acc <= 1'b0;
-            reset_parc <= 1'b0;
             workspace_addr_base <= t_byteAddr'(0);
+            workspace_size <= 64'd0;
+            start_interfaces <= 64'd0;
+            rst_interfaces <= 64'd0;
+            rst_buffers <= 14'd0;     
+            update_workspace = 1'b0;
         end 
         else begin
             if (csrs.cpu_wr_csrs[CFG_REG].en)
             begin
                 start_acc <= csrs.cpu_wr_csrs[CFG_REG].data[0];
-                reset_parc <= csrs.cpu_wr_csrs[CFG_REG].data[1];
+                update_workspace <= csrs.cpu_wr_csrs[CFG_REG].data[1];
             end
-            
             if (csrs.cpu_wr_csrs[ADDR_WORKSPACE_BASE].en)
             begin
                 workspace_addr_base <= csrs.cpu_wr_csrs[ADDR_WORKSPACE_BASE].data;
             end
+            if (csrs.cpu_wr_csrs[WORKSPACE_SIZE].en)
+            begin
+                workspace_size <= csrs.cpu_wr_csrs[WORKSPACE_SIZE].data;
+            end
+            if (csrs.cpu_wr_csrs[START_INTERFACES].en)
+            begin
+                start_interfaces <= csrs.cpu_wr_csrs[START_INTERFACES].data;
+            end
+            if (csrs.cpu_wr_csrs[RST_INTERFACES].en)
+            begin
+                rst_interfaces <= csrs.cpu_wr_csrs[RST_INTERFACES].data;
+            end
+            if (csrs.cpu_wr_csrs[RST_BUFFER_INDEX].en)
+            begin
+                rst_buffers <= csrs.cpu_wr_csrs[RST_BUFFER_INDEX].data[14-1:0];
+            end  
         end 
     end
         
@@ -165,9 +193,18 @@ module app_afu(
     
       .clk(clk),
       .rst(reset),
-      .rst_parc(reset_parc),
       .start(start_acc),
+      
+      .rst_interfaces(rst_interfaces),  
+      .start_interfaces(start_interfaces),
+     
+      .rst_buffer_in_index(rst_buffers[6:0]),
+      .rst_buffer_out_index(rst_buffers[14-1:7]),
+      
       .workspace_addr_base({(64-$bits(t_byteAddr))'(0),workspace_addr_base}),
+      .conf_size(workspace_size[15:0]),
+      .dsm_size(workspace_size[31:16]),
+      .update_workspace(update_workspace),
       
       .req_rd_en(req_rd_en), 
       .req_rd_available(~fiu.c0TxAlmFull),
@@ -188,9 +225,6 @@ module app_afu(
       .resp_wr_mdata(fiu.c1Rx.hdr.mdata)     
     );
     
-    //
-    // Count cycles for statistics
-    //
     
     always_ff @(posedge clk)
     begin

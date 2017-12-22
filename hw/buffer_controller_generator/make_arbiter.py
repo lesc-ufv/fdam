@@ -1,6 +1,6 @@
 from veriloggen import *
 
-from hw.buffer_controller_generator.make_priority_encoder import make_priority_encoder
+from make_priority_encoder import make_priority_encoder
 
 
 def make_arbiter():

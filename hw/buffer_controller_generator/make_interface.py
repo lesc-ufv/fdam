@@ -8,7 +8,6 @@ def make_interface(data_width, module_name, qtde_in, qtde_out):
 
     m.Input('clk')
     m.Input('rst')
-    m.Input('rst_parc')
     m.Input('start')
     for i in range(qtde_out):
         m.Input('available_write%d' % i)
