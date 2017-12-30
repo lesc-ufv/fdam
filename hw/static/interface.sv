@@ -69,8 +69,24 @@ module app_afu(
     //  CSRs (simple connections to the external CSR management engine)
     //
     // ====================================================================
- 
+    typedef enum logic[3:0] {
+        CLOCK_COUNT,
+        CL_WR_COUNT,
+        CL_RD_COUNT,
+        AFU_CONTROLLER_STATUS,
+        INF_1,
+        INF_2,
+        INF_3,
+        INF_4,
+        INF_5,
+        INF_6,
+        INF_7,
+        INF_8
+    }CSR_RD;
+    logic [576-1:0] info;
     logic [63:0]total_clocks;
+    logic [63:0]total_cl_rd;
+    logic [63:0]total_cl_wr;
     always_comb
     begin
         // The AFU ID is a unique ID for a given program.  Here we generated
@@ -84,7 +100,20 @@ module app_afu(
         // Exported counters.  The simple csrs interface used here has
         // no read request.  It expects the current CSR value to be
         // available every cycle.
-        csrs.cpu_rd_csrs[0].data = 64'(total_clocks);
+        csrs.cpu_rd_csrs[CLOCK_COUNT].data = 64'(total_clocks);
+        csrs.cpu_rd_csrs[CL_WR_COUNT].data = 64'(total_cl_wr);
+        csrs.cpu_rd_csrs[CL_RD_COUNT].data = 64'(total_cl_rd);        
+        csrs.cpu_rd_csrs[AFU_CONTROLLER_STATUS].data = 64'(info[63:0]);
+        csrs.cpu_rd_csrs[INF_1].data = 64'(info[127:64]);
+        csrs.cpu_rd_csrs[INF_2].data = 64'(info[191:128]);
+        csrs.cpu_rd_csrs[INF_3].data = 64'(info[255:192]);
+        csrs.cpu_rd_csrs[INF_4].data = 64'(info[319:256]);
+        csrs.cpu_rd_csrs[INF_5].data = 64'(info[383:320]);
+        csrs.cpu_rd_csrs[INF_6].data = 64'(info[447:384]);
+        csrs.cpu_rd_csrs[INF_7].data = 64'(info[511:448]);
+        csrs.cpu_rd_csrs[INF_8].data = 64'(info[575:512]);
+        
+        
     end    
     
     //
@@ -96,8 +125,10 @@ module app_afu(
       ADDR_WORKSPACE_BASE,
       WORKSPACE_SIZE,
       START_INTERFACES,
+      STOP_INTERFACES,
       RST_INTERFACES,
       RST_BUFFER_INDEX
+      
     }CSR_WR;
     
     t_byteAddr workspace_addr_base;
@@ -106,37 +137,47 @@ module app_afu(
     logic [63:0] rst_interfaces;
     logic [14-1:0] rst_buffers;
     logic update_workspace;
-    logic start_acc;
+    logic start_bufer_controller;
+    logic afu_reset;
 
     always_ff @(posedge clk)
     begin
         if(reset)
         begin
-            start_acc <= 1'b0;
+            start_bufer_controller <= 1'b0;
             workspace_addr_base <= t_byteAddr'(0);
             workspace_size <= 64'd0;
             start_interfaces <= 64'd0;
             rst_interfaces <= 64'd0;
             rst_buffers <= 14'd0;     
             update_workspace = 1'b0;
+            afu_reset <= 1'b0;
         end 
         else begin
             if (csrs.cpu_wr_csrs[CFG_REG].en)
             begin
-                start_acc <= csrs.cpu_wr_csrs[CFG_REG].data[0];
-                update_workspace <= csrs.cpu_wr_csrs[CFG_REG].data[1];
+                start_bufer_controller <= csrs.cpu_wr_csrs[CFG_REG].data[0];
+                afu_reset <= csrs.cpu_wr_csrs[CFG_REG].data[1];
+                update_workspace <= csrs.cpu_wr_csrs[CFG_REG].data[2];
             end
             if (csrs.cpu_wr_csrs[ADDR_WORKSPACE_BASE].en)
-            begin
+            begin   
                 workspace_addr_base <= csrs.cpu_wr_csrs[ADDR_WORKSPACE_BASE].data;
             end
             if (csrs.cpu_wr_csrs[WORKSPACE_SIZE].en)
             begin
                 workspace_size <= csrs.cpu_wr_csrs[WORKSPACE_SIZE].data;
             end
-            if (csrs.cpu_wr_csrs[START_INTERFACES].en)
-            begin
-                start_interfaces <= csrs.cpu_wr_csrs[START_INTERFACES].data;
+            if (csrs.cpu_wr_csrs[START_INTERFACES].en | csrs.cpu_wr_csrs[STOP_INTERFACES].en)
+            begin       
+                if(csrs.cpu_wr_csrs[START_INTERFACES].en)
+                begin
+                   start_interfaces <= start_interfaces | csrs.cpu_wr_csrs[START_INTERFACES].data;
+                end 
+                else
+                begin
+                  start_interfaces <= start_interfaces & ~csrs.cpu_wr_csrs[STOP_INTERFACES].data;
+                end 
             end
             if (csrs.cpu_wr_csrs[RST_INTERFACES].en)
             begin
@@ -192,8 +233,8 @@ module app_afu(
     buffer_controller buffer_controller(
     
       .clk(clk),
-      .rst(reset),
-      .start(start_acc),
+      .rst(reset|afu_reset),
+      .start(start_bufer_controller),
       
       .rst_interfaces(rst_interfaces),  
       .start_interfaces(start_interfaces),
@@ -222,7 +263,9 @@ module app_afu(
       .req_wr_data(req_wr_data),
       
       .resp_wr_valid(cci_c1Rx_isWriteRsp(fiu.c1Rx)),
-      .resp_wr_mdata(fiu.c1Rx.hdr.mdata)     
+      .resp_wr_mdata(fiu.c1Rx.hdr.mdata),
+      
+      .info(info)
     );
     
     
@@ -230,16 +273,19 @@ module app_afu(
     begin
        if(reset)begin
           total_clocks <= 64'd0;
+          total_cl_wr <= 64'd0;
+          total_cl_rd <= 64'd0;
        end 
-       else if(start_acc)begin
+       else if(start_bufer_controller)begin
           total_clocks <= total_clocks + 64'd1;
        end  
        
        if(fiu.c1Tx.valid) begin 
-          $display("REQ WR:%d - %x DATA %x",fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
+          $display("REQ WR:%d %x DATA %x",fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
        end 
        
        if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
+          total_cl_wr <= total_cl_wr + 64'd1;
           $display("RESP WR:%d",fiu.c1Rx.hdr.mdata); 
        end
        
@@ -249,6 +295,7 @@ module app_afu(
        
        if(cci_c0Rx_isReadRsp(fiu.c0Rx))
        begin
+          total_cl_rd <= total_cl_rd + 64'd1;
          $display("chegou:%d %x",fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
        end
        
