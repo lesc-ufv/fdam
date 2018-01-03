@@ -4,28 +4,28 @@ from veriloggen import *
 
 from make_arbiter import make_arbiter
 from make_fifo import make_fifo
-from make_interface import make_interface
+from make_afu import make_afu
 from util import numBits
 
 
-def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
-    MAX_INTERFACES = 64
+def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
+    MAX_AFUS = 64
     # verificação da possibilidade de construção do circuito
     qtde_fifo_in = 0
     qtde_fifo_out = 0
-    if len(interfaces) < 1:
-        print('No mínimo uma interface deve ser criada!')
+    if len(afus) < 1:
+        print('No mínimo uma afu deve ser criada!')
         print('Processo abortado.')
         exit()
-    for i in interfaces:
+    for i in afus:
         if i[0] == 0 or i[1] == 0:
-            print('As quantidades de entradas ou de saídas das interfaces não podem ser 0!')
+            print('As quantidades de entradas ou de saídas das afus não podem ser 0!')
             print('Processo abortado.')
             exit()
         qtde_fifo_in = qtde_fifo_in + i[0]
         qtde_fifo_out = qtde_fifo_out + i[1]
-    if (qtde_fifo_in + qtde_fifo_out) > MAX_INTERFACES:
-        print('As quantidades de entradas ou de saídas não podem ultrapassar %d!' % MAX_INTERFACES)
+    if (qtde_fifo_in + qtde_fifo_out) > MAX_AFUS:
+        print('As quantidades de entradas ou de saídas não podem ultrapassar %d!' % MAX_AFUS)
         print('Processo abortado.')
         exit()
     else:
@@ -39,21 +39,21 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
             num_cl_dsm = 1 + (num_cl_conf_total // 2)
             num_pointers_in = 8 * (num_cl_conf_in // 2)
             num_pointers_out = 8 * (num_cl_conf_out // 2)
-            m = Module('buffer_controller')
+            m = Module('afu_manager')
             clk = m.Input('clk')
             rst = m.Input('rst')
             start = m.Input('start')
-            rst_interfaces = m.Input('rst_interfaces', MAX_INTERFACES)
-            start_interfaces = m.Input('start_interfaces', MAX_INTERFACES)
-            rst_buffer_in_index = m.Input('rst_buffer_in_index', numBits(MAX_INTERFACES) + 1)
-            rst_buffer_out_index = m.Input('rst_buffer_out_index', numBits(MAX_INTERFACES) + 1)
+            rst_afus = m.Input('rst_afus', MAX_AFUS)
+            start_afus = m.Input('start_afus', MAX_AFUS)
+            rst_buffer_in_index = m.Input('rst_buffer_in_index', numBits(MAX_AFUS) + 1)
+            rst_buffer_out_index = m.Input('rst_buffer_out_index', numBits(MAX_AFUS) + 1)
             # Endereço da linha de cache com as configurações
             workspace_addr_base = m.Input('workspace_addr_base', addr_width)
             conf_size = m.Input('conf_size', 16)
             dsm_size = m.Input('dsm_size', 16)
             update_workspace = m.Input('update_workspace')
 
-            # Reading interface
+            # Reading afu
             req_rd_en = m.OutputReg('req_rd_en')
             req_rd_addr = m.OutputReg('req_rd_addr', addr_width)
             req_rd_mdata = m.OutputReg('req_rd_mdata', mdata_width)
@@ -63,7 +63,7 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
             resp_rd_mdata = m.Input('resp_rd_mdata', mdata_width)
             # ---------------------------------
 
-            # Writing interface
+            # Writing afu
             req_wr_available = m.Input('req_wr_available')
             req_wr_en = m.OutputReg('req_wr_en')
             req_wr_addr = m.OutputReg('req_wr_addr', addr_width)
@@ -72,8 +72,8 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
             resp_wr_valid = m.Input('resp_wr_valid')
             resp_wr_mdata = m.Input('resp_wr_mdata', mdata_width)
             # Infos
-            bits_info = 64 + (8 * MAX_INTERFACES)
-            info = m.Output('info', bits_info)
+            bits_info = 64 + (8 * MAX_AFUS)
+            info = m.OutputReg('info', bits_info)
 
             m.EmbeddedCode("//Parâmetros locais:")
             FIFO_IN_FULL = m.Localparam('FIFO_IN_FULL', pow(2, fifo_depth))
@@ -102,12 +102,12 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
             # Apalavra é constituída por:
             # bit 0 - done total
             # proximos Nbits - término de leitura das fifos_in
-            # próximos Mbits- término do processamento das interfaces
+            # próximos Mbits- término do processamento das afus
             m.EmbeddedCode("\n//Gerenciamento dos Done signals")
             done_read_buffers = m.Wire('done_read_buffers', qtde_fifo_in)
             done_write_buffers = m.Wire('done_write_buffers', qtde_fifo_out)
-            done_uut_interface = m.Wire('done_uut_interface', len(interfaces))
-            done_uut_interface_nopend = m.Wire('done_uut_interface_nopend', len(interfaces))
+            done_uut_afu = m.Wire('done_uut_afu', len(afus))
+            done_uut_afu_nopend = m.Wire('done_uut_afu_nopend', len(afus))
             done_reg_vet = m.Wire('done_reg_vet', cache_data_width)
             done_reg_vet_last = m.Reg('done_reg_vet_last', cache_data_width)
 
@@ -146,7 +146,7 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
 
             # criação das fifos, regs para as filas de entrada e saída
             m.EmbeddedCode("\n//criação das fifos, regs para as filas de entrada e saída")
-            pending_writes_interfaces = m.Wire('pending_writes_interfaces', len(interfaces))
+            pending_writes_afus = m.Wire('pending_writes_afus', len(afus))
             pending_writes_fifos_out = m.Reg('pending_writes_fifos_out', 8, qtde_fifo_out)
             fifos_in_read_request = m.Wire('fifos_in_read_request', qtde_fifo_in)
             fifos_out_read_request = m.Wire('fifos_out_read_request', qtde_fifo_in)
@@ -166,16 +166,16 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
             m.GenerateFor(i(0), i < qtde_fifo_out, i.inc(), 'gen_1').Assign(
                 done_write_buffers[i](counter_sent_data_out[i] >= qtde_data_out[i])
             )
-            m.GenerateFor(i(0), i < len(interfaces), i.inc(), 'gen_pend').Assign(
-                done_uut_interface_nopend[i](AndList(pending_writes_interfaces[i], done_uut_interface[i]))
+            m.GenerateFor(i(0), i < len(afus), i.inc(), 'gen_pend').Assign(
+                done_uut_afu_nopend[i](AndList(pending_writes_afus[i], done_uut_afu[i]))
             )
-            code = '(&done_read_buffers && &done_write_buffers && &done_uut_interface)'
+            code = '(&done_read_buffers && &done_write_buffers && &done_uut_afu)'
             done_reg_vet[0].assign(EmbeddedCode(code))
-            done_reg_vet[1:len(interfaces) + 1].assign(done_uut_interface_nopend)
-            done_reg_vet[len(interfaces) + 1:len(interfaces) + qtde_fifo_in + 1].assign(done_read_buffers)
-            done_reg_vet[len(interfaces) + qtde_fifo_in + 1:len(interfaces) + qtde_fifo_in + qtde_fifo_out + 1].assign(
+            done_reg_vet[1:len(afus) + 1].assign(done_uut_afu_nopend)
+            done_reg_vet[len(afus) + 1:len(afus) + qtde_fifo_in + 1].assign(done_read_buffers)
+            done_reg_vet[len(afus) + qtde_fifo_in + 1:len(afus) + qtde_fifo_in + qtde_fifo_out + 1].assign(
                 done_write_buffers)
-            val = len(interfaces) + qtde_fifo_in + qtde_fifo_out + 1
+            val = len(afus) + qtde_fifo_in + qtde_fifo_out + 1
             if val < 512:
                 done_reg_vet[val:].assign(Int(0, 512 - val, 10))
 
@@ -293,9 +293,9 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
 
                 m.Instance(arbiter, 'arbiter_out', params, ports)
 
-            interface_id = 0
+            afu_id = 0
             fifo_out_id = 0
-            for i in interfaces:
+            for i in afus:
                 num_fifo_out = i[1]
                 cond = '~req_wr_en && '
                 for j in range(num_fifo_out):
@@ -306,8 +306,8 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
                         cond = cond + ' && (pending_writes_fifos_out[%d] == 32\'d0 && empty_fifo_out[%d])' % (
                             fifo_out_id, fifo_out_id)
                     fifo_out_id = fifo_out_id + 1
-                pending_writes_interfaces[interface_id].assign(EmbeddedCode(cond))
-                interface_id = interface_id + 1
+                pending_writes_afus[afu_id].assign(EmbeddedCode(cond))
+                afu_id = afu_id + 1
 
             rst_counter_index = m.Integer('rst_counter_index')
             m.Always(Posedge(clk), Posedge(rst))(
@@ -748,57 +748,61 @@ def make_buffer_controller(cache_data_width, fifo_depth, interfaces):
                 )
 
             )
-            # criação das interfaces de conexão com os circuitos consumidores de dados
-            # início do processo de criação das interfaces
+            # criação das afus de conexão com os circuitos consumidores de dados
+            # início do processo de criação das afus
             module_number = 0
             idx_fifo_in = 0
             idx_fifo_out = 0
-            map_interfaces = {}
+            map_afus = {}
             params = []
-            for i in interfaces:
+            for i in afus:
                 j = 0
-                name = 'uut_interface%d_%d_%d' % (i[0], i[1], j)
-                while name in map_interfaces.keys():
+                name = 'uut_afu_%d_%d_%d' % (j, i[0], i[1])
+                while name in map_afus.keys():
                     j = j + 1
-                    name = 'uut_interface%d_%d_%d' % (i[0], i[1], j)
-                interface = make_interface(cache_data_width, name, i[0], i[1])
-                map_interfaces[name] = interface
-                con = [('clk', clk), ('rst', rst | rst_interfaces[module_number]),
-                       ('start', start_interfaces[module_number])]
-                # Entradas de dados das filas para a interface
+                    name = 'uut_afu_%d_%d_%d' % (j,i[0], i[1])
+                afu = make_afu(cache_data_width, name, i[0], i[1])
+                map_afus[name] = afu
+                con = [('clk', clk), ('rst', rst | rst_afus[module_number]),
+                       ('start', start_afus[module_number])]
+                # Entradas de dados das filas para a afu
                 for j in range(i[0]):
                     con.append(('available_read%d' % j, ~empty_fifo_in[idx_fifo_in]))
                     con.append(('almost_empty_read%d' % j, almostempty_fifo_in[idx_fifo_in]))
                     con.append(('req_rd_data%d' % j, re_fifo_in[idx_fifo_in]))
                     con.append(('rd_data%d' % j, dout_fifo_in[idx_fifo_in]))
                     idx_fifo_in = idx_fifo_in + 1
-                # Saídas de dados das filas para a interface
+                # Saídas de dados das filas para a afu
                 for j in range(i[1]):
                     con.append(('available_write%d' % j, ~almostfull_fifo_out[idx_fifo_out]))
                     con.append(('req_wr_data%d' % j, we_fifo_out[idx_fifo_out]))
                     con.append(('wr_data%d' % j, din_fifo_out[idx_fifo_out]))
                     idx_fifo_out = idx_fifo_out + 1
 
-                con.append(('done', done_uut_interface[module_number]))
-                # m.Instance(interface, (name + '_' + str(module_number)), params, con)
-                m.Instance(interface, name, params, con)
+                con.append(('done', done_uut_afu[module_number]))
+                # m.Instance(afu, (name + '_' + str(module_number)), params, con)
+                m.Instance(afu, name, params, con)
                 module_number = module_number + 1
 
             # Informações sobre o controlador de buffers para o software
-            info[0].assign(Mux(counter_received_conf >= num_cl_conf_total, Int(1, 1, 2), Int(0, 1, 2)))
-            info[1:64].assign(Int(0, 63, 10))
-            j = 64
-            for i in interfaces:
-                info[j:j + 16].assign(Cat(Int(i[0], 8, 10), Int(i[1], 8, 10)))
+            j = 63
+            code = ''
+            for i in afus:
+                code = code + 'info[%d:%d] <= {8\'d%d, 8\'d%d};\n'%(j+16,j+1,i[0],i[1])
                 j = j + 16
-
-            if j < info.width:
-                info[j:].assign(Int(0, info.width - j, 10))
-
-            print('Interface gerada!')
-            print('Quantidade de buffer de entrada: %d' % qtde_fifo_in)
-            print('Quantidade de buffer de saida: %d' % qtde_fifo_out)
+            m.Always()(
+                If(rst)(
+                    info(Int(0, info.width, 10))
+                ).Else(
+                    info[0](Mux(counter_received_conf >= num_cl_conf_total, Int(1, 1, 2), Int(0, 1, 2))),
+                    info[1:64](Int(0, 63, 10)),
+                    EmbeddedCode(code)
+                )
+            )
+            print('AFU Manager created!')
+            print('Input Buffer Amount: %d' % qtde_fifo_in)
+            print('Output Buffer Amount: %d' % qtde_fifo_out)
             return m
         except:
-            print("Erro:", sys.exc_info()[0])
+            print("Error:", sys.exc_info()[0])
             raise

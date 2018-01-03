@@ -25,9 +25,9 @@
 #define AFU_CONTROLLER_RESET (1L << 1)
 #define AFU_CONTROLLER_UPDATE_WKP (1L << 2)
 
-typedef int subafu_id;
+typedef unsigned int afu_id;
 
-typedef class AFU Afu;
+typedef class AFUManager Afu;
 
 typedef enum CSR_WR {
     CFG_REG,

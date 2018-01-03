@@ -2,78 +2,47 @@
 // Created by lucas on 12/28/17.
 //
 
-#ifndef SW_AFU_H
-#define SW_AFU_H
-
-#include <iostream>
-#include <map>
-#include "opae_files/opae_svc_wrapper.h"
-#include "opae_files/csr_mgr.h"
-#include "AFU_DEFS.h"
-#include "SubAFU.h"
+#ifndef SW_SUBAFU_H
+#define SW_SUBAFU_H
 
 
-using namespace std;
+#include <cstdint>
+#include <cstring>
+#include "AFUManagerDEFS.h"
+#include <exception>
 
 class AFU {
 
-
 private:
-    OPAE_SVC_WRAPPER *fpga;
-    CSR_MGR *csrs;
-    int numInputBuffers;
-    int numOutputBuffers;
-    int numSubAFUs;
-    int numClConfs;
-    int numClDSM;
-    bool commitedWorkspace;
-    map<subafu_id, SubAFU *> subAFUs;
-
+    Afu &afu;
+    afu_id ID;
+    int numInputBuffer;
+    int numOutputBuffer;
+    bool done;
 public:
-    AFU(const char *accel_uuid);
+    AFU(Afu &afu, afu_id id, int numInputBuffer, int numOutputBuffer);
 
     ~AFU();
 
-    uint64_t *workspace;
-    uint64_t *dsm;
-    int afuInfo[AFU_INF_SIZE];
+    void start();
 
-    void commitWorkspace();
+    void stop();
 
-    void printStatics();
+    void *createInputBufferSW(int indexInputBuffer, size_t nBytes, void *dataToCopy);
 
-    void printInfoAFU();
+    void *createOutputBufferSW(int indexInputBuffer, size_t nBytes);
 
-    void writeCSR(uint32_t regID, uint64_t val);
+    void waitDone(int64_t timeWaitMax);
 
-    uint64_t readCSR(uint32_t regID);
+    bool isDone();
 
-    void *fpgaAllocBuffer(size_t numBytes);
+    void setDone(bool done);
 
-    void fpgaFreeBuffer(void *ptr);
-
-    bool AFUIsSimulated();
-
-    SubAFU *getSubAFU(subafu_id id);
-
-    bool workspaceIscommited();
-
-    void printWorkspace();
-
-    void printDSM();
-
-    int getNumClConf();
-    int getNumClDSM();
-
-private:
-    void readInfoHwAfu();
-
-    void createWorkspace();
-
-    void createSubAFUs();
+    AFU& operator=(const AFU& subAFU);
 
     void clear();
+
 };
 
-#endif //SW_AFU_H
 
+#endif //SW_SUBAFU_H

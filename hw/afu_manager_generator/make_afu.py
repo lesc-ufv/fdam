@@ -3,7 +3,7 @@ from veriloggen import *
 
 # O arquivo deste módulo deve ser substituído pelo arquivo que ligará o circuito do usuário
 
-def make_interface(data_width, module_name, qtde_in, qtde_out):
+def make_afu(data_width, module_name, qtde_in, qtde_out):
     m = Module(module_name)
 
     m.Input('clk')

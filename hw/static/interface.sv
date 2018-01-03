@@ -133,8 +133,8 @@ module app_afu(
     
     t_byteAddr workspace_addr_base;
     logic [63:0] workspace_size;
-    logic [63:0] start_interfaces;
-    logic [63:0] rst_interfaces;
+    logic [63:0] start_afus;
+    logic [63:0] rst_afus;
     logic [14-1:0] rst_buffers;
     logic update_workspace;
     logic start_bufer_controller;
@@ -147,8 +147,8 @@ module app_afu(
             start_bufer_controller <= 1'b0;
             workspace_addr_base <= t_byteAddr'(0);
             workspace_size <= 64'd0;
-            start_interfaces <= 64'd0;
-            rst_interfaces <= 64'd0;
+            start_afus <= 64'd0;
+            rst_afus <= 64'd0;
             rst_buffers <= 14'd0;     
             update_workspace = 1'b0;
             afu_reset <= 1'b0;
@@ -172,16 +172,16 @@ module app_afu(
             begin       
                 if(csrs.cpu_wr_csrs[START_INTERFACES].en)
                 begin
-                   start_interfaces <= start_interfaces | csrs.cpu_wr_csrs[START_INTERFACES].data;
+                   start_afus <= start_afus | csrs.cpu_wr_csrs[START_INTERFACES].data;
                 end 
                 else
                 begin
-                  start_interfaces <= start_interfaces & ~csrs.cpu_wr_csrs[STOP_INTERFACES].data;
+                  start_afus <= start_afus & ~csrs.cpu_wr_csrs[STOP_INTERFACES].data;
                 end 
             end
             if (csrs.cpu_wr_csrs[RST_INTERFACES].en)
             begin
-                rst_interfaces <= csrs.cpu_wr_csrs[RST_INTERFACES].data;
+                rst_afus <= csrs.cpu_wr_csrs[RST_INTERFACES].data;
             end
             if (csrs.cpu_wr_csrs[RST_BUFFER_INDEX].en)
             begin
@@ -230,14 +230,14 @@ module app_afu(
         fiu.c1Tx = cci_mpf_genC1TxWriteReq(wr_hdr,req_wr_data,req_wr_en);
     end 
     
-    buffer_controller buffer_controller(
+    afu_manager afu_manager(
     
       .clk(clk),
       .rst(reset|afu_reset),
       .start(start_bufer_controller),
       
-      .rst_interfaces(rst_interfaces),  
-      .start_interfaces(start_interfaces),
+      .rst_afus(rst_afus),  
+      .start_afus(start_afus),
      
       .rst_buffer_in_index(rst_buffers[6:0]),
       .rst_buffer_out_index(rst_buffers[14-1:7]),

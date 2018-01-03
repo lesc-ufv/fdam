@@ -85,7 +85,7 @@ class CSR_MGR
         CSR_COMMON_DFH = 0,
         CSR_COMMON_ID_L = 1,
         CSR_COMMON_ID_H = 2,
-        // AFU frequency
+        // AFUManager frequency
         CSR_COMMON_FREQ = 8,
         // Number of read/write hits in the FIU system memory cache
         CSR_COMMON_CACHE_RD_HITS = 9,
@@ -115,14 +115,14 @@ class CSR_MGR
     }
 
     //
-    // Return the frequency at which the AFU is running.  In the common
+    // Return the frequency at which the AFUManager is running.  In the common
     // framework here, a CSR holds the frequency of the clock to which the
-    // AFU is attached.  When the attached clock is the "user clock" the
+    // AFUManager is attached.  When the attached clock is the "user clock" the
     // frequency isn't known at compile time.
     //
     uint64_t getAFUMHz(uint64_t uClk_usr_mhz = 0)
     {
-        // What's the AFU frequency (MHz)?
+        // What's the AFUManager frequency (MHz)?
         uint64_t afu_mhz = readCommonCSR(CSR_COMMON_FREQ);
 
         if (afu_mhz == 2)
