@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include <map>
-#include "opae_files/opae_svc_wrapper.h"
-#include "opae_files/csr_mgr.h"
+#include "opae_svc_wrapper.h"
+#include "csr_mgr.h"
 #include "AFUManagerDEFS.h"
 #include "AFU.h"
 
