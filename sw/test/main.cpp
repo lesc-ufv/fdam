@@ -57,7 +57,7 @@ void testLB(){
     for (it = begin; it != end; ++it) {
         afu = it->second;
         for (short i = 0; i < 32; ++i) {
-            dataIn[i] = (short) afu->getID();
+            dataIn[i] = (short) ((short) afu->getID() + 1);
         }
         afu->createInputBufferSW(0, 64, dataIn);
         afu->createOutputBufferSW(0, 64);
@@ -66,8 +66,6 @@ void testLB(){
     uint64_t  mask_afus = (uint64_t)((1L << afuManager->getNumAFUs()) - 1L);
     afuManager->startAFUs(mask_afus);
     afuManager->waitAllDone(2000);
-
-
 
     for (it = begin; it != end; ++it) {
         MSG("AFU "<< it->first <<": INPUT BUFFER 0:");

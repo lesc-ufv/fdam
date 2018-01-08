@@ -234,7 +234,7 @@ void AFUManager::updateWorkspace() {
         }
         for (int i = 0; i < afu->getNumOutputBuffer(); ++i) {
             idBufferGen = (afu->getID() * afu->getNumOutputBuffer() + i);
-            row = 2*((idBufferGen - (idBufferGen % 8)) / 8) + ((AFUManager::getNumInputBuffers()/8) * 2);
+            row = (int) (2 * ((idBufferGen - (idBufferGen % 8)) / 8) + ((std::ceil((double)AFUManager ::getNumInputBuffers() / 8.0)) * 2));
             col = (idBufferGen % 8);
             workspaceIndexPointer = GET_INDEX(row, col, 8);
             workspaceIndexQtd = GET_INDEX((row+1), col, 8);

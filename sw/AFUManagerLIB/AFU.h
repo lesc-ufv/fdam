@@ -16,16 +16,12 @@ class AFU {
 private:
     AFUManager_t &afuManager;
     afu_id ID;
-public:
-    afu_id getID() const;
-
-private:
     int numInputBuffer;
     int numOutputBuffer;
     void **Inputbuffers;
+    void **Outputbuffers;
     int *sizeOfInputBuffers;
     int *sizeOfOutputBuffers;
-    void **Outputbuffers;
     bool done;
 
 public:
@@ -36,7 +32,7 @@ public:
     void start();
 
     void stop();
-
+    
     bool createInputBufferSW(int BufferID, size_t nBytes, void *dataToCopy);
 
     bool createOutputBufferSW(int BufferID, size_t nBytes);
@@ -62,6 +58,8 @@ public:
     int getNumInputBuffer() const;
 
     int getNumOutputBuffer() const;
+    
+    afu_id getID() const;
 
 };
 
