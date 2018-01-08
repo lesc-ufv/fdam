@@ -350,7 +350,11 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             FSM_RD_REQ_READ_CONF = m.Localparam('FSM_RD_REQ_READ_CONF', 0)
             FSM_RD_REQ_READ_DATA = m.Localparam('FSM_RD_REQ_READ_DATA', 1)
 
+            read_req_data = m.Wire('read_req_data')
+
             if qtde_fifo_in > 1:
+                read_req_data.assign(AndList(req_rd_available, grant_in_valid,
+                                             (addr_offset_data_in[grant_in_index] < qtde_data_in[grant_in_index])))
                 m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag))(
                     If(rst)(
                         addr_offset_conf(Int(0, addr_offset_conf.width, 10)),
@@ -386,8 +390,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                                 )
                             ),
                             When(FSM_RD_REQ_READ_DATA)(
-                                If(AndList(req_rd_available, grant_in_valid,
-                                           (addr_offset_data_in[grant_in_index] < qtde_data_in[grant_in_index])))(
+                                If(read_req_data)(
                                     addr_offset_data_in[grant_in_index](
                                         addr_offset_data_in[grant_in_index] + Int(1, max_counter_read_bits, 10)),
                                     req_rd_addr(
@@ -401,6 +404,9 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                     )
                 )
             else:
+                read_req_data.assign(AndList(req_rd_available, fifos_in_read_request,
+                        (addr_offset_data_in[Int(0, qtde_fifo_in, 2)] < qtde_data_in[
+                            Int(0, qtde_fifo_in, 2)])))
                 m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag))(
                     If(rst)(
                         addr_offset_conf(Int(0, addr_offset_conf.width, 10)),
@@ -436,9 +442,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                                 )
                             ),
                             When(FSM_RD_REQ_READ_DATA)(
-                                If(AndList(req_rd_available, fifos_in_read_request,
-                                           (addr_offset_data_in[Int(0, qtde_fifo_in, 2)] < qtde_data_in[
-                                               Int(0, qtde_fifo_in, 2)])))(
+                                If(read_req_data)(
                                     addr_offset_data_in[Int(0, qtde_fifo_in, 2)](
                                         addr_offset_data_in[Int(0, qtde_fifo_in, 2)] + Int(1, max_counter_read_bits,
                                                                                            10)),
@@ -471,9 +475,9 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             update_dsm.assign(EmbeddedCode(code))
             if qtde_fifo_out > 1:
                 fifo_out_Almost_ready.assign(
-                    AndList(fifos_out_read_request, Not(almostempty_fifo_out[grant_in_index])))
+                    AndList(fifos_out_read_request, Not(almostempty_fifo_out[grant_out_index])))
                 fifo_out_ready.assign(AndList(fifos_out_read_request,
-                                              (count_fifo_out[grant_in_index] > Int(0, count_fifo_out.width, 10))))
+                                              (count_fifo_out[grant_out_index] > Int(0, count_fifo_out.width, 10))))
             else:
                 fifo_out_Almost_ready.assign(
                     AndList(fifos_out_read_request, Not(almostempty_fifo_out[Int(0, qtde_fifo_out, 2)])))
@@ -799,10 +803,12 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                     EmbeddedCode(code)
                 )
             )
-            print('AFU Manager created!')
-            print('Input Buffer Amount: %d' % qtde_fifo_in)
-            print('Output Buffer Amount: %d' % qtde_fifo_out)
+            print('AFU manager successfully created!')
+            print('Amount of AFUs: %d'%len(afus))
+            print('Amount of Input Buffer: %d' % qtde_fifo_in)
+            print('Amount of Output Buffer: %d' % qtde_fifo_out)
             return m
         except:
+            print('Failed to create the AFU manager!')
             print("Error:", sys.exc_info()[0])
             raise

@@ -2,8 +2,8 @@
 // Created by lucas on 12/28/17.
 //
 
-#ifndef SW_SUBAFU_H
-#define SW_SUBAFU_H
+#ifndef SW_AFU_H
+#define SW_AFU_H
 
 
 #include <cstdint>
@@ -14,13 +14,22 @@
 class AFU {
 
 private:
-    Afu &afu;
+    AFUManager_t &afuManager;
     afu_id ID;
+public:
+    afu_id getID() const;
+
+private:
     int numInputBuffer;
     int numOutputBuffer;
+    void **Inputbuffers;
+    int *sizeOfInputBuffers;
+    int *sizeOfOutputBuffers;
+    void **Outputbuffers;
     bool done;
+
 public:
-    AFU(Afu &afu, afu_id id, int numInputBuffer, int numOutputBuffer);
+    AFU(AFUManager_t &afuManager, afu_id id, int numInputBuffer, int numOutputBuffer);
 
     ~AFU();
 
@@ -28,9 +37,17 @@ public:
 
     void stop();
 
-    void *createInputBufferSW(int indexInputBuffer, size_t nBytes, void *dataToCopy);
+    bool createInputBufferSW(int BufferID, size_t nBytes, void *dataToCopy);
 
-    void *createOutputBufferSW(int indexInputBuffer, size_t nBytes);
+    bool createOutputBufferSW(int BufferID, size_t nBytes);
+
+    void *getInputBuffer(int BufferID);
+
+    void *getOutputBuffer(int BufferID);
+
+    int getSizeOfInputBuffer(int BufferID);
+
+    int getSizeOfOutputBuffer(int BufferID);
 
     void waitDone(int64_t timeWaitMax);
 
@@ -38,11 +55,15 @@ public:
 
     void setDone(bool done);
 
-    AFU& operator=(const AFU& subAFU);
+    AFU &operator=(const AFU &AFU);
 
     void clear();
+
+    int getNumInputBuffer() const;
+
+    int getNumOutputBuffer() const;
 
 };
 
 
-#endif //SW_SUBAFU_H
+#endif //SW_AFU_H

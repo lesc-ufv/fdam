@@ -7,10 +7,22 @@
 #include "AFU.h"
 #include "AFUManager.h"
 
-AFU::AFU(AFUManager &afu, afu_id id, int numInputBuffer, int numOutputBuffer) : afu(afu),
-                                                                                  ID(id),
-                                                                                  numInputBuffer(numInputBuffer),
-                                                                                  numOutputBuffer(numOutputBuffer) {
+AFU::AFU(AFUManager_t &afuManager, afu_id id, int numInputBuffer, int numOutputBuffer) : afuManager(afuManager),
+                                                                                ID(id),
+                                                                                numInputBuffer(numInputBuffer),
+                                                                                numOutputBuffer(numOutputBuffer) {
+
+    AFU::Inputbuffers = new void*[numInputBuffer];
+    AFU::Outputbuffers = new void*[numOutputBuffer];
+    AFU::sizeOfInputBuffers = new int[numInputBuffer];
+    AFU::sizeOfOutputBuffers = new int[numOutputBuffer];
+
+    for (int i = 0; i < numInputBuffer; ++i) {
+        Inputbuffers[i] = nullptr;
+    }
+    for (int i = 0; i < numOutputBuffer; ++i) {
+        Outputbuffers[i] = nullptr;
+    }
 
 }
 
@@ -19,11 +31,11 @@ AFU::~AFU() {
 }
 
 void AFU::start() {
-    AFU::afu.writeCSR(START_INTERFACES, (uint64_t) (1 << AFU::ID));
+    AFU::afuManager.writeCSR(REG_START_AFUs, (uint64_t) (1L << AFU::ID));
 }
 
 void AFU::stop() {
-    AFU::afu.writeCSR(STOP_INTERFACES, (uint64_t) (1 << AFU::ID));
+    AFU::afuManager.writeCSR(REG_STOP_AFUs, (uint64_t) (1L << AFU::ID));
 }
 
 void AFU::setDone(bool done) {
@@ -36,14 +48,15 @@ bool AFU::isDone() {
 
 void AFU::waitDone(int64_t timeWaitMax) {
 
-    uint64_t *done = &AFU::afu.dsm[GET_INDEX(AFU::afu.getNumClDSM()-1,0,8)];
+    uint64_t *done = &AFU::afuManager.dsm[GET_INDEX(AFU::afuManager.getNumClDSM() - 1, 0, 8)];
     bool flagDone = false;
     assert(done != nullptr);
     struct timespec pause;
     pause.tv_sec = 0;
-    pause.tv_nsec = 1000000;
+    pause.tv_nsec = 500000;
+    timeWaitMax *=2;
     while (timeWaitMax > 0 && !flagDone) {
-        uint64_t afuDoneBit = (uint64_t) (1 << (AFU::ID + 1));
+        uint64_t afuDoneBit = (uint64_t) (1L << (AFU::ID + 1L));
         flagDone = (done[0] & afuDoneBit) != 0;
         timeWaitMax--;
         nanosleep(&pause, NULL);
@@ -51,93 +64,109 @@ void AFU::waitDone(int64_t timeWaitMax) {
     AFU::stop();
     AFU::setDone(flagDone);
 }
-
-void *AFU::createInputBufferSW(int indexInputBuffer, size_t nBytes, void *dataToCopy) {
-
-    void *bf = nullptr;
-    if (indexInputBuffer < AFU::numInputBuffer) {
-        int idBufferGen = (AFU::ID * AFU::numInputBuffer + indexInputBuffer);
-        int row = ((idBufferGen - (idBufferGen % 8)) / 8);
-        int col = idBufferGen % 8;
-        double nb(nBytes);
-        uint64_t nBytesAlign = ((uint64_t) (std::ceil(nb / 64))) * 64;
-        if (AFU::afu.workspace[GET_INDEX(row, col, 8)] == 0) {
-            bf = AFU::afu.fpgaAllocBuffer(nBytesAlign);
-            assert(NULL != bf);
-            memset(bf, 0x00, nBytesAlign);
-            if (dataToCopy != NULL) {
-                memcpy(bf, dataToCopy, nBytes);
+bool AFU::createInputBufferSW(int BufferID, size_t nBytes, void *dataToCopy) {
+    if(BufferID >= 0 && BufferID < AFU::numInputBuffer){
+        if(AFU::Inputbuffers[BufferID] != nullptr){
+            return false;
+        }else{
+            double nb(nBytes);
+            uint64_t nBytesAlign = ((uint64_t) (std::ceil(nb / 64))) * 64;
+            AFU::Inputbuffers[BufferID] = AFU::afuManager.fpgaAllocBuffer(nBytesAlign);
+            if(AFU::Inputbuffers[BufferID] != nullptr){
+                memset(AFU::Inputbuffers[BufferID],0,nBytesAlign);
+                AFU::sizeOfInputBuffers[BufferID] = (int)nBytesAlign;
+                if(dataToCopy != nullptr){
+                    memcpy(AFU::Inputbuffers[BufferID],dataToCopy,nBytes);
+                }
+                return true;
             }
-            AFU::afu.workspace[GET_INDEX(row, col, 8)] = (uint64_t) intptr_t(bf);
-            row = row + 1;
-            AFU::afu.workspace[GET_INDEX(row, col, 8)] = (nBytesAlign / 64);
-        } else {
-            BEGIN_COLOR(RED);
-            MSG("buffer already allocated!");
-            END_COLOR();
         }
-    } else {
-        BEGIN_COLOR(RED);
-        MSG("Input Buffer ID invalid!");
-        END_COLOR();
     }
-    return bf;
+    return false;
 }
 
-void *AFU::createOutputBufferSW(int indexOutputBuffer, size_t nBytes) {
 
-    void *bf = nullptr;
-    if(indexOutputBuffer < AFU::numOutputBuffer) {
-        int idBufferGen = (AFU::ID * (AFU::numOutputBuffer) + indexOutputBuffer);
-        int row = ((idBufferGen - (idBufferGen % 8)) / 8) + (AFU::numInputBuffer * 2);
-        int col = idBufferGen % 8;
-        double nb(nBytes);
-        uint64_t nBytesAlign = ((uint64_t) (std::ceil(nb / 64))) * 64;
-        if (AFU::afu.workspace[GET_INDEX(row, col, 8)] == 0) {
-            bf = AFU::afu.fpgaAllocBuffer(nBytesAlign);
-            assert(NULL != bf);
-            memset(bf, 0x00, nBytesAlign);
-            AFU::afu.workspace[GET_INDEX(row, col, 8)] = (uint64_t) intptr_t(bf);
-            row = row + 1;
-            AFU::afu.workspace[GET_INDEX(row, col, 8)] = (nBytesAlign / 64);
-        } else {
-            BEGIN_COLOR(RED);
-            MSG("buffer already allocated");
-            END_COLOR();
+
+bool AFU::createOutputBufferSW(int BufferID, size_t nBytes) {
+    if(BufferID >= 0 && BufferID < AFU::numOutputBuffer){
+        if(AFU::Outputbuffers[BufferID] != nullptr){
+            return false;
+        }else{
+            double nb(nBytes);
+            uint64_t nBytesAlign = ((uint64_t) (std::ceil(nb / 64))) * 64;
+            AFU::Outputbuffers[BufferID] = AFU::afuManager.fpgaAllocBuffer(nBytes);
+            if(AFU::Outputbuffers[BufferID] != nullptr){
+                memset(AFU::Outputbuffers[BufferID],0,nBytesAlign);
+                AFU::sizeOfOutputBuffers[BufferID] = (int)nBytesAlign;
+                return true;
+            }
         }
-    } else{
-        BEGIN_COLOR(RED);
-        MSG("Output Buffer ID invalid!");
-        END_COLOR();
     }
-    return bf;
+    return false;
 }
 
-AFU &AFU::operator=(const AFU &subAFU) {
-    AFU::afu = subAFU.afu;
-    AFU::ID = subAFU.ID;
-    AFU::numInputBuffer = subAFU.numInputBuffer;
-    AFU::numOutputBuffer = subAFU.numOutputBuffer;
+AFU &AFU::operator=(const AFU &AFU) {
+    AFU::afuManager = AFU.afuManager;
+    AFU::ID = AFU.ID;
+    AFU::numInputBuffer = AFU.numInputBuffer;
+    AFU::numOutputBuffer = AFU.numOutputBuffer;
+    AFU::Inputbuffers = AFU.Inputbuffers;
+    AFU::Outputbuffers = AFU.Outputbuffers;
     return *this;
 }
 
 void AFU::clear() {
+
+    delete AFU::sizeOfInputBuffers;
+    delete AFU::sizeOfOutputBuffers;
     for (int i = 0; i < AFU::numInputBuffer; ++i) {
-        int idBufferGen = (AFU::ID * AFU::numInputBuffer + i);
-        int row = ((idBufferGen - (idBufferGen % 8)) / 8);
-        int col = idBufferGen % 8;
-        void *ptbf = (void *) AFU::afu.workspace[GET_INDEX(row, col, 8)];
-        AFU::afu.fpgaFreeBuffer(ptbf);
-        AFU::afu.workspace[GET_INDEX(row, col, 8)] = 0;
-        AFU::afu.workspace[GET_INDEX(row + 1, col, 8)] = 0;
+        if(nullptr != AFU::Inputbuffers[i]){
+            AFU::afuManager.fpgaFreeBuffer(AFU::Inputbuffers[i]);
+        }
     }
     for (int i = 0; i < AFU::numOutputBuffer; ++i) {
-        int idBufferGen = (AFU::ID * (AFU::numInputBuffer + AFU::numOutputBuffer) + i);
-        int row = ((idBufferGen - (idBufferGen % 8)) / 8);
-        int col = idBufferGen % 8;
-        void *ptbf = (void *) AFU::afu.workspace[GET_INDEX(row, col, 8)];
-        AFU::afu.fpgaFreeBuffer(ptbf);
-        AFU::afu.workspace[GET_INDEX(row, col, 8)] = 0;
-        AFU::afu.workspace[GET_INDEX(row + 1, col, 8)] = 0;
+        if(nullptr != AFU::Outputbuffers[i]){
+            AFU::afuManager.fpgaFreeBuffer(AFU::Outputbuffers[i]);
+        }
     }
+}
+
+int AFU::getNumInputBuffer() const {
+    return numInputBuffer;
+}
+
+int AFU::getNumOutputBuffer() const {
+    return numOutputBuffer;
+}
+
+void *AFU::getInputBuffer(int BufferID) {
+    if(BufferID >= 0 && BufferID < AFU::numInputBuffer){
+        return  AFU::Inputbuffers[BufferID];
+    }
+    return nullptr;
+}
+
+void *AFU::getOutputBuffer(int BufferID) {
+    if(BufferID >= 0 && BufferID < AFU::numOutputBuffer){
+        return  AFU::Outputbuffers[BufferID];
+    }
+    return nullptr;
+}
+
+afu_id AFU::getID() const {
+    return ID;
+}
+
+int AFU::getSizeOfInputBuffer(int BufferID) {
+    if(BufferID >= 0 && BufferID < AFU::numInputBuffer){
+        return  AFU::sizeOfInputBuffers[BufferID];
+    }
+    return 0;
+}
+
+int AFU::getSizeOfOutputBuffer(int BufferID) {
+    if(BufferID >= 0 && BufferID < AFU::numOutputBuffer){
+        return  AFU::sizeOfOutputBuffers[BufferID];
+    }
+    return 0;
 }

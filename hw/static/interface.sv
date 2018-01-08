@@ -70,18 +70,18 @@ module app_afu(
     //
     // ====================================================================
     typedef enum logic[3:0] {
-        CLOCK_COUNT,
-        CL_WR_COUNT,
-        CL_RD_COUNT,
-        AFU_CONTROLLER_STATUS,
-        INF_1,
-        INF_2,
-        INF_3,
-        INF_4,
-        INF_5,
-        INF_6,
-        INF_7,
-        INF_8
+      REG_CLOCK_COUNT,
+      REG_CL_WR_COUNT,
+      REG_CL_RD_COUNT,
+      REG_AFU_CONTROLLER_STATUS,
+      REG_INF_1,
+      REG_INF_2,
+      REG_INF_3,
+      REG_INF_4,
+      REG_INF_5,
+      REG_INF_6,
+      REG_INF_7,
+      REG_INF_8
     }CSR_RD;
     logic [576-1:0] info;
     logic [63:0]total_clocks;
@@ -100,18 +100,18 @@ module app_afu(
         // Exported counters.  The simple csrs interface used here has
         // no read request.  It expects the current CSR value to be
         // available every cycle.
-        csrs.cpu_rd_csrs[CLOCK_COUNT].data = 64'(total_clocks);
-        csrs.cpu_rd_csrs[CL_WR_COUNT].data = 64'(total_cl_wr);
-        csrs.cpu_rd_csrs[CL_RD_COUNT].data = 64'(total_cl_rd);        
-        csrs.cpu_rd_csrs[AFU_CONTROLLER_STATUS].data = 64'(info[63:0]);
-        csrs.cpu_rd_csrs[INF_1].data = 64'(info[127:64]);
-        csrs.cpu_rd_csrs[INF_2].data = 64'(info[191:128]);
-        csrs.cpu_rd_csrs[INF_3].data = 64'(info[255:192]);
-        csrs.cpu_rd_csrs[INF_4].data = 64'(info[319:256]);
-        csrs.cpu_rd_csrs[INF_5].data = 64'(info[383:320]);
-        csrs.cpu_rd_csrs[INF_6].data = 64'(info[447:384]);
-        csrs.cpu_rd_csrs[INF_7].data = 64'(info[511:448]);
-        csrs.cpu_rd_csrs[INF_8].data = 64'(info[575:512]);
+        csrs.cpu_rd_csrs[REG_CLOCK_COUNT].data = 64'(total_clocks);
+        csrs.cpu_rd_csrs[REG_CL_WR_COUNT].data = 64'(total_cl_wr);
+        csrs.cpu_rd_csrs[REG_CL_RD_COUNT].data = 64'(total_cl_rd);        
+        csrs.cpu_rd_csrs[REG_AFU_CONTROLLER_STATUS].data = 64'(info[63:0]);
+        csrs.cpu_rd_csrs[REG_INF_1].data = 64'(info[127:64]);
+        csrs.cpu_rd_csrs[REG_INF_2].data = 64'(info[191:128]);
+        csrs.cpu_rd_csrs[REG_INF_3].data = 64'(info[255:192]);
+        csrs.cpu_rd_csrs[REG_INF_4].data = 64'(info[319:256]);
+        csrs.cpu_rd_csrs[REG_INF_5].data = 64'(info[383:320]);
+        csrs.cpu_rd_csrs[REG_INF_6].data = 64'(info[447:384]);
+        csrs.cpu_rd_csrs[REG_INF_7].data = 64'(info[511:448]);
+        csrs.cpu_rd_csrs[REG_INF_8].data = 64'(info[575:512]);
         
         
     end    
@@ -121,14 +121,13 @@ module app_afu(
     //
     
     typedef enum logic[2:0]{
-      CFG_REG,
-      ADDR_WORKSPACE_BASE,
-      WORKSPACE_SIZE,
-      START_INTERFACES,
-      STOP_INTERFACES,
-      RST_INTERFACES,
-      RST_BUFFER_INDEX
-      
+      REG_CFG,
+      REG_ADDR_WORKSPACE_BASE,
+      REG_WORKSPACE_SIZE,
+      REG_START_AFUs,
+      REG_STOP_AFUs,
+      REG_RESET_AFUs,
+      REG_INDEX_BUFFER_RESET
     }CSR_WR;
     
     t_byteAddr workspace_addr_base;
@@ -137,14 +136,14 @@ module app_afu(
     logic [63:0] rst_afus;
     logic [14-1:0] rst_buffers;
     logic update_workspace;
-    logic start_bufer_controller;
+    logic start_afu_manager;
     logic afu_reset;
 
     always_ff @(posedge clk)
     begin
         if(reset)
         begin
-            start_bufer_controller <= 1'b0;
+            start_afu_manager <= 1'b0;
             workspace_addr_base <= t_byteAddr'(0);
             workspace_size <= 64'd0;
             start_afus <= 64'd0;
@@ -154,38 +153,35 @@ module app_afu(
             afu_reset <= 1'b0;
         end 
         else begin
-            if (csrs.cpu_wr_csrs[CFG_REG].en)
+            if (csrs.cpu_wr_csrs[REG_CFG].en)
             begin
-                start_bufer_controller <= csrs.cpu_wr_csrs[CFG_REG].data[0];
-                afu_reset <= csrs.cpu_wr_csrs[CFG_REG].data[1];
-                update_workspace <= csrs.cpu_wr_csrs[CFG_REG].data[2];
+                start_afu_manager <= csrs.cpu_wr_csrs[REG_CFG].data[0];
+                afu_reset <= csrs.cpu_wr_csrs[REG_CFG].data[1];
+                update_workspace <= csrs.cpu_wr_csrs[REG_CFG].data[2];
             end
-            if (csrs.cpu_wr_csrs[ADDR_WORKSPACE_BASE].en)
+            if (csrs.cpu_wr_csrs[REG_ADDR_WORKSPACE_BASE].en)
             begin   
-                workspace_addr_base <= csrs.cpu_wr_csrs[ADDR_WORKSPACE_BASE].data;
+                workspace_addr_base <= csrs.cpu_wr_csrs[REG_ADDR_WORKSPACE_BASE].data;
             end
-            if (csrs.cpu_wr_csrs[WORKSPACE_SIZE].en)
+            if (csrs.cpu_wr_csrs[REG_WORKSPACE_SIZE].en)
             begin
-                workspace_size <= csrs.cpu_wr_csrs[WORKSPACE_SIZE].data;
+                workspace_size <= csrs.cpu_wr_csrs[REG_WORKSPACE_SIZE].data;
             end
-            if (csrs.cpu_wr_csrs[START_INTERFACES].en | csrs.cpu_wr_csrs[STOP_INTERFACES].en)
+            if (csrs.cpu_wr_csrs[REG_START_AFUs].en)
             begin       
-                if(csrs.cpu_wr_csrs[START_INTERFACES].en)
-                begin
-                   start_afus <= start_afus | csrs.cpu_wr_csrs[START_INTERFACES].data;
-                end 
-                else
-                begin
-                  start_afus <= start_afus & ~csrs.cpu_wr_csrs[STOP_INTERFACES].data;
-                end 
-            end
-            if (csrs.cpu_wr_csrs[RST_INTERFACES].en)
+                start_afus <= start_afus | csrs.cpu_wr_csrs[REG_START_AFUs].data;
+            end 
+            if(csrs.cpu_wr_csrs[REG_STOP_AFUs].en)
             begin
-                rst_afus <= csrs.cpu_wr_csrs[RST_INTERFACES].data;
-            end
-            if (csrs.cpu_wr_csrs[RST_BUFFER_INDEX].en)
+               start_afus <= start_afus & ~csrs.cpu_wr_csrs[REG_STOP_AFUs].data;
+            end 
+            if (csrs.cpu_wr_csrs[REG_RESET_AFUs].en)
             begin
-                rst_buffers <= csrs.cpu_wr_csrs[RST_BUFFER_INDEX].data[14-1:0];
+                rst_afus <= csrs.cpu_wr_csrs[REG_RESET_AFUs].data;
+            end
+            if (csrs.cpu_wr_csrs[REG_INDEX_BUFFER_RESET].en)
+            begin
+                rst_buffers <= csrs.cpu_wr_csrs[REG_INDEX_BUFFER_RESET].data[14-1:0];
             end  
         end 
     end
@@ -234,7 +230,7 @@ module app_afu(
     
       .clk(clk),
       .rst(reset|afu_reset),
-      .start(start_bufer_controller),
+      .start(start_afu_manager),
       
       .rst_afus(rst_afus),  
       .start_afus(start_afus),
@@ -276,7 +272,7 @@ module app_afu(
           total_cl_wr <= 64'd0;
           total_cl_rd <= 64'd0;
        end 
-       else if(start_bufer_controller)begin
+       else if(start_afu_manager)begin
           total_clocks <= total_clocks + 64'd1;
        end  
        

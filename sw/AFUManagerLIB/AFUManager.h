@@ -2,11 +2,19 @@
 // Created by lucas on 12/28/17.
 //
 
-#ifndef SW_AFU_H
-#define SW_AFU_H
+#ifndef SW_AFU_MANAGER_H
+#define SW_AFU_MANAGER_H
 
+#include <stdint.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <assert.h>
+#include <stdio.h>
 #include <iostream>
+#include <string>
 #include <map>
+#include <cmath>
+
 #include "opae_svc_wrapper.h"
 #include "csr_mgr.h"
 #include "AFUManagerDEFS.h"
@@ -16,7 +24,6 @@
 using namespace std;
 
 class AFUManager {
-
 
 private:
     OPAE_SVC_WRAPPER *fpga;
@@ -29,20 +36,34 @@ private:
     bool commitedWorkspace;
     map<afu_id, AFU *> AFUs;
 
+    bool flagDoneAll;
+
+    void readInfoHwAfu();
+
+    void createWorkspace();
+
+    void updateWorkspace();
+
+    void createAFUs();
+
 public:
-    AFUManager(const char *accel_uuid);
-
-    ~AFUManager();
-
     uint64_t *workspace;
     uint64_t *dsm;
     int afuInfo[AFU_INF_SIZE];
 
-    void commitWorkspace();
+    AFUManager(const char *accel_uuid);
 
-    void printStatics();
+    ~AFUManager();
 
-    void printInfoAFU();
+    void clear();
+
+    int getNumInputBuffers() const;
+
+    int getNumOutputBuffers() const;
+
+    int getNumAFUs() const;
+
+    const map<afu_id, AFU *> &getAFUs() const;
 
     void writeCSR(uint32_t regID, uint64_t val);
 
@@ -52,29 +73,36 @@ public:
 
     void fpgaFreeBuffer(void *ptr);
 
+    void commitWorkspace();
+
+    void startAFUs(uint64_t startAfus);
+
+    void stopAFUs(uint64_t stopAfus);
+
+    void waitAllDone(int64_t timeWaitMax);
+
     bool AFUIsSimulated();
 
     AFU *getAFU(afu_id id);
 
     bool workspaceIscommited();
 
-    void printWorkspace();
+    bool isDoneAll();
 
-    void printDSM();
+    void setDoneAll(bool doneAll);
 
     int getNumClConf();
 
     int getNumClDSM();
 
-private:
-    void readInfoHwAfu();
+    void printWorkspace();
 
-    void createWorkspace();
+    void printDSM();
 
-    void createAFUs();
+    void printStatics();
 
-    void clear();
+    void printInfoAFUManager();
 };
 
-#endif //SW_AFU_H
+#endif //SW_AFU_MANAGER_H
 

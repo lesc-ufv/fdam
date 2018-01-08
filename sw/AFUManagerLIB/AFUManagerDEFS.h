@@ -2,8 +2,8 @@
 // Created by lucas on 12/28/17.
 //
 
-#ifndef SW_AFU_DEFS_H
-#define SW_AFU_DEFS_H
+#ifndef SW_AFU_MANAGER_DEFS_H
+#define SW_AFU_MANAGER_DEFS_H
 
 #define AFU_INF_SIZE 64
 
@@ -26,31 +26,30 @@
 #define AFU_CONTROLLER_UPDATE_WKP (1L << 2)
 
 typedef unsigned int afu_id;
-
-typedef class AFUManager Afu;
+typedef class AFUManager AFUManager_t;
 
 typedef enum CSR_WR {
-    CFG_REG,
-    ADDR_WORKSPACE_BASE,
-    WORKSPACE_SIZE,
-    START_INTERFACES,
-    STOP_INTERFACES,
-    RST_INTERFACES,
-    RST_BUFFER_INDEX
+    REG_CFG,
+    REG_ADDR_WORKSPACE_BASE,
+    REG_WORKSPACE_SIZE,
+    REG_START_AFUs,
+    REG_STOP_AFUs,
+    REG_RESET_AFUs,
+    REG_INDEX_BUFFER_RESET
 } CSR_WR;
 typedef enum CSR_RD {
-    CLOCK_COUNT,
-    CL_WR_COUNT,
-    CL_RD_COUNT,
-    AFU_CONTROLLER_STATUS,
-    INF_1,
-    INF_2,
-    INF_3,
-    INF_4,
-    INF_5,
-    INF_6,
-    INF_7,
-    INF_8
+    REG_CLOCK_COUNT,
+    REG_CL_WR_COUNT,
+    REG_CL_RD_COUNT,
+    REG_AFU_CONTROLLER_STATUS,
+    REG_INF_1,
+    REG_INF_2,
+    REG_INF_3,
+    REG_INF_4,
+    REG_INF_5,
+    REG_INF_6,
+    REG_INF_7,
+    REG_INF_8
 } CSR_RD;
 
-#endif //SW_AFU_DEFS_H
+#endif //SW_AFU_MANAGER_DEFS_H
