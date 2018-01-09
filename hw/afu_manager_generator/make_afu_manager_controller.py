@@ -85,12 +85,11 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             configurations_addr_base.assign(workspace_addr_base[6:])
             dsm_addr_base.assign(workspace_addr_base[6:] + num_cl_conf_total)
             m.EmbeddedCode("\n//Flag to reset buffers:")
-            reset_buffers_in_flag = m.Wire('reset_buffers_in_flag')
-            reset_buffers_out_flag = m.Wire('reset_buffers_out_flag')
-            reset_buffers_in_flag.assign(
-                Mux(rst_buffer_in_index != Int(0, rst_buffer_in_index.width, 2), Int(1, 1, 2), Int(0, 1, 2)))
-            reset_buffers_out_flag.assign(
-                Mux(rst_buffer_out_index != Int(0, rst_buffer_out_index.width, 2), Int(1, 1, 2), Int(0, 1, 2)))
+
+            rst_buffer_in_index_reg = m.Reg('rst_buffer_in_index_reg',rst_buffer_in_index.width)
+            rst_buffer_out_index_reg = m.Reg('rst_buffer_out_index_reg', rst_buffer_out_index.width)
+            reset_buffers_in_flag = m.Reg('reset_buffers_in_flag')
+            reset_buffers_out_flag = m.Reg('reset_buffers_out_flag')
 
             # Registrador para pipeline do dado a ser enfileirado nas filas de entrada
             m.EmbeddedCode("\n//Registrador para pipeline do dado a ser enfileirado nas filas de entrada")
@@ -292,6 +291,20 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                          ('grant_encoded', grant_out_index)]
 
                 m.Instance(arbiter, 'arbiter_out', params, ports)
+
+            m.Always(Posedge(clk), Posedge(rst))(
+                If(rst)(
+                    reset_buffers_in_flag(Int(0,1,2)),
+                    reset_buffers_out_flag(Int(0, 1, 2)),
+                    rst_buffer_in_index_reg(Int(0,rst_buffer_in_index_reg.width,10)),
+                    rst_buffer_out_index_reg(Int(0, rst_buffer_out_index_reg.width, 10))
+                ).Else(
+                    reset_buffers_in_flag(Mux(rst_buffer_in_index != Int(0, rst_buffer_in_index.width, 2), Int(1, 1, 2), Int(0, 1, 2))),
+                    reset_buffers_out_flag(Mux(rst_buffer_out_index != Int(0, rst_buffer_out_index.width, 2), Int(1, 1, 2), Int(0, 1, 2))),
+                    rst_buffer_in_index_reg(rst_buffer_in_index),
+                    rst_buffer_out_index_reg(rst_buffer_out_index)
+                )
+            )
 
             afu_id = 0
             fifo_out_id = 0
