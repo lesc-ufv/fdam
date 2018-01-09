@@ -7,7 +7,7 @@ TEST = main
 OBJDIR = obj
 
 # Files and folders
-SRCS = $(TEST).cpp $(BASE_FILE_SRC)
+SRCS = $(BASE_FILE_SRC) $(TEST).cpp
 OBJS = $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(SRCS)))
 
 # Targets

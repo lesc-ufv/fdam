@@ -88,11 +88,12 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
 
             rst_buffer_in_index_reg = m.Reg('rst_buffer_in_index_reg',rst_buffer_in_index.width)
             rst_buffer_out_index_reg = m.Reg('rst_buffer_out_index_reg', rst_buffer_out_index.width)
+            rst_buffer_in_index_reg_reg = m.Reg('rst_buffer_in_index_reg_reg',rst_buffer_in_index.width)
+            rst_buffer_out_index_reg_reg = m.Reg('rst_buffer_out_index_reg_reg', rst_buffer_out_index.width)
             reset_buffers_in_flag = m.Reg('reset_buffers_in_flag')
             reset_buffers_out_flag = m.Reg('reset_buffers_out_flag')
-
-            # Registrador para pipeline do dado a ser enfileirado nas filas de entrada
-            m.EmbeddedCode("\n//Registrador para pipeline do dado a ser enfileirado nas filas de entrada")
+            reset_buffers_in_flag_reg = m.Reg('reset_buffers_in_flag_reg')
+            reset_buffers_out_flag_reg = m.Reg('reset_buffers_out_flag_reg')
             resp_rd_data_tmp = m.Reg('resp_rd_data_tmp', cache_data_width)
             reset_buffers_in = m.Reg('reset_buffers_in', qtde_fifo_in)
             reset_buffers_out = m.Reg('reset_buffers_out', qtde_fifo_out)
@@ -107,7 +108,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             done_write_buffers = m.Wire('done_write_buffers', qtde_fifo_out)
             done_uut_afu = m.Wire('done_uut_afu', len(afus))
             done_uut_afu_nopend = m.Wire('done_uut_afu_nopend', len(afus))
-            done_reg_vet = m.Wire('done_reg_vet', cache_data_width)
+            done_reg_vet = m.Reg('done_reg_vet', cache_data_width)
             done_reg_vet_last = m.Reg('done_reg_vet_last', cache_data_width)
 
             # controle da fsm de leitura de dados e configurações
@@ -168,16 +169,29 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             m.GenerateFor(i(0), i < len(afus), i.inc(), 'gen_pend').Assign(
                 done_uut_afu_nopend[i](AndList(pending_writes_afus[i], done_uut_afu[i]))
             )
-            code = '(&done_read_buffers && &done_write_buffers && &done_uut_afu)'
-            done_reg_vet[0].assign(EmbeddedCode(code))
-            done_reg_vet[1:len(afus) + 1].assign(done_uut_afu_nopend)
-            done_reg_vet[len(afus) + 1:len(afus) + qtde_fifo_in + 1].assign(done_read_buffers)
-            done_reg_vet[len(afus) + qtde_fifo_in + 1:len(afus) + qtde_fifo_in + qtde_fifo_out + 1].assign(
-                done_write_buffers)
-            val = len(afus) + qtde_fifo_in + qtde_fifo_out + 1
-            if val < 512:
-                done_reg_vet[val:].assign(Int(0, 512 - val, 10))
+            # code = '(&done_read_buffers && &done_write_buffers && &done_uut_afu_nopend)'
+            # done_reg_vet[0].assign(EmbeddedCode(code))
+            # done_reg_vet[1:len(afus) + 1].assign(done_uut_afu_nopend)
+            # done_reg_vet[len(afus) + 1:len(afus) + qtde_fifo_in + 1].assign(done_read_buffers)
+            # done_reg_vet[len(afus) + qtde_fifo_in + 1:len(afus) + qtde_fifo_in + qtde_fifo_out + 1].assign(
+            #     done_write_buffers)
+            # val = len(afus) + qtde_fifo_in + qtde_fifo_out + 1
+            # if val < 512:
+            #    done_reg_vet[val:].assign(Int(0, 512 - val, 10))
 
+            code = '(&done_read_buffers && &done_write_buffers && &done_uut_afu_nopend)'
+            m.Always(Posedge(clk),Posedge(rst))(
+                If(rst)(
+                    done_reg_vet(Int(0,done_reg_vet.width,10))
+                ).Elif(start)(
+                    done_reg_vet[0](EmbeddedCode(code)),
+                    done_reg_vet[1:len(afus) + 1](done_uut_afu_nopend),
+                    done_reg_vet[len(afus) + 1:len(afus) + qtde_fifo_in + 1](done_read_buffers),
+                    done_reg_vet[len(afus) + qtde_fifo_in + 1:len(afus) + qtde_fifo_in + qtde_fifo_out + 1](
+                        done_write_buffers)
+
+                )
+            )
             # Assigns para o acesso direto aos endereços de cada fila de entrada de dados
             # e para as quantidades de dados para leitura de cada fila
             m.EmbeddedCode("\n//Assigns para o acesso direto aos endereços de cada fila de entrada de dados")
@@ -296,13 +310,23 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                 If(rst)(
                     reset_buffers_in_flag(Int(0,1,2)),
                     reset_buffers_out_flag(Int(0, 1, 2)),
+                    reset_buffers_in_flag_reg(Int(0, 1, 2)),
+                    reset_buffers_out_flag_reg(Int(0, 1, 2)),
                     rst_buffer_in_index_reg(Int(0,rst_buffer_in_index_reg.width,10)),
-                    rst_buffer_out_index_reg(Int(0, rst_buffer_out_index_reg.width, 10))
+                    rst_buffer_out_index_reg(Int(0, rst_buffer_out_index_reg.width, 10)),
+                    rst_buffer_in_index_reg_reg(Int(0, rst_buffer_in_index_reg_reg.width, 10)),
+                    rst_buffer_out_index_reg_reg(Int(0, rst_buffer_out_index_reg_reg.width, 10))
                 ).Else(
                     reset_buffers_in_flag(Mux(rst_buffer_in_index != Int(0, rst_buffer_in_index.width, 2), Int(1, 1, 2), Int(0, 1, 2))),
                     reset_buffers_out_flag(Mux(rst_buffer_out_index != Int(0, rst_buffer_out_index.width, 2), Int(1, 1, 2), Int(0, 1, 2))),
+                    reset_buffers_in_flag_reg(reset_buffers_in_flag),
+                    reset_buffers_out_flag_reg(reset_buffers_out_flag),
                     rst_buffer_in_index_reg(rst_buffer_in_index-Int(1,rst_buffer_in_index.width,10)),
-                    rst_buffer_out_index_reg(rst_buffer_out_index-Int(1,rst_buffer_out_index.width,10))
+                    rst_buffer_out_index_reg(rst_buffer_out_index-Int(1,rst_buffer_out_index.width,10)),
+                    rst_buffer_in_index_reg_reg(rst_buffer_in_index_reg),
+                    rst_buffer_out_index_reg_reg(rst_buffer_out_index_reg)
+
+
                 )
             )
 
@@ -368,7 +392,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             if qtde_fifo_in > 1:
                 read_req_data.assign(AndList(req_rd_available, grant_in_valid,
                                              (addr_offset_data_in[grant_in_index] < qtde_data_in[grant_in_index])))
-                m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag))(
+                m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag_reg))(
                     If(rst)(
                         addr_offset_conf(Int(0, addr_offset_conf.width, 10)),
                         req_rd_en(Int(0, 1, 2)),
@@ -385,8 +409,8 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                         req_rd_addr(Int(0, req_rd_addr.width, 2)),
                         req_rd_mdata(Int(0, req_rd_mdata.width, 2)),
                         fsm_rd(FSM_RD_REQ_READ_CONF),
-                    ).Elif(reset_buffers_in_flag)(
-                        addr_offset_data_in[rst_buffer_in_index_reg](Int(0, addr_offset_data_in.width, 10))
+                    ).Elif(reset_buffers_in_flag_reg)(
+                        addr_offset_data_in[rst_buffer_in_index_reg_reg](Int(0, addr_offset_data_in.width, 10))
                     ).Elif(start)(
                         req_rd_en(Int(0, 1, 2)),
                         Case(fsm_rd)(
@@ -420,7 +444,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                 read_req_data.assign(AndList(req_rd_available, fifos_in_read_request,
                         (addr_offset_data_in[Int(0, qtde_fifo_in, 2)] < qtde_data_in[
                             Int(0, qtde_fifo_in, 2)])))
-                m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag))(
+                m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag_reg))(
                     If(rst)(
                         addr_offset_conf(Int(0, addr_offset_conf.width, 10)),
                         req_rd_en(Int(0, 1, 2)),
@@ -437,8 +461,8 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                         req_rd_addr(Int(0, req_rd_addr.width, 2)),
                         req_rd_mdata(Int(0, req_rd_mdata.width, 2)),
                         fsm_rd(FSM_RD_REQ_READ_CONF),
-                    ).Elif(reset_buffers_in_flag)(
-                        addr_offset_data_in[rst_buffer_in_index_reg](Int(0, addr_offset_data_in.width, 10))
+                    ).Elif(reset_buffers_in_flag_reg)(
+                        addr_offset_data_in[rst_buffer_in_index_reg_reg](Int(0, addr_offset_data_in.width, 10))
                     ).Elif(start)(
                         req_rd_en(Int(0, 1, 2)),
                         Case(fsm_rd)(
@@ -480,12 +504,8 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             counter_write_dsm = m.Reg('counter_write_dsm', dsm_size.width)
             dsm_wr_ready = m.Reg('dsm_wr_ready')
             m.EmbeddedCode('')
-            update_dsm = m.Wire('update_dsm')
             fifo_out_Almost_ready = m.Wire('fifo_out_almost_ready')
             fifo_out_ready = m.Wire('fifo_out_ready')
-
-            code = '|((done_reg_vet ^ done_reg_vet_last) & done_reg_vet)'
-            update_dsm.assign(EmbeddedCode(code))
             if qtde_fifo_out > 1:
                 fifo_out_Almost_ready.assign(
                     AndList(fifos_out_read_request, Not(almostempty_fifo_out[grant_out_index])))
@@ -499,7 +519,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                                                                                               10))))
 
             if qtde_fifo_out > 1:
-                m.Always(Posedge(clk), Posedge(rst), Posedge(reset_buffers_out_flag))(
+                m.Always(Posedge(clk), Posedge(rst), Posedge(reset_buffers_out_flag_reg))(
                     If(rst)(
                         counter_write_dsm(Int(0, counter_write_dsm.width, 10)),
                         req_wr_en(Int(0, 1, 10)),
@@ -513,8 +533,8 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                             rst_counter_index.inc())(
                             addr_offset_data_out[rst_counter_index](Int(0, max_counter_read_bits, 10))
                         )
-                    ).Elif(reset_buffers_out_flag)(
-                        addr_offset_data_out[rst_buffer_out_index_reg](Int(0, addr_offset_data_out.width, 10))
+                    ).Elif(reset_buffers_out_flag_reg)(
+                        addr_offset_data_out[rst_buffer_out_index_reg_reg](Int(0, addr_offset_data_out.width, 10))
                     ).Elif(start)(
                         req_wr_en(Int(0, 1, 2)),
                         re_fifo_out(Int(0, re_fifo_out.width, 10)),
@@ -564,7 +584,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                     )
                 )
             else:
-                m.Always(Posedge(clk), Posedge(rst), Posedge(reset_buffers_out_flag))(
+                m.Always(Posedge(clk), Posedge(rst), Posedge(reset_buffers_out_flag_reg))(
                     If(rst)(
                         counter_write_dsm(Int(0, counter_write_dsm.width, 10)),
                         req_wr_en(Int(0, 1, 10)),
@@ -577,8 +597,8 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                             rst_counter_index.inc())(
                             addr_offset_data_out[rst_counter_index](Int(0, max_counter_read_bits, 10))
                         )
-                    ).Elif(reset_buffers_out_flag)(
-                        addr_offset_data_out[rst_buffer_out_index_reg](
+                    ).Elif(reset_buffers_out_flag_reg)(
+                        addr_offset_data_out[rst_buffer_out_index_reg_reg](
                             Int(0, addr_offset_data_out.width, 10))
                     ).Elif(start)(
                         req_wr_en(Int(0, 1, 2)),
@@ -631,7 +651,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             m.EmbeddedCode("//Machine for receiving cache data and:")
             m.EmbeddedCode("//1 - save in configuration regs and")
             m.EmbeddedCode("//2 - queuing in the queue.")
-            m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag))(
+            m.Always(Posedge(clk), Posedge(rst), Posedge(update_workspace), Posedge(reset_buffers_in_flag_reg))(
                 If(rst)(
                     counter_received_conf(Int(0, 1, 2)),
                     we_fifo_in(Int(0, we_fifo_in.width, 10)),
@@ -646,7 +666,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
 
                 ).Elif(update_workspace)(
                     counter_received_conf(Int(0, 1, 2))
-                ).Elif(reset_buffers_in_flag)(
+                ).Elif(reset_buffers_in_flag_reg)(
                     counter_received_data_in[rst_buffer_in_index_reg](Int(0, max_counter_read_bits, 10))
                 ).Elif(start)(
                     we_fifo_in(Int(0, we_fifo_in.width, 10)),
@@ -667,14 +687,14 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             )
             # Machine responsible for receiving written data responses.
             m.EmbeddedCode("//Machine responsible for receiving written data responses.")
-            m.Always(Posedge(clk), Posedge(rst), Posedge(reset_buffers_out_flag))(
+            m.Always(Posedge(clk), Posedge(rst), Posedge(reset_buffers_out_flag_reg))(
                 If(rst)(
                     For(rst_counter_index(0), rst_counter_index < counter_sent_data_out.length,
                         rst_counter_index.inc())(
                         counter_sent_data_out[rst_counter_index](Int(0, max_counter_read_bits, 10))
                     )
-                ).Elif(reset_buffers_out_flag)(
-                    counter_sent_data_out[rst_buffer_out_index_reg](Int(0, max_counter_read_bits, 10))
+                ).Elif(reset_buffers_out_flag_reg)(
+                    counter_sent_data_out[rst_buffer_out_index_reg_reg](Int(0, max_counter_read_bits, 10))
                 ).Elif(start)(
                     If(resp_wr_valid)(
                         If(resp_wr_mdata != TAG_WR_DSM)(
@@ -691,33 +711,42 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                     reset_buffers_in(Int(0, reset_buffers_in.width, 10)),
                     reset_buffers_out(Int(0, reset_buffers_out.width, 10))
                 ).Elif(start)(
-                    If(reset_buffers_in_flag)(
-                        reset_buffers_in[rst_buffer_in_index_reg](Int(1, 1, 2))
+                    If(reset_buffers_in_flag_reg)(
+                        reset_buffers_in[rst_buffer_in_index_reg_reg](Int(1, 1, 2))
                     ),
-                    If(reset_buffers_out_flag)(
-                        reset_buffers_out[rst_buffer_out_index_reg](Int(1, 1, 2))
+                    If(reset_buffers_out_flag_reg)(
+                        reset_buffers_out[rst_buffer_out_index_reg_reg](Int(1, 1, 2))
                     )
                 )
             )
-
-            CHECK_DSM = m.Localparam('CHECK_DSM', 0)
-            WAIT_DSM_WRITE = m.Localparam('WAIT_DSM_WRITE', 1)
-
+            FIRST_UPDATE = m.Localparam('FIRST_UPDATE', 0)
+            CHECK_DSM = m.Localparam('CHECK_DSM', 1)
+            WAIT_DSM_WRITE = m.Localparam('WAIT_DSM_WRITE', 2)
+            update_dsm = m.Wire('update_dsm')
             index = m.Integer('index')
-            fsm_dsm = m.Reg('fsm_dsm', 1)
+            fsm_dsm = m.Reg('fsm_dsm', 2)
             counter_written_dsm = m.Reg('counter_written_dsm', dsm_size.width)
+
+            code = '|((done_reg_vet ^ done_reg_vet_last) & done_reg_vet)'
+            update_dsm.assign(EmbeddedCode(code))
 
             m.Always(Posedge(clk), Posedge(rst))(
                 If(rst)(
                     dsm_wr_ready(Int(0, 1, 2)),
                     counter_written_dsm(Int(0, counter_written_dsm.width, 10)),
-                    done_reg_vet_last(done_reg_vet),
+                    done_reg_vet_last(Int(0,done_reg_vet_last.width,10)),
                     For(rst_counter_index(0), rst_counter_index < dsm.length, rst_counter_index.inc())(
                         dsm[rst_counter_index](Int(0, cache_data_width, 10))
                     ),
-                    fsm_dsm(CHECK_DSM)
+                    fsm_dsm(FIRST_UPDATE)
                 ).Elif(start)(
                     Case(fsm_dsm)(
+                        When(FIRST_UPDATE)(
+                            If(update_dsm)(
+                                done_reg_vet_last(done_reg_vet),
+                                fsm_dsm(CHECK_DSM)
+                            )
+                        ),
                         When(CHECK_DSM)(
                             If(update_dsm)(
                                 done_reg_vet_last(done_reg_vet),
@@ -807,7 +836,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
             for i in afus:
                 code = code + 'info[%d:%d] <= {8\'d%d, 8\'d%d};\n'%(j+16,j+1,i[0],i[1])
                 j = j + 16
-            m.Always()(
+            m.Always(Posedge(clk),Posedge(rst))(
                 If(rst)(
                     info(Int(0, info.width, 10))
                 ).Else(

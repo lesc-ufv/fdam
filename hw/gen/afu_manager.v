@@ -42,10 +42,12 @@ module afu_manager
   //Flag to reset buffers:
   reg [7-1:0] rst_buffer_in_index_reg;
   reg [7-1:0] rst_buffer_out_index_reg;
+  reg [7-1:0] rst_buffer_in_index_reg_reg;
+  reg [7-1:0] rst_buffer_out_index_reg_reg;
   reg reset_buffers_in_flag;
   reg reset_buffers_out_flag;
-
-  //Registrador para pipeline do dado a ser enfileirado nas filas de entrada
+  reg reset_buffers_in_flag_reg;
+  reg reset_buffers_out_flag_reg;
   reg [512-1:0] resp_rd_data_tmp;
   reg [8-1:0] reset_buffers_in;
   reg [8-1:0] reset_buffers_out;
@@ -55,7 +57,7 @@ module afu_manager
   wire [8-1:0] done_write_buffers;
   wire [8-1:0] done_uut_afu;
   wire [8-1:0] done_uut_afu_nopend;
-  wire [512-1:0] done_reg_vet;
+  reg [512-1:0] done_reg_vet;
   reg [512-1:0] done_reg_vet_last;
 
   //controle da fsm de leitura de dados e configurações
@@ -116,11 +118,20 @@ module afu_manager
   end
   endgenerate
 
-  assign done_reg_vet[0] = &done_read_buffers && &done_write_buffers && &done_uut_afu;
-  assign done_reg_vet[8:1] = done_uut_afu_nopend;
-  assign done_reg_vet[16:9] = done_read_buffers;
-  assign done_reg_vet[24:17] = done_write_buffers;
-  assign done_reg_vet[511:25] = 487'd0;
+
+  always @(posedge clk or posedge rst) begin
+    if(rst) begin
+      done_reg_vet <= 512'd0;
+    end else begin
+      if(start) begin
+        done_reg_vet[0] <= &done_read_buffers && &done_write_buffers && &done_uut_afu_nopend;
+        done_reg_vet[8:1] <= done_uut_afu_nopend;
+        done_reg_vet[16:9] <= done_read_buffers;
+        done_reg_vet[24:17] <= done_write_buffers;
+      end 
+    end
+  end
+
 
   //Assigns para o acesso direto aos endereços de cada fila de entrada de dados
   //e para as quantidades de dados para leitura de cada fila
@@ -274,13 +285,21 @@ module afu_manager
     if(rst) begin
       reset_buffers_in_flag <= 1'b0;
       reset_buffers_out_flag <= 1'b0;
+      reset_buffers_in_flag_reg <= 1'b0;
+      reset_buffers_out_flag_reg <= 1'b0;
       rst_buffer_in_index_reg <= 7'd0;
       rst_buffer_out_index_reg <= 7'd0;
+      rst_buffer_in_index_reg_reg <= 7'd0;
+      rst_buffer_out_index_reg_reg <= 7'd0;
     end else begin
       reset_buffers_in_flag <= (rst_buffer_in_index != 7'b0)? 1'b1 : 1'b0;
       reset_buffers_out_flag <= (rst_buffer_out_index != 7'b0)? 1'b1 : 1'b0;
+      reset_buffers_in_flag_reg <= reset_buffers_in_flag;
+      reset_buffers_out_flag_reg <= reset_buffers_out_flag;
       rst_buffer_in_index_reg <= rst_buffer_in_index - 7'd1;
       rst_buffer_out_index_reg <= rst_buffer_out_index - 7'd1;
+      rst_buffer_in_index_reg_reg <= rst_buffer_in_index_reg;
+      rst_buffer_out_index_reg_reg <= rst_buffer_out_index_reg;
     end
   end
 
@@ -327,7 +346,7 @@ module afu_manager
   wire read_req_data;
   assign read_req_data = req_rd_available && grant_in_valid && (addr_offset_data_in[grant_in_index] < qtde_data_in[grant_in_index]);
 
-  always @(posedge clk or posedge rst or posedge update_workspace or posedge reset_buffers_in_flag) begin
+  always @(posedge clk or posedge rst or posedge update_workspace or posedge reset_buffers_in_flag_reg) begin
     if(rst) begin
       addr_offset_conf <= 3'd0;
       req_rd_en <= 1'b0;
@@ -344,8 +363,8 @@ module afu_manager
         req_rd_addr <= 64'b0;
         req_rd_mdata <= 16'b0;
         fsm_rd <= FSM_RD_REQ_READ_CONF;
-      end else if(reset_buffers_in_flag) begin
-        addr_offset_data_in[rst_buffer_in_index_reg] <= 64'd0;
+      end else if(reset_buffers_in_flag_reg) begin
+        addr_offset_data_in[rst_buffer_in_index_reg_reg] <= 64'd0;
       end else begin
         if(start) begin
           req_rd_en <= 1'b0;
@@ -385,14 +404,12 @@ module afu_manager
   reg [16-1:0] counter_write_dsm;
   reg dsm_wr_ready;
 
-  wire update_dsm;
   wire fifo_out_almost_ready;
   wire fifo_out_ready;
-  assign update_dsm = |((done_reg_vet ^ done_reg_vet_last) & done_reg_vet);
   assign fifo_out_almost_ready = fifos_out_read_request && !almostempty_fifo_out[grant_out_index];
   assign fifo_out_ready = fifos_out_read_request && (count_fifo_out[grant_out_index] > 5'd0);
 
-  always @(posedge clk or posedge rst or posedge reset_buffers_out_flag) begin
+  always @(posedge clk or posedge rst or posedge reset_buffers_out_flag_reg) begin
     if(rst) begin
       counter_write_dsm <= 16'd0;
       req_wr_en <= 1'd0;
@@ -406,8 +423,8 @@ module afu_manager
         addr_offset_data_out[rst_counter_index] <= 64'd0;
       end
     end else begin
-      if(reset_buffers_out_flag) begin
-        addr_offset_data_out[rst_buffer_out_index_reg] <= 64'd0;
+      if(reset_buffers_out_flag_reg) begin
+        addr_offset_data_out[rst_buffer_out_index_reg_reg] <= 64'd0;
       end else begin
         if(start) begin
           req_wr_en <= 1'b0;
@@ -460,7 +477,7 @@ module afu_manager
   //1 - save in configuration regs and
   //2 - queuing in the queue.
 
-  always @(posedge clk or posedge rst or posedge update_workspace or posedge reset_buffers_in_flag) begin
+  always @(posedge clk or posedge rst or posedge update_workspace or posedge reset_buffers_in_flag_reg) begin
     if(rst) begin
       counter_received_conf <= 1'b0;
       we_fifo_in <= 8'd0;
@@ -474,7 +491,7 @@ module afu_manager
     end else begin
       if(update_workspace) begin
         counter_received_conf <= 1'b0;
-      end else if(reset_buffers_in_flag) begin
+      end else if(reset_buffers_in_flag_reg) begin
         counter_received_data_in[rst_buffer_in_index_reg] <= 64'd0;
       end else begin
         if(start) begin
@@ -498,14 +515,14 @@ module afu_manager
 
   //Machine responsible for receiving written data responses.
 
-  always @(posedge clk or posedge rst or posedge reset_buffers_out_flag) begin
+  always @(posedge clk or posedge rst or posedge reset_buffers_out_flag_reg) begin
     if(rst) begin
       for(rst_counter_index=0; rst_counter_index<8; rst_counter_index=rst_counter_index+1) begin
         counter_sent_data_out[rst_counter_index] <= 64'd0;
       end
     end else begin
-      if(reset_buffers_out_flag) begin
-        counter_sent_data_out[rst_buffer_out_index_reg] <= 64'd0;
+      if(reset_buffers_out_flag_reg) begin
+        counter_sent_data_out[rst_buffer_out_index_reg_reg] <= 64'd0;
       end else begin
         if(start) begin
           if(resp_wr_valid) begin
@@ -526,34 +543,43 @@ module afu_manager
       reset_buffers_out <= 8'd0;
     end else begin
       if(start) begin
-        if(reset_buffers_in_flag) begin
-          reset_buffers_in[rst_buffer_in_index_reg] <= 1'b1;
+        if(reset_buffers_in_flag_reg) begin
+          reset_buffers_in[rst_buffer_in_index_reg_reg] <= 1'b1;
         end 
-        if(reset_buffers_out_flag) begin
-          reset_buffers_out[rst_buffer_out_index_reg] <= 1'b1;
+        if(reset_buffers_out_flag_reg) begin
+          reset_buffers_out[rst_buffer_out_index_reg_reg] <= 1'b1;
         end 
       end 
     end
   end
 
-  localparam CHECK_DSM = 0;
-  localparam WAIT_DSM_WRITE = 1;
+  localparam FIRST_UPDATE = 0;
+  localparam CHECK_DSM = 1;
+  localparam WAIT_DSM_WRITE = 2;
+  wire update_dsm;
   integer index;
-  reg [1-1:0] fsm_dsm;
+  reg [2-1:0] fsm_dsm;
   reg [16-1:0] counter_written_dsm;
+  assign update_dsm = |((done_reg_vet ^ done_reg_vet_last) & done_reg_vet);
 
   always @(posedge clk or posedge rst) begin
     if(rst) begin
       dsm_wr_ready <= 1'b0;
       counter_written_dsm <= 16'd0;
-      done_reg_vet_last <= done_reg_vet;
+      done_reg_vet_last <= 512'd0;
       for(rst_counter_index=0; rst_counter_index<3; rst_counter_index=rst_counter_index+1) begin
         dsm[rst_counter_index] <= 512'd0;
       end
-      fsm_dsm <= CHECK_DSM;
+      fsm_dsm <= FIRST_UPDATE;
     end else begin
       if(start) begin
         case(fsm_dsm)
+          FIRST_UPDATE: begin
+            if(update_dsm) begin
+              done_reg_vet_last <= done_reg_vet;
+              fsm_dsm <= CHECK_DSM;
+            end 
+          end
           CHECK_DSM: begin
             if(update_dsm) begin
               done_reg_vet_last <= done_reg_vet;
@@ -722,7 +748,7 @@ module afu_manager
   );
 
 
-  always @(*) begin
+  always @(posedge clk or posedge rst) begin
     if(rst) begin
       info <= 576'd0;
     end else begin

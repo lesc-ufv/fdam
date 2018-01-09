@@ -41,7 +41,7 @@ LDFLAGS  += -L$(DESTDIR)$(prefix)/lib -Wl,-rpath-link -Wl,$(prefix)/lib -Wl,-rpa
             -L$(DESTDIR)$(prefix)/lib64 -Wl,-rpath-link -Wl,$(prefix)/lib64 -Wl,-rpath -Wl,$(DESTDIR)$(prefix)/lib64
 endif
 
-CPPFLAGS += -IAFUManagerLIB -std=c++11
+CPPFLAGS += -std=c++11
 LDFLAGS += -lboost_program_options -luuid -lMPF -std=c++11
 
 FPGA_LIBS = -lopae-c -ljson-c
