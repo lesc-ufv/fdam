@@ -301,8 +301,8 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                 ).Else(
                     reset_buffers_in_flag(Mux(rst_buffer_in_index != Int(0, rst_buffer_in_index.width, 2), Int(1, 1, 2), Int(0, 1, 2))),
                     reset_buffers_out_flag(Mux(rst_buffer_out_index != Int(0, rst_buffer_out_index.width, 2), Int(1, 1, 2), Int(0, 1, 2))),
-                    rst_buffer_in_index_reg(rst_buffer_in_index),
-                    rst_buffer_out_index_reg(rst_buffer_out_index)
+                    rst_buffer_in_index_reg(rst_buffer_in_index-Int(1,rst_buffer_in_index.width,10)),
+                    rst_buffer_out_index_reg(rst_buffer_out_index-Int(1,rst_buffer_out_index.width,10))
                 )
             )
 
@@ -386,7 +386,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                         req_rd_mdata(Int(0, req_rd_mdata.width, 2)),
                         fsm_rd(FSM_RD_REQ_READ_CONF),
                     ).Elif(reset_buffers_in_flag)(
-                        addr_offset_data_in[rst_buffer_in_index](Int(0, addr_offset_data_in.width, 10))
+                        addr_offset_data_in[rst_buffer_in_index_reg](Int(0, addr_offset_data_in.width, 10))
                     ).Elif(start)(
                         req_rd_en(Int(0, 1, 2)),
                         Case(fsm_rd)(
@@ -438,7 +438,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                         req_rd_mdata(Int(0, req_rd_mdata.width, 2)),
                         fsm_rd(FSM_RD_REQ_READ_CONF),
                     ).Elif(reset_buffers_in_flag)(
-                        addr_offset_data_in[rst_buffer_in_index](Int(0, addr_offset_data_in.width, 10))
+                        addr_offset_data_in[rst_buffer_in_index_reg](Int(0, addr_offset_data_in.width, 10))
                     ).Elif(start)(
                         req_rd_en(Int(0, 1, 2)),
                         Case(fsm_rd)(
@@ -514,7 +514,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                             addr_offset_data_out[rst_counter_index](Int(0, max_counter_read_bits, 10))
                         )
                     ).Elif(reset_buffers_out_flag)(
-                        addr_offset_data_out[rst_buffer_out_index - 1](Int(0, addr_offset_data_out.width, 10))
+                        addr_offset_data_out[rst_buffer_out_index_reg](Int(0, addr_offset_data_out.width, 10))
                     ).Elif(start)(
                         req_wr_en(Int(0, 1, 2)),
                         re_fifo_out(Int(0, re_fifo_out.width, 10)),
@@ -578,7 +578,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                             addr_offset_data_out[rst_counter_index](Int(0, max_counter_read_bits, 10))
                         )
                     ).Elif(reset_buffers_out_flag)(
-                        addr_offset_data_out[rst_buffer_out_index - 1](
+                        addr_offset_data_out[rst_buffer_out_index_reg](
                             Int(0, addr_offset_data_out.width, 10))
                     ).Elif(start)(
                         req_wr_en(Int(0, 1, 2)),
@@ -647,7 +647,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                 ).Elif(update_workspace)(
                     counter_received_conf(Int(0, 1, 2))
                 ).Elif(reset_buffers_in_flag)(
-                    counter_received_data_in[rst_buffer_in_index](Int(0, max_counter_read_bits, 10))
+                    counter_received_data_in[rst_buffer_in_index_reg](Int(0, max_counter_read_bits, 10))
                 ).Elif(start)(
                     we_fifo_in(Int(0, we_fifo_in.width, 10)),
                     If(resp_rd_valid)(
@@ -674,7 +674,7 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                         counter_sent_data_out[rst_counter_index](Int(0, max_counter_read_bits, 10))
                     )
                 ).Elif(reset_buffers_out_flag)(
-                    counter_sent_data_out[rst_buffer_out_index](Int(0, max_counter_read_bits, 10))
+                    counter_sent_data_out[rst_buffer_out_index_reg](Int(0, max_counter_read_bits, 10))
                 ).Elif(start)(
                     If(resp_wr_valid)(
                         If(resp_wr_mdata != TAG_WR_DSM)(
@@ -692,10 +692,10 @@ def make_afu_manager_controller(cache_data_width, fifo_depth, afus):
                     reset_buffers_out(Int(0, reset_buffers_out.width, 10))
                 ).Elif(start)(
                     If(reset_buffers_in_flag)(
-                        reset_buffers_in[rst_buffer_in_index](Int(1, 1, 2))
+                        reset_buffers_in[rst_buffer_in_index_reg](Int(1, 1, 2))
                     ),
                     If(reset_buffers_out_flag)(
-                        reset_buffers_out[rst_buffer_out_index](Int(1, 1, 2))
+                        reset_buffers_out[rst_buffer_out_index_reg](Int(1, 1, 2))
                     )
                 )
             )

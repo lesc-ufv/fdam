@@ -279,8 +279,8 @@ module afu_manager
     end else begin
       reset_buffers_in_flag <= (rst_buffer_in_index != 7'b0)? 1'b1 : 1'b0;
       reset_buffers_out_flag <= (rst_buffer_out_index != 7'b0)? 1'b1 : 1'b0;
-      rst_buffer_in_index_reg <= rst_buffer_in_index;
-      rst_buffer_out_index_reg <= rst_buffer_out_index;
+      rst_buffer_in_index_reg <= rst_buffer_in_index - 7'd1;
+      rst_buffer_out_index_reg <= rst_buffer_out_index - 7'd1;
     end
   end
 
@@ -345,7 +345,7 @@ module afu_manager
         req_rd_mdata <= 16'b0;
         fsm_rd <= FSM_RD_REQ_READ_CONF;
       end else if(reset_buffers_in_flag) begin
-        addr_offset_data_in[rst_buffer_in_index] <= 64'd0;
+        addr_offset_data_in[rst_buffer_in_index_reg] <= 64'd0;
       end else begin
         if(start) begin
           req_rd_en <= 1'b0;
@@ -407,7 +407,7 @@ module afu_manager
       end
     end else begin
       if(reset_buffers_out_flag) begin
-        addr_offset_data_out[rst_buffer_out_index - 1] <= 64'd0;
+        addr_offset_data_out[rst_buffer_out_index_reg] <= 64'd0;
       end else begin
         if(start) begin
           req_wr_en <= 1'b0;
@@ -475,7 +475,7 @@ module afu_manager
       if(update_workspace) begin
         counter_received_conf <= 1'b0;
       end else if(reset_buffers_in_flag) begin
-        counter_received_data_in[rst_buffer_in_index] <= 64'd0;
+        counter_received_data_in[rst_buffer_in_index_reg] <= 64'd0;
       end else begin
         if(start) begin
           we_fifo_in <= 8'd0;
@@ -505,7 +505,7 @@ module afu_manager
       end
     end else begin
       if(reset_buffers_out_flag) begin
-        counter_sent_data_out[rst_buffer_out_index] <= 64'd0;
+        counter_sent_data_out[rst_buffer_out_index_reg] <= 64'd0;
       end else begin
         if(start) begin
           if(resp_wr_valid) begin
@@ -527,10 +527,10 @@ module afu_manager
     end else begin
       if(start) begin
         if(reset_buffers_in_flag) begin
-          reset_buffers_in[rst_buffer_in_index] <= 1'b1;
+          reset_buffers_in[rst_buffer_in_index_reg] <= 1'b1;
         end 
         if(reset_buffers_out_flag) begin
-          reset_buffers_out[rst_buffer_out_index] <= 1'b1;
+          reset_buffers_out[rst_buffer_out_index_reg] <= 1'b1;
         end 
       end 
     end
