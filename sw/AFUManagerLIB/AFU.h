@@ -15,24 +15,36 @@ class AFU {
 
 private:
     AFUManager_t &afuManager;
-    afu_id ID;
+    afuid_t ID;
     int numInputBuffer;
     int numOutputBuffer;
     void **Inputbuffers;
     void **Outputbuffers;
+    void *dsm;
+    size_t  dsm_size;
     int *sizeOfInputBuffers;
     int *sizeOfOutputBuffers;
-    bool done;
 
+private:
+    void createDSM();
+    void sendConfDSM();
+    void clearDSM();
+    size_t getSizeDsm();
 public:
-    AFU(AFUManager_t &afuManager, afu_id id, int numInputBuffer, int numOutputBuffer);
+    AFU(AFUManager_t &afuManager, afuid_t id, int numInputBuffer, int numOutputBuffer);
 
     ~AFU();
 
     void start();
 
     void stop();
-    
+
+    void reset();
+
+    void sendConfIn(int BufferID);
+
+    void sendConfOut(int BufferID);
+
     bool createInputBufferSW(int BufferID, size_t nBytes, void *dataToCopy);
 
     bool createOutputBufferSW(int BufferID, size_t nBytes);
@@ -40,6 +52,12 @@ public:
     void *getInputBuffer(int BufferID);
 
     void *getOutputBuffer(int BufferID);
+
+    void *getDsm();
+
+    bool copyInputBuffer(int BufferID, void * data);
+
+    bool copyOutputBuffer(int BufferID, void * data);
 
     int getSizeOfInputBuffer(int BufferID);
 
@@ -49,8 +67,6 @@ public:
 
     bool isDone();
 
-    void setDone(bool done);
-
     AFU &operator=(const AFU &AFU);
 
     void clear();
@@ -59,8 +75,8 @@ public:
 
     int getNumOutputBuffer() const;
     
-    afu_id getID() const;
-
+    afuid_t getID() const;
+    void printDSM();
 };
 
 

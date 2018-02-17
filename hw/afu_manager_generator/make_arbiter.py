@@ -9,28 +9,32 @@ def make_arbiter():
     TYPE = m.Parameter('TYPE', "ROUND_ROBIN")
     BLOCK = m.Parameter('BLOCK', "NONE")
     LSB_PRIORITY = m.Parameter('LSB_PRIORITY', "LOW")
+    WIDTH = m.Parameter('WIDTH', EmbeddedCode('PORTS>1?$clog2(PORTS):1'))
     clk = m.Input('clk')
     rst = m.Input('rst')
     request = m.Input('request', PORTS)
     acknowledge = m.Input('acknowledge', PORTS)
     grant = m.Output('grant', PORTS)
     grant_valid = m.Output('grant_valid')
-    grant_encoded = m.Output('grant_encoded', EmbeddedCode('$clog2(PORTS)'))
+    grant_encoded = m.Output('grant_encoded',WIDTH)
 
     grant_reg = m.Reg('grant_reg', PORTS)
-    grant_next = m.Reg('grant_next', PORTS)
     grant_valid_reg = m.Reg('grant_valid_reg')
-    grant_valid_next = m.Reg('grant_valid_next')
-    grant_encoded_reg = m.Reg('grant_encoded_reg', EmbeddedCode('$clog2(PORTS)'))
-    grant_encoded_next = m.Reg('grant_encoded_next', EmbeddedCode('$clog2(PORTS)'))
+    grant_encoded_reg = m.Reg('grant_encoded_reg',WIDTH)
+
+    genIf = m.GenerateIf(PORTS>1,'gen_if_true')
+
+    grant_next = genIf.Reg('grant_next', PORTS)
+    grant_valid_next = genIf.Reg('grant_valid_next')
+    grant_encoded_next = genIf.Reg('grant_encoded_next', EmbeddedCode('$clog2(PORTS)'))
 
     m.Assign(grant_valid(grant_valid_reg))
     m.Assign(grant(grant_reg))
     m.Assign(grant_encoded(grant_encoded_reg))
 
-    request_valid = m.Wire('request_valid')
-    request_index = m.Wire('request_index', EmbeddedCode('$clog2(PORTS)'))
-    request_mask = m.Wire('request_mask', PORTS)
+    request_valid = genIf.Wire('request_valid')
+    request_index = genIf.Wire('request_index', EmbeddedCode('$clog2(PORTS)'))
+    request_mask = genIf.Wire('request_mask', PORTS)
 
     pe = make_priority_encoder()
     params = [('WIDTH', PORTS), ('LSB_PRIORITY', LSB_PRIORITY)]
@@ -40,12 +44,12 @@ def make_arbiter():
         ('output_encoded', request_index),
         ('output_unencoded', request_mask)
     ]
-    m.Instance(pe, 'priority_encoder_inst', params, con)
-    mask_reg = m.Reg('mask_reg', PORTS)
-    mask_next = m.Reg('mask_next', PORTS)
-    masked_request_valid = m.Wire('masked_request_valid')
-    masked_request_index = m.Wire('masked_request_index', EmbeddedCode('$clog2(PORTS)'))
-    masked_request_mask = m.Wire('masked_request_mask', PORTS)
+    genIf.Instance(pe, 'priority_encoder_inst', params, con)
+    mask_reg = genIf.Reg('mask_reg', PORTS)
+    mask_next = genIf.Reg('mask_next', PORTS)
+    masked_request_valid = genIf.Wire('masked_request_valid')
+    masked_request_index = genIf.Wire('masked_request_index', EmbeddedCode('$clog2(PORTS)'))
+    masked_request_mask = genIf.Wire('masked_request_mask', PORTS)
     params = [('WIDTH', PORTS), ('LSB_PRIORITY', LSB_PRIORITY)]
     con = [
         ('input_unencoded', request & mask_reg),
@@ -53,9 +57,9 @@ def make_arbiter():
         ('output_encoded', masked_request_index),
         ('output_unencoded', masked_request_mask)
     ]
-    m.Instance(pe, 'priority_encoder_masked', params, con)
+    genIf.Instance(pe, 'priority_encoder_masked', params, con)
 
-    m.Always()(
+    genIf.Always()(
         grant_next(0, blk=True),
         grant_valid_next(0, blk=True),
         grant_encoded_next(0, blk=True),
@@ -97,7 +101,7 @@ def make_arbiter():
 
         )
     )
-    m.Always(Posedge(clk))(
+    genIf.Always(Posedge(clk))(
         If(rst)(
             grant_reg(0),
             grant_valid_reg(0),
@@ -108,6 +112,18 @@ def make_arbiter():
             grant_valid_reg(grant_valid_next),
             grant_encoded_reg(grant_encoded_next),
             mask_reg(mask_next)
+        )
+    )
+    genIf = genIf.Else('gen_if_false')
+    genIf.Always(Posedge(clk))(
+        If(rst)(
+            grant_reg(0),
+            grant_valid_reg(0),
+            grant_encoded_reg(0),
+        ).Else(
+            grant_reg(request),
+            grant_valid_reg(request),
+            grant_encoded_reg(0)
         )
     )
 

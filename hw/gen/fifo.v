@@ -12,12 +12,13 @@ module fifo #
   input we,
   input [FIFO_WIDTH-1:0] din,
   input re,
+  output reg valid,
   output reg [FIFO_WIDTH-1:0] dout,
   output reg empty,
   output reg almostempty,
   output reg full,
   output reg almostfull,
-  output reg [FIFO_DEPTH_BITS-1:0] count
+  output reg [FIFO_DEPTH_BITS+1-1:0] count
 );
 
   reg [FIFO_DEPTH_BITS-1:0] rp;
@@ -81,11 +82,16 @@ module fifo #
   always @(posedge clk) begin
     if(rst) begin
       dout <= 0;
+      valid <= 1'b0;
     end else begin
+      valid <= 1'b0;
       if(we == 1'b1) begin
         mem[wp] <= din;
       end 
-      dout <= mem[rp];
+      if(re == 1'b1) begin
+        dout <= mem[rp];
+        valid <= 1'b1;
+      end 
     end
   end
 

@@ -31,27 +31,15 @@ private:
     int numInputBuffers;
     int numOutputBuffers;
     int numAFUs;
-    int numClConfs;
-    int numClDSM;
-    bool commitedWorkspace;
-    map<afu_id, AFU *> AFUs;
-
-    bool flagDoneAll;
+    map<afuid_t, AFU *> AFUs;
 
     void readInfoHwAfu();
-
-    void createWorkspace();
-
-    void updateWorkspace();
-
     void createAFUs();
 
 public:
-    uint64_t *workspace;
-    uint64_t *dsm;
     int afuInfo[AFU_INF_SIZE];
 
-    AFUManager(const char *accel_uuid);
+    explicit AFUManager(const char *accel_uuid);
 
     ~AFUManager();
 
@@ -63,7 +51,7 @@ public:
 
     int getNumAFUs() const;
 
-    const map<afu_id, AFU *> &getAFUs() const;
+    const map<afuid_t, AFU *> &getAFUs() const;
 
     void writeCSR(uint32_t regID, uint64_t val);
 
@@ -73,31 +61,19 @@ public:
 
     void fpgaFreeBuffer(void *ptr);
 
-    void commitWorkspace();
-
     void startAFUs(uint64_t startAfus);
 
     void stopAFUs(uint64_t stopAfus);
+
+    void resetAFUs(uint64_t resetAfus);
 
     void waitAllDone(int64_t timeWaitMax);
 
     bool AFUIsSimulated();
 
-    AFU *getAFU(afu_id id);
-
-    bool workspaceIscommited();
+    AFU *getAFU(afuid_t id);
 
     bool isDoneAll();
-
-    void setDoneAll(bool doneAll);
-
-    int getNumClConf();
-
-    int getNumClDSM();
-
-    void printWorkspace();
-
-    void printDSM();
 
     void printStatics();
 

@@ -1,767 +1,345 @@
 
-module afu_manager
+module afu_manager #
+(
+  parameter ADDR_WIDTH = 64,
+  parameter QTD_WIDTH = 32,
+  parameter DATA_WIDTH = 512,
+  parameter CONF_ID_QUEUE_WIDTH = 32,
+  parameter TAG_WIDTH = 16,
+  parameter FIFO_DEPTH_BITS = 4,
+  parameter FIFO_FULL = 2 ** FIFO_DEPTH_BITS
+)
 (
   input clk,
   input rst,
-  input start,
-  input [64-1:0] rst_afus,
-  input [64-1:0] start_afus,
-  input [7-1:0] rst_buffer_in_index,
-  input [7-1:0] rst_buffer_out_index,
-  input [64-1:0] workspace_addr_base,
-  input [16-1:0] conf_size,
-  input [16-1:0] dsm_size,
-  input update_workspace,
+  input [1-1:0] rst_afus,
+  input [1-1:0] start_afus,
+  input [2-1:0] conf_valid,
+  input [ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0] conf,
   output reg req_rd_en,
-  output reg [64-1:0] req_rd_addr,
-  output reg [16-1:0] req_rd_mdata,
+  output reg [ADDR_WIDTH-1:0] req_rd_addr,
+  output reg [TAG_WIDTH-1:0] req_rd_mdata,
   input req_rd_available,
   input resp_rd_valid,
-  input [512-1:0] resp_rd_data,
-  input [16-1:0] resp_rd_mdata,
+  input [DATA_WIDTH-1:0] resp_rd_data,
+  input [TAG_WIDTH-1:0] resp_rd_mdata,
   input req_wr_available,
   output reg req_wr_en,
-  output reg [64-1:0] req_wr_addr,
-  output reg [16-1:0] req_wr_mdata,
-  output reg [512-1:0] req_wr_data,
+  output reg [ADDR_WIDTH-1:0] req_wr_addr,
+  output reg [TAG_WIDTH-1:0] req_wr_mdata,
+  output reg [DATA_WIDTH-1:0] req_wr_data,
   input resp_wr_valid,
-  input [16-1:0] resp_wr_mdata,
-  output reg [576-1:0] info
+  input [TAG_WIDTH-1:0] resp_wr_mdata,
+  output reg [512-1:0] info
 );
 
-  //Parâmetros locais:
-  localparam FIFO_IN_FULL = 32;
-  localparam TAG_WR_DSM = 16'hfffe;
-  localparam TAG_RD_CONF = 16'hffff;
-  //CONFs e DSM addr calc:
-  wire [64-1:0] configurations_addr_base;
-  wire [64-1:0] dsm_addr_base;
-  assign configurations_addr_base = workspace_addr_base[63:6];
-  assign dsm_addr_base = workspace_addr_base[63:6] + 4;
-
-  //Flag to reset buffers:
-  reg [7-1:0] rst_buffer_in_index_reg;
-  reg [7-1:0] rst_buffer_out_index_reg;
-  reg [7-1:0] rst_buffer_in_index_reg_reg;
-  reg [7-1:0] rst_buffer_out_index_reg_reg;
-  reg reset_buffers_in_flag;
-  reg reset_buffers_out_flag;
-  reg reset_buffers_in_flag_reg;
-  reg reset_buffers_out_flag_reg;
-  reg [512-1:0] resp_rd_data_tmp;
-  reg [8-1:0] reset_buffers_in;
-  reg [8-1:0] reset_buffers_out;
-
-  //Gerenciamento dos Done signals
-  wire [8-1:0] done_read_buffers;
-  wire [8-1:0] done_write_buffers;
-  wire [8-1:0] done_uut_afu;
-  wire [8-1:0] done_uut_afu_nopend;
-  reg [512-1:0] done_reg_vet;
-  reg [512-1:0] done_reg_vet_last;
-
-  //controle da fsm de leitura de dados e configurações
-  reg [2-1:0] fsm_rd;
-
-  //controle da fsm de escrita de dados
-  reg [2-1:0] fsm_wr;
-
-  //registradores onde ficarão armazenados os endereços
-  //as quantidades de dados para cada fila de entrada e para cada fila de saída
-  //control for conf
-  reg [512-1:0] configurations [0:4-1];
-  reg [512-1:0] dsm [0:3-1];
-  reg [3-1:0] counter_received_conf;
-  reg [3-1:0] addr_offset_conf;
-
-  //control for data_in
-  reg [64-1:0] counter_received_data_in [0:8-1];
-  reg [64-1:0] addr_offset_data_in [0:8-1];
-  wire [64-1:0] qtde_data_in [0:8-1];
-  wire [64-1:0] addr_in [0:8-1];
-
-  // control for data_out
-  reg [64-1:0] counter_sent_data_out [0:8-1];
-  reg [64-1:0] addr_offset_data_out [0:8-1];
-  wire [64-1:0] qtde_data_out [0:8-1];
-  wire [64-1:0] addr_out [0:8-1];
-
-  //criação das fifos, regs para as filas de entrada e saída
-  wire [8-1:0] pending_writes_afus;
-  reg [8-1:0] pending_writes_fifos_out [0:8-1];
-  wire [8-1:0] fifos_in_read_request;
-  wire [8-1:0] fifos_out_read_request;
-  reg [8-1:0] we_fifo_in;
-  reg [8-1:0] re_fifo_out;
-  wire [512-1:0] dout_fifo_out [0:8-1];
-  wire [8-1:0] almostempty_fifo_out;
-  wire [5-1:0] count_fifo_out [0:8-1];
-  genvar i;
-  genvar j;
-
-  //controle de DONE
-
-  generate for(i=0; i<8; i=i+1) begin : gen_0
-    assign done_read_buffers[i] = counter_received_data_in[i] >= qtde_data_in[i];
-  end
-  endgenerate
+  reg [1-1:0] rd_req_arbiter_request;
+  wire [1-1:0] rd_req_arbiter_grant;
+  wire rd_req_arbiter_grant_valid;
+  wire [1-1:0] rd_req_arbiter_grant_encoded;
 
 
-  generate for(i=0; i<8; i=i+1) begin : gen_1
-    assign done_write_buffers[i] = counter_sent_data_out[i] >= qtde_data_out[i];
-  end
-  endgenerate
+  reg [1-1:0] wr_req_arbiter_request;
+  wire [1-1:0] wr_req_arbiter_grant;
+  wire wr_req_arbiter_grant_valid;
+  wire [1-1:0] wr_req_arbiter_grant_encoded;
 
 
-  generate for(i=0; i<8; i=i+1) begin : gen_pend
-    assign done_uut_afu_nopend[i] = pending_writes_afus[i] && done_uut_afu[i];
-  end
-  endgenerate
+  genvar idx_req_rd_fifo;
+  reg [1-1:0] req_rd_fifo_re;
+  wire [1-1:0] req_rd_fifo_valid;
+  wire [1-1:0] req_rd_fifo_empty;
+  wire [1-1:0] req_rd_fifo_amostempty;
+  wire [(ADDR_WIDTH+TAG_WIDTH)*1-1:0] req_rd_fifo_dout;
+  wire [1-1:0] afu_req_rd_fifo_we;
+  wire [(ADDR_WIDTH+TAG_WIDTH)*1-1:0] afu_req_rd_fifo_din;
+  wire [1-1:0] afu_req_rd_fifo_full;
+  wire [1-1:0] afu_req_rd_fifo_almostfull;
+  wire [(FIFO_DEPTH_BITS+1)*1-1:0] req_rd_fifo_count;
 
 
-  always @(posedge clk or posedge rst) begin
-    if(rst) begin
-      done_reg_vet <= 512'd0;
-    end else begin
-      if(start) begin
-        done_reg_vet[0] <= &done_read_buffers && &done_write_buffers && &done_uut_afu_nopend;
-        done_reg_vet[8:1] <= done_uut_afu_nopend;
-        done_reg_vet[16:9] <= done_read_buffers;
-        done_reg_vet[24:17] <= done_write_buffers;
-      end 
-    end
-  end
+  genvar idx_req_wr_fifo;
+  reg [1-1:0] req_wr_fifo_re;
+  wire [1-1:0] req_wr_fifo_valid;
+  wire [1-1:0] req_wr_fifo_empty;
+  wire [1-1:0] req_wr_fifo_amostempty;
+  wire [(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)*1-1:0] req_wr_fifo_dout;
+  wire [1-1:0] afu_req_wr_fifo_we;
+  wire [(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)*1-1:0] afu_req_wr_fifo_din;
+  wire [1-1:0] afu_req_wr_fifo_full;
+  wire [1-1:0] afu_req_wr_fifo_almostfull;
+  wire [(FIFO_DEPTH_BITS+1)*1-1:0] req_wr_fifo_count;
 
 
-  //Assigns para o acesso direto aos endereços de cada fila de entrada de dados
-  //e para as quantidades de dados para leitura de cada fila
-
-  generate for(i=0; i<1; i=i+1) begin : gen_2
-    for(j=0; j<8; j=j+1) begin : gen_3
-      assign addr_in[(i*8) + j] = configurations[i*2][(j * 64) + 64 -1 :j * 64];
-      assign qtde_data_in[(i*8) + j] = configurations[(i*2)+1][(j * 64) + 64 -1:j * 64];
-    end
-  end
-  endgenerate
-
-  //Assigns para o acesso direto aos endereços de cada fila de saída de dados
-  //e para as quantidades de dados de escrita de cada fila
-
-  generate for(i=0; i<1; i=i+1) begin : gen_4
-    for(j=0; j<8; j=j+1) begin : gen_5
-      assign addr_out[(i*8) + j] = configurations[(i*2)+2][(j * 64) + 64 -1 :j * 64];
-      assign qtde_data_out[(i*8) + j] = configurations[(i*2)+3][(j * 64) + 64 -1:j * 64];
-    end
-  end
-  endgenerate
-
-  //Criação das filas de entrada
-  wire [8-1:0] re_fifo_in;
-  wire [8-1:0] almostempty_fifo_in;
-  wire [8-1:0] empty_fifo_in;
-  wire [8-1:0] almostfull_fifo_in;
-  wire [8-1:0] full_fifo_in;
-  wire [5-1:0] count_fifo_in [0:8-1];
-  wire [512-1:0] dout_fifo_in [0:8-1];
-
-  generate for(i=0; i<8; i=i+1) begin : gen_6
-    assign fifos_in_read_request[i] = addr_offset_data_in[i] - counter_received_data_in[i] + count_fifo_in[i] < FIFO_IN_FULL;
-  end
-  endgenerate
+  wire [ADDR_WIDTH+TAG_WIDTH-1:0] req_rd_fifo_sel_dout;
+  wire req_rd_fifo_sel_dout_valid;
+  wire [DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH-1:0] req_wr_fifo_sel_dout;
+  wire req_wr_fifo_sel_dout_valid;
 
 
-  generate for(i=0; i<8; i=i+1) begin : gen_7
+  localparam FSM_REQ_RD_IDLE = 0;
+  localparam FSM_REQ_RD_WAIT = 1;
+  reg [1-1:0] fsm_req_rd;
+  localparam FSM_REQ_WR_IDLE = 0;
+  localparam FSM_REQ_WR_WAIT = 1;
+  reg [1-1:0] fsm_req_wr;
+
+  arbiter
+  #(
+    .PORTS(1),
+    .TYPE("ROUND_ROBIN"),
+    .BLOCK("NONE"),
+    .LSB_PRIORITY("LOW")
+  )
+  rd_req_arbiter
+  (
+    .clk(clk),
+    .rst(rst),
+    .request(rd_req_arbiter_request),
+    .acknowledge(1'd0),
+    .grant(rd_req_arbiter_grant),
+    .grant_valid(rd_req_arbiter_grant_valid),
+    .grant_encoded(rd_req_arbiter_grant_encoded)
+  );
+
+
+  arbiter
+  #(
+    .PORTS(1),
+    .TYPE("ROUND_ROBIN"),
+    .BLOCK("NONE"),
+    .LSB_PRIORITY("LOW")
+  )
+  wr_req_arbiter
+  (
+    .clk(clk),
+    .rst(rst),
+    .request(wr_req_arbiter_request),
+    .acknowledge(1'd0),
+    .grant(wr_req_arbiter_grant),
+    .grant_valid(wr_req_arbiter_grant_valid),
+    .grant_encoded(wr_req_arbiter_grant_encoded)
+  );
+
+
+  generate for(idx_req_rd_fifo=0; idx_req_rd_fifo<1; idx_req_rd_fifo=idx_req_rd_fifo+1) begin : gen_req_rd_fifos
 
     fifo
     #(
-      .FIFO_WIDTH(512),
-      .FIFO_DEPTH_BITS(5)
+      .FIFO_WIDTH(ADDR_WIDTH + TAG_WIDTH),
+      .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
+      .FIFO_ALMOSTFULL_THRESHOLD(FIFO_FULL - 2),
+      .FIFO_ALMOSTEMPTY_THRESHOLD(2)
     )
-    fifo_in
+    req_rd_fifo
     (
       .clk(clk),
-      .rst(rst | reset_buffers_in[i]),
-      .we(we_fifo_in[i]),
-      .din(resp_rd_data_tmp),
-      .re(re_fifo_in[i]),
-      .dout(dout_fifo_in[i]),
-      .count(count_fifo_in[i]),
-      .empty(empty_fifo_in[i]),
-      .almostempty(almostempty_fifo_in[i]),
-      .full(full_fifo_in[i]),
-      .almostfull(almostfull_fifo_in[i])
+      .rst(rst),
+      .we(afu_req_rd_fifo_we[idx_req_rd_fifo]),
+      .din(afu_req_rd_fifo_din[idx_req_rd_fifo*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH)-1:idx_req_rd_fifo*(ADDR_WIDTH+TAG_WIDTH)]),
+      .re(req_rd_fifo_re[idx_req_rd_fifo]),
+      .valid(req_rd_fifo_valid[idx_req_rd_fifo]),
+      .dout(req_rd_fifo_dout[idx_req_rd_fifo*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH)-1:idx_req_rd_fifo*(ADDR_WIDTH+TAG_WIDTH)]),
+      .count(req_rd_fifo_count[idx_req_rd_fifo*(FIFO_DEPTH_BITS+1)+(FIFO_DEPTH_BITS+1)-1:idx_req_rd_fifo*(FIFO_DEPTH_BITS+1)]),
+      .empty(req_rd_fifo_empty[idx_req_rd_fifo]),
+      .full(afu_req_rd_fifo_full[idx_req_rd_fifo]),
+      .almostfull(afu_req_rd_fifo_almostfull[idx_req_rd_fifo]),
+      .almostempty(req_rd_fifo_amostempty[idx_req_rd_fifo])
     );
 
   end
   endgenerate
 
-  //Criação das filas de saída
-  wire [8-1:0] we_fifo_out;
-  wire [8-1:0] empty_fifo_out;
-  wire [8-1:0] almostfull_fifo_out;
-  wire [8-1:0] full_fifo_out;
-  wire [512-1:0] din_fifo_out [0:8-1];
 
-  generate for(i=0; i<8; i=i+1) begin : gen_8
-    assign fifos_out_read_request[i] = ~empty_fifo_out[i];
-  end
-  endgenerate
-
-
-  generate for(i=0; i<8; i=i+1) begin : gen_9
+  generate for(idx_req_wr_fifo=0; idx_req_wr_fifo<1; idx_req_wr_fifo=idx_req_wr_fifo+1) begin : gen_req_wr_fifos
 
     fifo
     #(
-      .FIFO_WIDTH(512),
-      .FIFO_DEPTH_BITS(5)
+      .FIFO_WIDTH(ADDR_WIDTH + DATA_WIDTH + TAG_WIDTH),
+      .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
+      .FIFO_ALMOSTFULL_THRESHOLD(FIFO_FULL - 2),
+      .FIFO_ALMOSTEMPTY_THRESHOLD(2)
     )
-    fifo_out
+    req_wr_fifo
     (
       .clk(clk),
-      .rst(rst | reset_buffers_out[i]),
-      .we(we_fifo_out[i]),
-      .din(din_fifo_out[i]),
-      .re(re_fifo_out[i]),
-      .dout(dout_fifo_out[i]),
-      .count(count_fifo_out[i]),
-      .empty(empty_fifo_out[i]),
-      .almostempty(almostempty_fifo_out[i]),
-      .full(full_fifo_out[i]),
-      .almostfull(almostfull_fifo_out[i])
+      .rst(rst),
+      .we(afu_req_wr_fifo_we[idx_req_wr_fifo]),
+      .din(afu_req_wr_fifo_din[idx_req_wr_fifo*(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)-1:idx_req_wr_fifo*(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)]),
+      .re(req_wr_fifo_re[idx_req_wr_fifo]),
+      .valid(req_wr_fifo_valid[idx_req_wr_fifo]),
+      .dout(req_wr_fifo_dout[idx_req_wr_fifo*(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)-1:idx_req_wr_fifo*(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)]),
+      .count(req_wr_fifo_count[idx_req_wr_fifo*(FIFO_DEPTH_BITS+1)+(FIFO_DEPTH_BITS+1)-1:idx_req_wr_fifo*(FIFO_DEPTH_BITS+1)]),
+      .empty(req_wr_fifo_empty[idx_req_wr_fifo]),
+      .full(afu_req_wr_fifo_full[idx_req_wr_fifo]),
+      .almostfull(afu_req_wr_fifo_almostfull[idx_req_wr_fifo]),
+      .almostempty(req_wr_fifo_amostempty[idx_req_wr_fifo])
     );
 
   end
   endgenerate
 
-  //Arbitro de leitura
-  wire [8-1:0] grant_in;
-  wire grant_in_valid;
-  wire [3-1:0] grant_in_index;
 
-  arbiter
+  afu_0
   #(
-    .PORTS(8),
-    .TYPE("ROUND_ROBIN"),
-    .BLOCK("NONE"),
-    .LSB_PRIORITY("LOW")
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .QTD_WIDTH(QTD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .CONF_ID_QUEUE_WIDTH(CONF_ID_QUEUE_WIDTH),
+    .INITIAL_INPUT_QUEUE_ID(0),
+    .INITIAL_OUTPUT_QUEUE_ID(0),
+    .NUM_INPUT_QUEUES(1),
+    .NUM_OUTPUT_QUEUES(1),
+    .TAG_WIDTH(TAG_WIDTH),
+    .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
+    .FIFO_FULL(FIFO_FULL)
   )
-  arbiter_in
+  afu_0_1x1
   (
     .clk(clk),
-    .rst(rst),
-    .request(fifos_in_read_request),
-    .acknowledge(8'd0),
-    .grant(grant_in),
-    .grant_valid(grant_in_valid),
-    .grant_encoded(grant_in_index)
-  );
-
-  //Arbitro de escrita
-  wire [8-1:0] grant_out;
-  wire grant_out_valid;
-  wire [3-1:0] grant_out_index;
-  reg [3-1:0] grant_out_index_tmp;
-
-  arbiter
-  #(
-    .PORTS(8),
-    .TYPE("ROUND_ROBIN"),
-    .BLOCK("NONE"),
-    .LSB_PRIORITY("LOW")
-  )
-  arbiter_out
-  (
-    .clk(clk),
-    .rst(rst),
-    .request(fifos_out_read_request),
-    .acknowledge(8'd0),
-    .grant(grant_out),
-    .grant_valid(grant_out_valid),
-    .grant_encoded(grant_out_index)
+    .rst(rst | rst_afus[0]),
+    .start(start_afus[0]),
+    .conf_valid(conf_valid),
+    .conf(conf),
+    .available_read(~afu_req_rd_fifo_almostfull[0:0]),
+    .request_read(afu_req_rd_fifo_we[0:0]),
+    .request_data(afu_req_rd_fifo_din[1*(0*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:1*(0*(ADDR_WIDTH+TAG_WIDTH))]),
+    .read_data_valid(resp_rd_valid),
+    .read_queue_id(resp_rd_mdata),
+    .read_data(resp_rd_data),
+    .available_write(~afu_req_wr_fifo_almostfull[0:0]),
+    .request_write(afu_req_wr_fifo_we[0:0]),
+    .write_data(afu_req_wr_fifo_din[1*(0*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:1*(0*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))]),
+    .write_data_valid(resp_wr_valid),
+    .write_queue_id(resp_wr_mdata)
   );
 
 
-  always @(posedge clk or posedge rst) begin
-    if(rst) begin
-      reset_buffers_in_flag <= 1'b0;
-      reset_buffers_out_flag <= 1'b0;
-      reset_buffers_in_flag_reg <= 1'b0;
-      reset_buffers_out_flag_reg <= 1'b0;
-      rst_buffer_in_index_reg <= 7'd0;
-      rst_buffer_out_index_reg <= 7'd0;
-      rst_buffer_in_index_reg_reg <= 7'd0;
-      rst_buffer_out_index_reg_reg <= 7'd0;
-    end else begin
-      reset_buffers_in_flag <= (rst_buffer_in_index != 7'b0)? 1'b1 : 1'b0;
-      reset_buffers_out_flag <= (rst_buffer_out_index != 7'b0)? 1'b1 : 1'b0;
-      reset_buffers_in_flag_reg <= reset_buffers_in_flag;
-      reset_buffers_out_flag_reg <= reset_buffers_out_flag;
-      rst_buffer_in_index_reg <= rst_buffer_in_index - 7'd1;
-      rst_buffer_out_index_reg <= rst_buffer_out_index - 7'd1;
-      rst_buffer_in_index_reg_reg <= rst_buffer_in_index_reg;
-      rst_buffer_out_index_reg_reg <= rst_buffer_out_index_reg;
-    end
-  end
+  select_ff
+  #(
+    .DATA_WIDTH(ADDR_WIDTH + TAG_WIDTH)
+  )
+  req_rd_fifo_sel
+  (
+    .clk(clk),
+    .rst(rst),
+    .data_in_valid(req_rd_fifo_valid),
+    .data_in_0(req_rd_fifo_dout[(0*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:0*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_out_valid(req_rd_fifo_sel_dout_valid),
+    .data_out(req_rd_fifo_sel_dout)
+  );
 
-  assign pending_writes_afus[0] = ~req_wr_en && (pending_writes_fifos_out[0] == 32'd0 && empty_fifo_out[0]);
-  assign pending_writes_afus[1] = ~req_wr_en && (pending_writes_fifos_out[1] == 32'd0 && empty_fifo_out[1]);
-  assign pending_writes_afus[2] = ~req_wr_en && (pending_writes_fifos_out[2] == 32'd0 && empty_fifo_out[2]);
-  assign pending_writes_afus[3] = ~req_wr_en && (pending_writes_fifos_out[3] == 32'd0 && empty_fifo_out[3]);
-  assign pending_writes_afus[4] = ~req_wr_en && (pending_writes_fifos_out[4] == 32'd0 && empty_fifo_out[4]);
-  assign pending_writes_afus[5] = ~req_wr_en && (pending_writes_fifos_out[5] == 32'd0 && empty_fifo_out[5]);
-  assign pending_writes_afus[6] = ~req_wr_en && (pending_writes_fifos_out[6] == 32'd0 && empty_fifo_out[6]);
-  assign pending_writes_afus[7] = ~req_wr_en && (pending_writes_fifos_out[7] == 32'd0 && empty_fifo_out[7]);
-  integer rst_counter_index;
 
-  always @(posedge clk or posedge rst) begin
+  select_ff
+  #(
+    .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)
+  )
+  req_wr_fifo_sel
+  (
+    .clk(clk),
+    .rst(rst),
+    .data_in_valid(req_wr_fifo_valid),
+    .data_in_0(req_wr_fifo_dout[(0*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:0*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_out_valid(req_wr_fifo_sel_dout_valid),
+    .data_out(req_wr_fifo_sel_dout)
+  );
+
+
+  always @(posedge clk) begin
     if(rst) begin
-      for(rst_counter_index=0; rst_counter_index<8; rst_counter_index=rst_counter_index+1) begin
-        pending_writes_fifos_out[rst_counter_index] <= 8'd0;
-      end
+      fsm_req_rd <= 0;
+      rd_req_arbiter_request <= 0;
+      req_rd_fifo_re <= 0;
     end else begin
-      case({ req_wr_en, resp_wr_valid })
-        2'b1: begin
-          pending_writes_fifos_out[resp_wr_mdata] <= pending_writes_fifos_out[resp_wr_mdata] - 8'd1;
-        end
-        2'b10: begin
-          pending_writes_fifos_out[req_wr_mdata] <= pending_writes_fifos_out[req_wr_mdata] + 8'd1;
-        end
-        2'b11: begin
-          if(resp_wr_mdata != req_wr_mdata) begin
-            pending_writes_fifos_out[resp_wr_mdata] <= pending_writes_fifos_out[resp_wr_mdata] - 8'd1;
-            pending_writes_fifos_out[req_wr_mdata] <= pending_writes_fifos_out[req_wr_mdata] + 8'd1;
+      rd_req_arbiter_request <= 0;
+      req_rd_fifo_re <= 0;
+      case(fsm_req_rd)
+        FSM_REQ_RD_IDLE: begin
+          if(req_rd_available) begin
+            rd_req_arbiter_request <= ~req_rd_fifo_empty;
+          end 
+          if(rd_req_arbiter_grant_valid) begin
+            req_rd_fifo_re <= rd_req_arbiter_grant;
+            fsm_req_rd <= FSM_REQ_RD_WAIT;
           end 
         end
-        default: begin
+        FSM_REQ_RD_WAIT: begin
+          if(req_rd_en) begin
+            fsm_req_rd <= FSM_REQ_RD_IDLE;
+          end 
         end
       endcase
     end
   end
 
-  //Máquina responsável por fazer a leitura das configurações de ponteiros para os
-  //registradores respectivos e dos dados para as filas
-  //Parâmetros locais:
-  localparam FSM_RD_REQ_READ_CONF = 0;
-  localparam FSM_RD_REQ_READ_DATA = 1;
-  wire read_req_data;
-  assign read_req_data = req_rd_available && grant_in_valid && (addr_offset_data_in[grant_in_index] < qtde_data_in[grant_in_index]);
 
-  always @(posedge clk or posedge rst or posedge update_workspace or posedge reset_buffers_in_flag_reg) begin
+  always @(posedge clk) begin
     if(rst) begin
-      addr_offset_conf <= 3'd0;
+      fsm_req_wr <= 0;
+      wr_req_arbiter_request <= 0;
+      req_wr_fifo_re <= 0;
+    end else begin
+      wr_req_arbiter_request <= 0;
+      req_wr_fifo_re <= 0;
+      case(fsm_req_wr)
+        FSM_REQ_WR_IDLE: begin
+          if(req_wr_available) begin
+            wr_req_arbiter_request <= ~req_wr_fifo_empty;
+          end 
+          if(wr_req_arbiter_grant_valid) begin
+            req_wr_fifo_re <= wr_req_arbiter_grant;
+            fsm_req_wr <= FSM_REQ_WR_WAIT;
+          end 
+        end
+        FSM_REQ_WR_WAIT: begin
+          if(req_wr_en) begin
+            fsm_req_wr <= FSM_REQ_WR_IDLE;
+          end 
+        end
+      endcase
+    end
+  end
+
+
+  always @(posedge clk) begin
+    if(rst) begin
       req_rd_en <= 1'b0;
-      req_rd_addr <= 64'b0;
-      req_rd_mdata <= 16'b0;
-      fsm_rd <= FSM_RD_REQ_READ_CONF;
-      for(rst_counter_index=0; rst_counter_index<8; rst_counter_index=rst_counter_index+1) begin
-        addr_offset_data_in[rst_counter_index] <= 64'd0;
-      end
+      req_rd_addr <= 0;
+      req_rd_mdata <= 0;
     end else begin
-      if(update_workspace) begin
-        addr_offset_conf <= 3'd0;
-        req_rd_en <= 1'b0;
-        req_rd_addr <= 64'b0;
-        req_rd_mdata <= 16'b0;
-        fsm_rd <= FSM_RD_REQ_READ_CONF;
-      end else if(reset_buffers_in_flag_reg) begin
-        addr_offset_data_in[rst_buffer_in_index_reg_reg] <= 64'd0;
-      end else begin
-        if(start) begin
-          req_rd_en <= 1'b0;
-          case(fsm_rd)
-            FSM_RD_REQ_READ_CONF: begin
-              if(addr_offset_conf < conf_size) begin
-                if(req_rd_available) begin
-                  addr_offset_conf <= addr_offset_conf + 3'd1;
-                  req_rd_addr <= configurations_addr_base + addr_offset_conf;
-                  req_rd_mdata <= TAG_RD_CONF;
-                  req_rd_en <= 1'b1;
-                end 
-              end else if(counter_received_conf >= conf_size) begin
-                fsm_rd <= FSM_RD_REQ_READ_DATA;
-              end 
-            end
-            FSM_RD_REQ_READ_DATA: begin
-              if(read_req_data) begin
-                addr_offset_data_in[grant_in_index] <= addr_offset_data_in[grant_in_index] + 64'd1;
-                req_rd_addr <= addr_in[grant_in_index][63:6] + addr_offset_data_in[grant_in_index];
-                req_rd_en <= 1'b1;
-                req_rd_mdata <= grant_in_index;
-              end 
-            end
-          endcase
-        end 
-      end
-    end
-  end
-
-  //Máquina responsável por fazer a leitura das fifos e gravar de volta na memória
-  //Parâmetros locais:
-  localparam FSM_WR_REQ_IDLE = 0;
-  localparam FSM_WR_REQ_WRITE_DSM = 1;
-  localparam FSM_WR_REQ_WRITE_DATA = 2;
-
-  reg [16-1:0] counter_write_dsm;
-  reg dsm_wr_ready;
-
-  wire fifo_out_almost_ready;
-  wire fifo_out_ready;
-  assign fifo_out_almost_ready = fifos_out_read_request && !almostempty_fifo_out[grant_out_index];
-  assign fifo_out_ready = fifos_out_read_request && (count_fifo_out[grant_out_index] > 5'd0);
-
-  always @(posedge clk or posedge rst or posedge reset_buffers_out_flag_reg) begin
-    if(rst) begin
-      counter_write_dsm <= 16'd0;
-      req_wr_en <= 1'd0;
-      req_wr_addr <= 64'd0;
-      req_wr_mdata <= 16'd0;
-      req_wr_data <= 512'd0;
-      re_fifo_out <= 8'd0;
-      grant_out_index_tmp <= 3'd0;
-      fsm_wr <= FSM_WR_REQ_IDLE;
-      for(rst_counter_index=0; rst_counter_index<8; rst_counter_index=rst_counter_index+1) begin
-        addr_offset_data_out[rst_counter_index] <= 64'd0;
-      end
-    end else begin
-      if(reset_buffers_out_flag_reg) begin
-        addr_offset_data_out[rst_buffer_out_index_reg_reg] <= 64'd0;
-      end else begin
-        if(start) begin
-          req_wr_en <= 1'b0;
-          re_fifo_out <= 8'd0;
-          case(fsm_wr)
-            FSM_WR_REQ_IDLE: begin
-              if(req_wr_available) begin
-                if(dsm_wr_ready) begin
-                  counter_write_dsm <= 16'd0;
-                  fsm_wr <= FSM_WR_REQ_WRITE_DSM;
-                end else if(fifo_out_ready) begin
-                  grant_out_index_tmp <= grant_out_index;
-                  re_fifo_out[grant_out_index] <= 1'b1;
-                  fsm_wr <= FSM_WR_REQ_WRITE_DATA;
-                end 
-              end 
-            end
-            FSM_WR_REQ_WRITE_DSM: begin
-              if(counter_write_dsm >= dsm_size) begin
-                fsm_wr <= FSM_WR_REQ_IDLE;
-              end else if(req_wr_available) begin
-                req_wr_addr <= dsm_addr_base + counter_write_dsm;
-                req_wr_mdata <= TAG_WR_DSM;
-                req_wr_data <= dsm[counter_write_dsm];
-                req_wr_en <= 1'b1;
-                counter_write_dsm <= counter_write_dsm + 16'd1;
-              end 
-            end
-            FSM_WR_REQ_WRITE_DATA: begin
-              addr_offset_data_out[grant_out_index_tmp] <= addr_offset_data_out[grant_out_index_tmp] + 64'd1;
-              req_wr_addr <= addr_out[grant_out_index_tmp][63:6] + addr_offset_data_out[grant_out_index_tmp];
-              req_wr_mdata <= grant_out_index_tmp;
-              req_wr_data <= dout_fifo_out[grant_out_index_tmp];
-              req_wr_en <= 1'b1;
-              if(fifo_out_almost_ready && req_wr_available && !dsm_wr_ready) begin
-                grant_out_index_tmp <= grant_out_index;
-                re_fifo_out[8'b0] <= 1'b1;
-                fsm_wr <= FSM_WR_REQ_WRITE_DATA;
-              end else begin
-                fsm_wr <= FSM_WR_REQ_IDLE;
-              end
-            end
-          endcase
-        end 
-      end
-    end
-  end
-
-  //Machine for receiving cache data and:
-  //1 - save in configuration regs and
-  //2 - queuing in the queue.
-
-  always @(posedge clk or posedge rst or posedge update_workspace or posedge reset_buffers_in_flag_reg) begin
-    if(rst) begin
-      counter_received_conf <= 1'b0;
-      we_fifo_in <= 8'd0;
-      resp_rd_data_tmp <= 512'd0;
-      for(rst_counter_index=0; rst_counter_index<8; rst_counter_index=rst_counter_index+1) begin
-        counter_received_data_in[rst_counter_index] <= 64'd0;
-      end
-      for(rst_counter_index=0; rst_counter_index<4; rst_counter_index=rst_counter_index+1) begin
-        configurations[rst_counter_index] <= 512'd0;
-      end
-    end else begin
-      if(update_workspace) begin
-        counter_received_conf <= 1'b0;
-      end else if(reset_buffers_in_flag_reg) begin
-        counter_received_data_in[rst_buffer_in_index_reg] <= 64'd0;
-      end else begin
-        if(start) begin
-          we_fifo_in <= 8'd0;
-          if(resp_rd_valid) begin
-            if(resp_rd_mdata == TAG_RD_CONF) begin
-              if(counter_received_conf < conf_size) begin
-                configurations[counter_received_conf] <= resp_rd_data;
-                counter_received_conf <= counter_received_conf + 3'd1;
-              end 
-            end else begin
-              resp_rd_data_tmp <= resp_rd_data;
-              counter_received_data_in[resp_rd_mdata] <= counter_received_data_in[resp_rd_mdata] + 64'd1;
-              we_fifo_in[resp_rd_mdata] <= 1'd1;
-            end
-          end 
-        end 
-      end
-    end
-  end
-
-  //Machine responsible for receiving written data responses.
-
-  always @(posedge clk or posedge rst or posedge reset_buffers_out_flag_reg) begin
-    if(rst) begin
-      for(rst_counter_index=0; rst_counter_index<8; rst_counter_index=rst_counter_index+1) begin
-        counter_sent_data_out[rst_counter_index] <= 64'd0;
-      end
-    end else begin
-      if(reset_buffers_out_flag_reg) begin
-        counter_sent_data_out[rst_buffer_out_index_reg_reg] <= 64'd0;
-      end else begin
-        if(start) begin
-          if(resp_wr_valid) begin
-            if(resp_wr_mdata != TAG_WR_DSM) begin
-              counter_sent_data_out[resp_wr_mdata] <= counter_sent_data_out[resp_wr_mdata] + 64'd1;
-            end 
-          end 
-        end 
-      end
-    end
-  end
-
-  //Recebimento de reset dos buffers de entrada e saida
-
-  always @(posedge clk or posedge rst) begin
-    if(rst) begin
-      reset_buffers_in <= 8'd0;
-      reset_buffers_out <= 8'd0;
-    end else begin
-      if(start) begin
-        if(reset_buffers_in_flag_reg) begin
-          reset_buffers_in[rst_buffer_in_index_reg_reg] <= 1'b1;
-        end 
-        if(reset_buffers_out_flag_reg) begin
-          reset_buffers_out[rst_buffer_out_index_reg_reg] <= 1'b1;
-        end 
-      end 
-    end
-  end
-
-  localparam FIRST_UPDATE = 0;
-  localparam CHECK_DSM = 1;
-  localparam WAIT_DSM_WRITE = 2;
-  wire update_dsm;
-  integer index;
-  reg [2-1:0] fsm_dsm;
-  reg [16-1:0] counter_written_dsm;
-  assign update_dsm = |((done_reg_vet ^ done_reg_vet_last) & done_reg_vet);
-
-  always @(posedge clk or posedge rst) begin
-    if(rst) begin
-      dsm_wr_ready <= 1'b0;
-      counter_written_dsm <= 16'd0;
-      done_reg_vet_last <= 512'd0;
-      for(rst_counter_index=0; rst_counter_index<3; rst_counter_index=rst_counter_index+1) begin
-        dsm[rst_counter_index] <= 512'd0;
-      end
-      fsm_dsm <= FIRST_UPDATE;
-    end else begin
-      if(start) begin
-        case(fsm_dsm)
-          FIRST_UPDATE: begin
-            if(update_dsm) begin
-              done_reg_vet_last <= done_reg_vet;
-              fsm_dsm <= CHECK_DSM;
-            end 
-          end
-          CHECK_DSM: begin
-            if(update_dsm) begin
-              done_reg_vet_last <= done_reg_vet;
-              dsm[2] <= done_reg_vet;
-              for(index=0; index<1; index=index+1) begin
-                dsm[index] <= { counter_received_data_in[index * 8 + 7], counter_received_data_in[index * 8 + 6], counter_received_data_in[index * 8 + 5], counter_received_data_in[index * 8 + 4], counter_received_data_in[index * 8 + 3], counter_received_data_in[index * 8 + 2], counter_received_data_in[index * 8 + 1], counter_received_data_in[index * 8 + 0] };
-                dsm[index + 1] <= { counter_sent_data_out[index * 8 + 7], counter_sent_data_out[index * 8 + 6], counter_sent_data_out[index * 8 + 5], counter_sent_data_out[index * 8 + 4], counter_sent_data_out[index * 8 + 3], counter_sent_data_out[index * 8 + 2], counter_sent_data_out[index * 8 + 1], counter_sent_data_out[index * 8 + 0] };
-              end
-              counter_written_dsm <= 16'd0;
-              dsm_wr_ready <= 1'b1;
-              fsm_dsm <= WAIT_DSM_WRITE;
-            end 
-          end
-          WAIT_DSM_WRITE: begin
-            if(fsm_wr == FSM_WR_REQ_WRITE_DSM) begin
-              dsm_wr_ready <= 1'b0;
-            end 
-            if(resp_wr_valid) begin
-              if(resp_wr_mdata == TAG_WR_DSM) begin
-                counter_written_dsm <= counter_written_dsm + 16'd1;
-              end 
-            end 
-            if(counter_written_dsm >= dsm_size) begin
-              fsm_dsm <= CHECK_DSM;
-            end 
-          end
-        endcase
+      req_rd_en <= 1'b0;
+      if(req_rd_fifo_sel_dout_valid) begin
+        req_rd_en <= 1'b1;
+        req_rd_mdata <= req_rd_fifo_sel_dout[TAG_WIDTH-1:0];
+        req_rd_addr <= req_rd_fifo_sel_dout[ADDR_WIDTH+TAG_WIDTH-1:TAG_WIDTH];
       end 
     end
   end
 
 
-  uut_afu_0_1_1
-  uut_afu_0_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[0]),
-    .start(start_afus[0]),
-    .available_read0(~empty_fifo_in[0]),
-    .almost_empty_read0(almostempty_fifo_in[0]),
-    .req_rd_data0(re_fifo_in[0]),
-    .rd_data0(dout_fifo_in[0]),
-    .available_write0(~almostfull_fifo_out[0]),
-    .req_wr_data0(we_fifo_out[0]),
-    .wr_data0(din_fifo_out[0]),
-    .done(done_uut_afu[0])
-  );
-
-
-  uut_afu_1_1_1
-  uut_afu_1_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[1]),
-    .start(start_afus[1]),
-    .available_read0(~empty_fifo_in[1]),
-    .almost_empty_read0(almostempty_fifo_in[1]),
-    .req_rd_data0(re_fifo_in[1]),
-    .rd_data0(dout_fifo_in[1]),
-    .available_write0(~almostfull_fifo_out[1]),
-    .req_wr_data0(we_fifo_out[1]),
-    .wr_data0(din_fifo_out[1]),
-    .done(done_uut_afu[1])
-  );
-
-
-  uut_afu_2_1_1
-  uut_afu_2_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[2]),
-    .start(start_afus[2]),
-    .available_read0(~empty_fifo_in[2]),
-    .almost_empty_read0(almostempty_fifo_in[2]),
-    .req_rd_data0(re_fifo_in[2]),
-    .rd_data0(dout_fifo_in[2]),
-    .available_write0(~almostfull_fifo_out[2]),
-    .req_wr_data0(we_fifo_out[2]),
-    .wr_data0(din_fifo_out[2]),
-    .done(done_uut_afu[2])
-  );
-
-
-  uut_afu_3_1_1
-  uut_afu_3_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[3]),
-    .start(start_afus[3]),
-    .available_read0(~empty_fifo_in[3]),
-    .almost_empty_read0(almostempty_fifo_in[3]),
-    .req_rd_data0(re_fifo_in[3]),
-    .rd_data0(dout_fifo_in[3]),
-    .available_write0(~almostfull_fifo_out[3]),
-    .req_wr_data0(we_fifo_out[3]),
-    .wr_data0(din_fifo_out[3]),
-    .done(done_uut_afu[3])
-  );
-
-
-  uut_afu_4_1_1
-  uut_afu_4_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[4]),
-    .start(start_afus[4]),
-    .available_read0(~empty_fifo_in[4]),
-    .almost_empty_read0(almostempty_fifo_in[4]),
-    .req_rd_data0(re_fifo_in[4]),
-    .rd_data0(dout_fifo_in[4]),
-    .available_write0(~almostfull_fifo_out[4]),
-    .req_wr_data0(we_fifo_out[4]),
-    .wr_data0(din_fifo_out[4]),
-    .done(done_uut_afu[4])
-  );
-
-
-  uut_afu_5_1_1
-  uut_afu_5_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[5]),
-    .start(start_afus[5]),
-    .available_read0(~empty_fifo_in[5]),
-    .almost_empty_read0(almostempty_fifo_in[5]),
-    .req_rd_data0(re_fifo_in[5]),
-    .rd_data0(dout_fifo_in[5]),
-    .available_write0(~almostfull_fifo_out[5]),
-    .req_wr_data0(we_fifo_out[5]),
-    .wr_data0(din_fifo_out[5]),
-    .done(done_uut_afu[5])
-  );
-
-
-  uut_afu_6_1_1
-  uut_afu_6_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[6]),
-    .start(start_afus[6]),
-    .available_read0(~empty_fifo_in[6]),
-    .almost_empty_read0(almostempty_fifo_in[6]),
-    .req_rd_data0(re_fifo_in[6]),
-    .rd_data0(dout_fifo_in[6]),
-    .available_write0(~almostfull_fifo_out[6]),
-    .req_wr_data0(we_fifo_out[6]),
-    .wr_data0(din_fifo_out[6]),
-    .done(done_uut_afu[6])
-  );
-
-
-  uut_afu_7_1_1
-  uut_afu_7_1_1
-  (
-    .clk(clk),
-    .rst(rst | rst_afus[7]),
-    .start(start_afus[7]),
-    .available_read0(~empty_fifo_in[7]),
-    .almost_empty_read0(almostempty_fifo_in[7]),
-    .req_rd_data0(re_fifo_in[7]),
-    .rd_data0(dout_fifo_in[7]),
-    .available_write0(~almostfull_fifo_out[7]),
-    .req_wr_data0(we_fifo_out[7]),
-    .wr_data0(din_fifo_out[7]),
-    .done(done_uut_afu[7])
-  );
-
-
-  always @(posedge clk or posedge rst) begin
+  always @(posedge clk) begin
     if(rst) begin
-      info <= 576'd0;
+      req_wr_en <= 1'b0;
+      req_wr_addr <= 0;
+      req_wr_mdata <= 0;
+      req_wr_data <= 0;
     end else begin
-      info[0] <= (counter_received_conf >= 4)? 1'b1 : 1'b0;
-      info[63:1] <= 63'd0;
-      info[79:64] <= {8'd1, 8'd1};
-      info[95:80] <= {8'd1, 8'd1};
-      info[111:96] <= {8'd1, 8'd1};
-      info[127:112] <= {8'd1, 8'd1};
-      info[143:128] <= {8'd1, 8'd1};
-      info[159:144] <= {8'd1, 8'd1};
-      info[175:160] <= {8'd1, 8'd1};
-      info[191:176] <= {8'd1, 8'd1};
+      req_wr_en <= 1'b0;
+      if(req_wr_fifo_sel_dout_valid) begin
+        req_wr_en <= 1'b1;
+        req_wr_mdata <= req_wr_fifo_sel_dout[TAG_WIDTH-1:0];
+        req_wr_addr <= req_wr_fifo_sel_dout[ADDR_WIDTH+TAG_WIDTH-1:TAG_WIDTH];
+        req_wr_data <= req_wr_fifo_sel_dout[DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH-1:ADDR_WIDTH+TAG_WIDTH];
+      end 
+    end
+  end
+
+
+  always @(posedge clk) begin
+    if(rst) begin
+      info <= 512'd0;
+    end else begin
+      info[15:0] <= {8'd1, 8'd1};
 
     end
   end

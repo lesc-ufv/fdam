@@ -56,6 +56,6 @@ module priority_encoder #
   end
   endgenerate
 
-  assign output_unencoded = 1 << output_encoded;
+  assign output_unencoded = 1'b1 << output_encoded;
 
 endmodule

@@ -51,5 +51,5 @@ def make_priority_encoder():
         end else begin\n\
             assign output_encoded = valid1 ? {1\'b0, out1} : {1\'b1, out2};\n\
         end')
-    m.EmbeddedCode('assign output_unencoded = 1 << output_encoded;')
+    m.EmbeddedCode('assign output_unencoded = 1\'b1 << output_encoded;')
     return m

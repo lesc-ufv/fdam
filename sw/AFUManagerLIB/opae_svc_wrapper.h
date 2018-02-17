@@ -38,11 +38,11 @@
 
 typedef class OPAE_SVC_WRAPPER SVC_WRAPPER;
 
-class OPAE_SVC_WRAPPER {
-public:
+class OPAE_SVC_WRAPPER
+{
+  public:
     // The constructor and destructor connect to and disconnect from the FPGA.
-    OPAE_SVC_WRAPPER(const char *accel_uuid);
-
+    OPAE_SVC_WRAPPER(const char* accel_uuid);
     ~OPAE_SVC_WRAPPER();
 
     // Any errors in constructor?
@@ -54,11 +54,13 @@ public:
     //
     // Wrap MMIO write and read.
     //
-    fpga_result mmioWrite64(uint32_t idx, uint64_t v) {
+    fpga_result mmioWrite64(uint32_t idx, uint64_t v)
+    {
         return fpgaWriteMMIO64(accel_handle, 0, idx, v);
     }
 
-    uint64_t mmioRead64(uint32_t idx) {
+    uint64_t mmioRead64(uint32_t idx)
+    {
         fpga_result r;
         uint64_t v;
 
@@ -75,21 +77,20 @@ public:
     // The function returns the virtual address of the buffer and also
     // the I/O (physical) address if ioAddress isn't NULL.
     //
-    void *allocBuffer(size_t nBytes, uint64_t *ioAddress = NULL);
-
-    void freeBuffer(void *va);
+    void* allocBuffer(size_t nBytes, uint64_t* ioAddress = NULL);
+    void freeBuffer(void* va);
 
     mpf_handle_t mpf_handle;
 
-protected:
+  protected:
     fpga_handle accel_handle;
 
     bool is_ok;
     bool is_simulated;
 
-private:
+  private:
     // Connect to an accelerator
-    fpga_result findAndOpenAccel(const char *accel_uuid);
+    fpga_result findAndOpenAccel(const char* accel_uuid);
 
     // Is the HW simulated with ASE or real?
     bool probeForASE();

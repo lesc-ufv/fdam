@@ -10,7 +10,6 @@ AFUManager::AFUManager(const char *accel_uuid) {
     AFUManager::csrs = new CSR_MGR(*AFUManager::fpga);
     AFUManager::readInfoHwAfu();
     assert(AFUManager::numAFUs > 0);
-    AFUManager::createWorkspace();
     AFUManager::createAFUs();
 }
 
@@ -29,9 +28,9 @@ void AFUManager::readInfoHwAfu() {
     inf[6] = AFUManager::readCSR(REG_INF_7);
     inf[7] = AFUManager::readCSR(REG_INF_8);
     int index = 0;
-    for (int i = 0; i < 8; ++i) {
+    for (unsigned long i : inf) {
         for (int j = 0; j < 8; ++j) {
-            AFUManager::afuInfo[index] = (int) ((inf[i] >> j * 8) & 0xFF);
+            AFUManager::afuInfo[index] = (int) ((i >> j * 8) & 0xFF);
             index++;
         }
     }
@@ -45,10 +44,9 @@ void AFUManager::readInfoHwAfu() {
         AFUManager::numInputBuffers += AFUManager::afuInfo[k];
         AFUManager::numOutputBuffers += AFUManager::afuInfo[k + 1];
     }
-
 }
 
-AFU *AFUManager::getAFU(afu_id id) {
+AFU *AFUManager::getAFU(afuid_t id) {
     if (id < AFUManager::numAFUs) {
         return AFUManager::AFUs.at(id);
     } else {
@@ -72,137 +70,70 @@ bool AFUManager::AFUIsSimulated() {
 }
 
 void *AFUManager::fpgaAllocBuffer(size_t numBytes) {
-    AFUManager::commitedWorkspace = false;
     return AFUManager::fpga->allocBuffer(numBytes);
 }
 
 void AFUManager::fpgaFreeBuffer(void *ptr) {
-    AFUManager::commitedWorkspace = false;
     AFUManager::fpga->freeBuffer(ptr);
-}
-
-void AFUManager::createWorkspace() {
-    int num_cl_conf_in = (int) (2 * std::ceil((double) AFUManager::numInputBuffers / 8));
-    int num_cl_conf_out = (int) (2 * std::ceil((double) AFUManager::numOutputBuffers / 8));
-    AFUManager::numClConfs = num_cl_conf_in + num_cl_conf_out;
-    AFUManager::numClDSM = 1 + (AFUManager::numClConfs / 2);
-    size_t workspaceSize = (size_t) CL(AFUManager::numClConfs + AFUManager::numClDSM);
-    uint64_t size = (uint64_t) AFUManager::numClDSM;
-    size = size << 16L;
-    size |= AFUManager::numClConfs;
-
-    AFUManager::workspace = (uint64_t *) AFUManager::fpgaAllocBuffer(workspaceSize);
-    assert(NULL != AFUManager::workspace);
-    memset(AFUManager::workspace, 0x00, workspaceSize);
-
-    AFUManager::dsm = (uint64_t *) (((char *) AFUManager::workspace) + CL(AFUManager::numClConfs));
-    AFUManager::writeCSR(REG_ADDR_WORKSPACE_BASE, (uint64_t) intptr_t(AFUManager::workspace));
-    AFUManager::writeCSR(REG_WORKSPACE_SIZE, size);
 }
 
 void AFUManager::createAFUs() {
     for (int i = 0; i < AFUManager::numAFUs; ++i) {
         int numInputBuffers = afuInfo[i * 2];
         int numOutputBuffers = afuInfo[i * 2 + 1];
-        afu_id id = (afu_id) i;
+        auto id = (afuid_t) i;
         AFUManager::AFUs[id] = new AFU(*this, id, numInputBuffers, numOutputBuffers);
     }
 }
 
 void AFUManager::clear() {
-    AFUManager::commitedWorkspace = false;
-    AFUManager::writeCSR(REG_CFG, AFU_CONTROLLER_STOP);
-    for (map<afu_id, AFU *>::iterator it = AFUManager::AFUs.begin(); it != AFUManager::AFUs.end(); ++it)
-        delete (it->second);
+    for (auto &it : AFUManager::AFUs)
+        delete (it.second);
 
-    AFUManager::fpgaFreeBuffer((void *)AFUManager::workspace);
     delete AFUManager::csrs;
     delete AFUManager::fpga;
 }
 
-void AFUManager::commitWorkspace() {
-    AFUManager::commitedWorkspace = false;
-    AFUManager::updateWorkspace();
-    AFUManager::writeCSR(REG_CFG, AFU_CONTROLLER_STOP);
-    AFUManager::writeCSR(REG_CFG, AFU_CONTROLLER_UPDATE_WKP);
-    int result = 1;
-    struct timespec pause;
-    pause.tv_sec = 0;
-    pause.tv_nsec = 500000;//0.5 milis
-    while (result != 0) {
-        nanosleep(&pause, NULL);
-        result = (int) (AFUManager::readCSR(REG_AFU_CONTROLLER_STATUS) & 1L);
-    };
-    AFUManager::writeCSR(REG_CFG, AFU_CONTROLLER_START);
-    while (result == 0) {
-        nanosleep(&pause, NULL);
-        result = (int) (AFUManager::readCSR(REG_AFU_CONTROLLER_STATUS) & 1L);
-    };
-    AFUManager::commitedWorkspace = true;
-}
-
-bool AFUManager::workspaceIscommited() {
-    return AFUManager::commitedWorkspace;
-}
-
-int AFUManager::getNumClConf() {
-    return AFUManager::numClConfs;
-}
-
-int AFUManager::getNumClDSM() {
-    return AFUManager::numClDSM;
-}
-
 void AFUManager::startAFUs(uint64_t startAfus) {
-    if (!AFUManager::workspaceIscommited())
-        AFUManager::commitWorkspace();
     AFUManager::writeCSR(REG_START_AFUs, startAfus);
-
 }
 
 void AFUManager::stopAFUs(uint64_t stopAfus) {
     AFUManager::writeCSR(REG_STOP_AFUs, stopAfus);
 }
 
+void AFUManager::resetAFUs(uint64_t resetAfus) {
+    AFUManager::writeCSR(REG_RESET_AFUs, resetAfus);
+}
+
 void AFUManager::waitAllDone(int64_t timeWaitMax) {
-    uint64_t *done = &AFUManager::dsm[GET_INDEX((AFUManager::getNumClDSM() - 1), 0, 8)];
-    bool flagDone = false;
-    assert(done != nullptr);
-    struct timespec pause;
+    bool flagNoMaxTime = false;
+    struct timespec pause{};
     pause.tv_sec = 0;
     pause.tv_nsec = 500000;
-    timeWaitMax *=2;
-    while (timeWaitMax > 0 && !flagDone) {
-        flagDone = (done[0] & 1L) != 0;
-        timeWaitMax--;
-        nanosleep(&pause, NULL);
+    if (timeWaitMax == 0) {
+        flagNoMaxTime = true;
+        timeWaitMax = 1;
+    }
+    timeWaitMax *= 2;
+    while (timeWaitMax > 0 && !AFUManager::isDoneAll()) {
+        if (!flagNoMaxTime)timeWaitMax--;
+        nanosleep(&pause, nullptr);
     };
-    AFUManager::stopAFUs(0L);
-    AFUManager::setDoneAll(flagDone);
-
 }
 
 bool AFUManager::isDoneAll() {
-    return AFUManager::flagDoneAll;
-}
-
-void AFUManager::setDoneAll(bool doneAll) {
-    AFUManager::flagDoneAll = doneAll;
-    for (map<afu_id, AFU *>::iterator it = AFUManager::AFUs.begin(); it != AFUManager::AFUs.end(); ++it) {
-        AFU *afu = it->second;
-        uint64_t *done = &AFUManager::dsm[GET_INDEX(AFUManager::getNumClDSM() - 1, 0, 8)];
-        uint64_t afuDoneBit = (uint64_t) (1L << (it->first + 1L));
-        bool flagDone = (done[0] & afuDoneBit) != 0L;
-        afu->setDone(flagDone);
-    }
-
+    for (auto &afu : AFUManager::AFUs)
+        if(!afu.second->isDone())
+            return false;
+    return true;
 }
 
 int AFUManager::getNumAFUs() const {
     return numAFUs;
 }
 
-const map<afu_id, AFU *> &AFUManager::getAFUs() const {
+const map<afuid_t, AFU *> &AFUManager::getAFUs() const {
     return AFUs;
 }
 
@@ -212,36 +143,6 @@ int AFUManager::getNumInputBuffers() const {
 
 int AFUManager::getNumOutputBuffers() const {
     return numOutputBuffers;
-}
-
-void AFUManager::updateWorkspace() {
-    AFU *afu;
-    int idBufferGen;
-    int row;
-    int col;
-    int workspaceIndexPointer;
-    int workspaceIndexQtd;
-    for (map<afu_id, AFU *>::iterator it = AFUManager::AFUs.begin(); it != AFUManager::AFUs.end(); ++it) {
-        afu = it->second;
-        for (int i = 0; i < afu->getNumInputBuffer(); ++i) {
-            idBufferGen = (afu->getID() * afu->getNumInputBuffer() + i);
-            row = 2*((idBufferGen - (idBufferGen % 8)) / 8);
-            col = (idBufferGen % 8);
-            workspaceIndexPointer = GET_INDEX(row, col, 8);
-            workspaceIndexQtd = GET_INDEX((row+1), col, 8);
-            AFUManager::workspace[workspaceIndexPointer] = (uint64_t) intptr_t(afu->getInputBuffer(i));
-            AFUManager::workspace[workspaceIndexQtd] = (uint64_t) (afu->getSizeOfInputBuffer(i) / 64); //number in cache lines
-        }
-        for (int i = 0; i < afu->getNumOutputBuffer(); ++i) {
-            idBufferGen = (afu->getID() * afu->getNumOutputBuffer() + i);
-            row = (int) (2 * ((idBufferGen - (idBufferGen % 8)) / 8) + ((std::ceil((double)AFUManager ::getNumInputBuffers() / 8.0)) * 2));
-            col = (idBufferGen % 8);
-            workspaceIndexPointer = GET_INDEX(row, col, 8);
-            workspaceIndexQtd = GET_INDEX((row+1), col, 8);
-            AFUManager::workspace[workspaceIndexPointer] = (uint64_t) intptr_t(afu->getOutputBuffer(i));
-            AFUManager::workspace[workspaceIndexQtd] = (uint64_t) (afu->getSizeOfOutputBuffer(i) / 64); //number in cache lines
-        }
-    }
 }
 
 void AFUManager::printStatics() {
@@ -265,7 +166,7 @@ void AFUManager::printStatics() {
 
     // MFP VTP (virtual to physical) statistics
     if (mpfVtpIsAvailable(AFUManager::fpga->mpf_handle)) {
-        mpf_vtp_stats vtp_stats;
+        mpf_vtp_stats vtp_stats{};
         mpfVtpGetStats(AFUManager::fpga->mpf_handle, &vtp_stats);
         if (vtp_stats.numFailedTranslations) {
             MSG("VTP failed translating VA: 0x" << hex << uint64_t(vtp_stats.ptWalkLastVAddr) << dec);
@@ -282,32 +183,9 @@ void AFUManager::printInfoAFUManager() {
     MSG("AFUManager INFO:");
     MSG("NUM AFUS: " << numAFUs);
     for (int i = 0; i < numAFUs; ++i) {
-        MSG("AFU " << i << ": Input Buffer: " << afuInfo[i] << " Output Buffer: " << afuInfo[i + 1]);
+        MSG("AFU " << i << ": Input queues: " << AFUManager::afuInfo[i] << " Output queues: " << AFUManager::afuInfo[i + 1]);
     }
     END_COLOR();
 }
-
-void AFUManager::printWorkspace() {
-    for (int i = 0; i < AFUManager::numClConfs; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            cout << std::hex << AFUManager::workspace[GET_INDEX(i, j, 8)] << " ";
-        }
-        cout << endl;
-    }
-}
-
-void AFUManager::printDSM() {
-    BEGIN_COLOR(GREEN);
-    MSG("DSM:");
-    for (int i = 0; i < AFUManager::numClDSM; ++i) {
-        cout << "  [APP]  ";
-        for (int j = 7; j >= 0; --j) {
-            cout << std::hex << AFUManager::dsm[GET_INDEX(i, j, 8)] << " ";
-        }
-        cout << endl;
-    }
-    END_COLOR();
-}
-
 
 

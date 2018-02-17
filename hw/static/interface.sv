@@ -73,7 +73,6 @@ module app_afu(
       REG_CLOCK_COUNT,
       REG_CL_WR_COUNT,
       REG_CL_RD_COUNT,
-      REG_AFU_CONTROLLER_STATUS,
       REG_INF_1,
       REG_INF_2,
       REG_INF_3,
@@ -83,7 +82,7 @@ module app_afu(
       REG_INF_7,
       REG_INF_8
     }CSR_RD;
-    logic [576-1:0] info;
+    logic [511:0] info;
     logic [63:0]total_clocks;
     logic [63:0]total_cl_rd;
     logic [63:0]total_cl_wr;
@@ -103,70 +102,75 @@ module app_afu(
         csrs.cpu_rd_csrs[REG_CLOCK_COUNT].data = 64'(total_clocks);
         csrs.cpu_rd_csrs[REG_CL_WR_COUNT].data = 64'(total_cl_wr);
         csrs.cpu_rd_csrs[REG_CL_RD_COUNT].data = 64'(total_cl_rd);        
-        csrs.cpu_rd_csrs[REG_AFU_CONTROLLER_STATUS].data = 64'(info[63:0]);
-        csrs.cpu_rd_csrs[REG_INF_1].data = 64'(info[127:64]);
-        csrs.cpu_rd_csrs[REG_INF_2].data = 64'(info[191:128]);
-        csrs.cpu_rd_csrs[REG_INF_3].data = 64'(info[255:192]);
-        csrs.cpu_rd_csrs[REG_INF_4].data = 64'(info[319:256]);
-        csrs.cpu_rd_csrs[REG_INF_5].data = 64'(info[383:320]);
-        csrs.cpu_rd_csrs[REG_INF_6].data = 64'(info[447:384]);
-        csrs.cpu_rd_csrs[REG_INF_7].data = 64'(info[511:448]);
-        csrs.cpu_rd_csrs[REG_INF_8].data = 64'(info[575:512]);
-        
+        csrs.cpu_rd_csrs[REG_INF_1].data = 64'(info[63:0]);
+        csrs.cpu_rd_csrs[REG_INF_2].data = 64'(info[127:64]);
+        csrs.cpu_rd_csrs[REG_INF_3].data = 64'(info[191:128]);
+        csrs.cpu_rd_csrs[REG_INF_4].data = 64'(info[255:192]);
+        csrs.cpu_rd_csrs[REG_INF_5].data = 64'(info[319:256]);
+        csrs.cpu_rd_csrs[REG_INF_6].data = 64'(info[383:320]);
+        csrs.cpu_rd_csrs[REG_INF_7].data = 64'(info[447:384]);
+        csrs.cpu_rd_csrs[REG_INF_8].data = 64'(info[511:448]);  
         
     end    
     
     //
     // Consume configuration CSR writes
     //
-    
-    typedef enum logic[2:0]{
-      REG_CFG,
-      REG_ADDR_WORKSPACE_BASE,
-      REG_WORKSPACE_SIZE,
+    typedef enum logic[3:0]{
+      REG_CONF_DSM_LOW,
+      REG_CONF_DSM_HIGH,
+      REG_CONF_IN_LOW,
+      REG_CONF_IN_HIGH,
+      REG_CONF_OUT_LOW,
+      REG_CONF_OUT_HIGH,
       REG_START_AFUs,
       REG_STOP_AFUs,
-      REG_RESET_AFUs,
-      REG_INDEX_BUFFER_RESET
+      REG_RESET_AFUs
     }CSR_WR;
     
-    t_byteAddr workspace_addr_base;
-    logic [63:0] workspace_size;
     logic [63:0] start_afus;
     logic [63:0] rst_afus;
-    logic [14-1:0] rst_buffers;
-    logic update_workspace;
-    logic start_afu_manager;
-    logic afu_reset;
+    logic [127:0] conf;
+    logic [1:0]conf_valid;
 
     always_ff @(posedge clk)
     begin
         if(reset)
         begin
-            start_afu_manager <= 1'b0;
-            workspace_addr_base <= t_byteAddr'(0);
-            workspace_size <= 64'd0;
             start_afus <= 64'd0;
             rst_afus <= 64'd0;
-            rst_buffers <= 14'd0;     
-            update_workspace = 1'b0;
-            afu_reset <= 1'b0;
+            conf_valid <= 2'd0;
+            conf <= 128'd0;
         end 
         else begin
-            if (csrs.cpu_wr_csrs[REG_CFG].en)
+            conf_valid <= 2'd0;
+            if(csrs.cpu_wr_csrs[REG_CONF_IN_LOW].en)
             begin
-                start_afu_manager <= csrs.cpu_wr_csrs[REG_CFG].data[0];
-                afu_reset <= csrs.cpu_wr_csrs[REG_CFG].data[1];
-                update_workspace <= csrs.cpu_wr_csrs[REG_CFG].data[2];
-            end
-            if (csrs.cpu_wr_csrs[REG_ADDR_WORKSPACE_BASE].en)
-            begin   
-                workspace_addr_base <= csrs.cpu_wr_csrs[REG_ADDR_WORKSPACE_BASE].data;
-            end
-            if (csrs.cpu_wr_csrs[REG_WORKSPACE_SIZE].en)
+              conf[63:0] <= csrs.cpu_wr_csrs[REG_CONF_IN_LOW].data;
+            end 
+            if(csrs.cpu_wr_csrs[REG_CONF_IN_HIGH].en)
             begin
-                workspace_size <= csrs.cpu_wr_csrs[REG_WORKSPACE_SIZE].data;
-            end
+              conf[127:64] <= csrs.cpu_wr_csrs[REG_CONF_IN_HIGH].data;
+              conf_valid <= 2'd1;
+            end   
+            if(csrs.cpu_wr_csrs[REG_CONF_OUT_LOW].en)
+            begin
+              conf[63:0] <= csrs.cpu_wr_csrs[REG_CONF_OUT_LOW].data;
+            end 
+            if(csrs.cpu_wr_csrs[REG_CONF_OUT_HIGH].en)
+            begin
+              conf[127:64] <= csrs.cpu_wr_csrs[REG_CONF_OUT_HIGH].data;
+              conf_valid <= 2'd2;
+            end 
+            if(csrs.cpu_wr_csrs[REG_CONF_DSM_LOW].en)
+            begin
+              conf[63:0] <= csrs.cpu_wr_csrs[REG_CONF_DSM_LOW].data;
+            end 
+            if(csrs.cpu_wr_csrs[REG_CONF_DSM_HIGH].en)
+            begin
+              conf[127:64] <= csrs.cpu_wr_csrs[REG_CONF_DSM_HIGH].data;
+              conf_valid <= 2'd3;
+            end 
             if (csrs.cpu_wr_csrs[REG_START_AFUs].en)
             begin       
                 start_afus <= start_afus | csrs.cpu_wr_csrs[REG_START_AFUs].data;
@@ -179,10 +183,6 @@ module app_afu(
             begin
                 rst_afus <= csrs.cpu_wr_csrs[REG_RESET_AFUs].data;
             end
-            if (csrs.cpu_wr_csrs[REG_INDEX_BUFFER_RESET].en)
-            begin
-                rst_buffers <= csrs.cpu_wr_csrs[REG_INDEX_BUFFER_RESET].data[14-1:0];
-            end  
         end 
     end
         
@@ -225,24 +225,17 @@ module app_afu(
         
         fiu.c1Tx = cci_mpf_genC1TxWriteReq(wr_hdr,req_wr_data,req_wr_en);
     end 
-    
     afu_manager afu_manager(
     
       .clk(clk),
-      .rst(reset|afu_reset),
-      .start(start_afu_manager),
-      
+      .rst(reset),
+     
       .rst_afus(rst_afus),  
       .start_afus(start_afus),
-     
-      .rst_buffer_in_index(rst_buffers[6:0]),
-      .rst_buffer_out_index(rst_buffers[14-1:7]),
       
-      .workspace_addr_base({(64-$bits(t_byteAddr))'(0),workspace_addr_base}),
-      .conf_size(workspace_size[15:0]),
-      .dsm_size(workspace_size[31:16]),
-      .update_workspace(update_workspace),
-      
+      .conf_valid(conf_valid),
+      .conf(conf),
+        
       .req_rd_en(req_rd_en), 
       .req_rd_available(~fiu.c0TxAlmFull),
       .req_rd_addr(req_rd_addr),
@@ -272,29 +265,30 @@ module app_afu(
           total_cl_wr <= 64'd0;
           total_cl_rd <= 64'd0;
        end 
-       else if(start_afu_manager)begin
-          total_clocks <= total_clocks + 64'd1;
-       end  
-       
-       if(fiu.c1Tx.valid) begin 
-          $display("REQ WR:%d %x DATA %x",fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
+       else begin
+          if(|start_afus)begin 
+             total_clocks <= total_clocks + 64'd1;
+          end
+          
+          if(fiu.c1Tx.valid) begin 
+             $display("%d:REQ WR:%d %x DATA %x",total_clocks,fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
+          end 
+          
+          if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
+             total_cl_wr <= total_cl_wr + 64'd1;
+             $display("%d:RESP WR:%d",total_clocks,fiu.c1Rx.hdr.mdata); 
+          end
+          
+          if(fiu.c0Tx.valid) begin
+             $display("%d:pediu: %x - %x",total_clocks,clAddrToByteAddr(fiu.c0Tx.hdr.base.address),req_rd_addr);
+          end 
+          
+          if(cci_c0Rx_isReadRsp(fiu.c0Rx))
+          begin
+             total_cl_rd <= total_cl_rd + 64'd1;
+            $display("%d:chegou:%d %x",total_clocks,fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
+          end
        end 
-       
-       if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
-          total_cl_wr <= total_cl_wr + 64'd1;
-          $display("RESP WR:%d",fiu.c1Rx.hdr.mdata); 
-       end
-       
-       if(fiu.c0Tx.valid) begin
-          $display("pediu: %x - %x",clAddrToByteAddr(fiu.c0Tx.hdr.base.address),req_rd_addr);
-       end 
-       
-       if(cci_c0Rx_isReadRsp(fiu.c0Rx))
-       begin
-          total_cl_rd <= total_cl_rd + 64'd1;
-         $display("chegou:%d %x",fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
-       end
-       
     end 
     
     //
