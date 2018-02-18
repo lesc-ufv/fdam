@@ -63,8 +63,8 @@ def make_output_queue_controller():
 
     end_req_wr_data.assign((count_req_cl >= qtd_data_cl))
     done.assign(AndList(end_req_wr_data,(write_peding == 0),start))
-    issue_req_data.assign(AndList(start & conf_ready & ~end_req_wr_data & available_write,(~fifo_empty),(~fifo_re)))
-    afu_user_available_write.assign(~fifo_full&~afu_user_request_write)
+    issue_req_data.assign(AndList(start & conf_ready & ~end_req_wr_data & available_write,Mux(fifo_almostempty,(~fifo_empty&~fifo_re),Int(1,1,2))))
+    afu_user_available_write.assign(~fifo_almostfull)
     write_data_valid_queue.assign(AndList(write_data_valid,(write_queue_id == ID_QUEUE)))
 
     m.Always(Posedge(clk))(
@@ -97,7 +97,7 @@ def make_output_queue_controller():
             If(conf_ready & flag_addr_init)(
                 addr_write_next(addr_base),
                 flag_addr_init(Int(0, 1, 2))
-            ).Elif(request_write)(
+            ).Elif(fifo_dout_valid)(
                 addr_write_next.inc(),
                 count_req_cl.inc()
             )

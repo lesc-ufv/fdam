@@ -68,8 +68,8 @@ def make_input_queue_controller():
     end_req_rd_data.assign((count_req_cl >= qtd_data_cl))
     done.assign(AndList(end_req_rd_data, (read_peding == 0), start))
     issue_req_data.assign(start & conf_ready & ~end_req_rd_data & available_read & fifo_fit & ~request_read)
-    fifo_fit.assign((read_peding + fifo_count) < FIFO_FULL)
-    afu_user_available_read.assign(~fifo_empty& ~afu_user_request_read)
+    fifo_fit.assign(EmbeddedCode('(read_peding + fifo_count) < FIFO_FULL'))
+    afu_user_available_read.assign(Mux(fifo_almostempty,~fifo_empty& ~afu_user_request_read,Int(1,1,2)))
     read_data_valid_queue.assign(AndList(read_data_valid, read_queue_id == ID_QUEUE))
 
     m.Always(Posedge(clk))(
@@ -123,7 +123,7 @@ def make_input_queue_controller():
         If(rst)(
             read_peding(0)
         ).Else(
-            Case(Cat(read_data_valid_queue, request_read))(
+            Case(Cat(fifo_we, request_read))(
                 When(Int(0, 2, 10))(
                     read_peding(read_peding)
                 ),

@@ -27,9 +27,13 @@ private:
 
 private:
     void createDSM();
+    
     void sendConfDSM();
+    
     void clearDSM();
+    
     size_t getSizeDsm();
+    
 public:
     AFU(AFUManager_t &afuManager, afuid_t id, int numInputBuffer, int numOutputBuffer);
 
@@ -64,10 +68,8 @@ public:
     int getSizeOfOutputBuffer(int BufferID);
 
     void waitDone(int64_t timeWaitMax);
-
+    
     bool isDone();
-
-    AFU &operator=(const AFU &AFU);
 
     void clear();
 
@@ -76,7 +78,14 @@ public:
     int getNumOutputBuffer() const;
     
     afuid_t getID() const;
+    
     void printDSM();
+    
+    int getInputBufferGlobalID(int BufferID);
+    
+    int getOutputBufferGlobalID(int BufferID);
+    
+    AFU &operator=(const AFU &AFU);
 };
 
 

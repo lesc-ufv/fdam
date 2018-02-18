@@ -145,7 +145,7 @@ def make_afu_manager(afus):
 
         fifo = make_fifo()
         params = [('FIFO_WIDTH', ADDR_WIDTH + TAG_WIDTH), ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
-                  ('FIFO_ALMOSTFULL_THRESHOLD', FIFO_FULL - 2), ('FIFO_ALMOSTEMPTY_THRESHOLD', 2)]
+                  ('FIFO_ALMOSTFULL_THRESHOLD', FIFO_FULL - 4), ('FIFO_ALMOSTEMPTY_THRESHOLD', 2)]
         con = [('clk', clk), ('rst', rst), ('we', afu_req_rd_fifo_we[idx_req_rd_fifo]),
                ('din', afu_req_rd_fifo_din[
                        idx_req_rd_fifo * (ADDR_WIDTH + TAG_WIDTH):idx_req_rd_fifo * (ADDR_WIDTH + TAG_WIDTH) + (
@@ -165,7 +165,7 @@ def make_afu_manager(afus):
         genReqRdFifos.Instance(fifo, 'req_rd_fifo', params, con)
 
         params = [('FIFO_WIDTH', ADDR_WIDTH + DATA_WIDTH + TAG_WIDTH), ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
-                  ('FIFO_ALMOSTFULL_THRESHOLD', FIFO_FULL - 2), ('FIFO_ALMOSTEMPTY_THRESHOLD', 2)]
+                  ('FIFO_ALMOSTFULL_THRESHOLD', FIFO_FULL - 4), ('FIFO_ALMOSTEMPTY_THRESHOLD', 2)]
         con = [('clk', clk), ('rst', rst), ('we', afu_req_wr_fifo_we[idx_req_wr_fifo]),
                ('din', afu_req_wr_fifo_din[
                        idx_req_wr_fifo * (ADDR_WIDTH + DATA_WIDTH + TAG_WIDTH):idx_req_wr_fifo * (

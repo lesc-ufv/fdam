@@ -48,12 +48,21 @@ void AFU::reset() {
 }
 
 void AFU::sendConfIn(int BufferID) {
-    int bufferIdGlobal = (BufferID * AFU::getNumInputBuffer() + AFU::getID());
+    int bufferIdGlobal = AFU::getInputBufferGlobalID(BufferID);
     auto numCl = static_cast<uint64_t>(AFU::getSizeOfInputBuffer(BufferID) / 64);
     auto val_low = static_cast<uint64_t>(numCl << 32 | bufferIdGlobal);
     auto val_high = static_cast<uint64_t>(intptr_t(AFU::getInputBuffer(BufferID)) / 64);
     AFU::afuManager.writeCSR(REG_CONF_IN_LOW, val_low);
     AFU::afuManager.writeCSR(REG_CONF_IN_HIGH, val_high);
+}
+
+void AFU::sendConfOut(int BufferID) {
+    int bufferIdGlobal = AFU::getOutputBufferGlobalID(BufferID);
+    auto numCl = static_cast<uint64_t>(AFU::getSizeOfOutputBuffer(BufferID) / 64);
+    auto val_low = static_cast<uint64_t>(numCl << 32 | bufferIdGlobal);
+    auto val_high = static_cast<uint64_t>(intptr_t(AFU::getOutputBuffer(BufferID)) / 64);
+    AFU::afuManager.writeCSR(REG_CONF_OUT_LOW, val_low);
+    AFU::afuManager.writeCSR(REG_CONF_OUT_HIGH, val_high);
 }
 
 void AFU::createDSM() {
@@ -75,15 +84,6 @@ size_t AFU::getSizeDsm() {
 
 void AFU::clearDSM() {
     memset(AFU::getDsm(), 0, AFU::getSizeDsm());
-}
-
-void AFU::sendConfOut(int BufferID) {
-    int bufferIdGlobal = (BufferID * AFU::getNumOutputBuffer() + AFU::getID());
-    auto numCl = static_cast<uint64_t>(AFU::getSizeOfOutputBuffer(BufferID) / 64);
-    auto val_low = static_cast<uint64_t>(numCl << 32 | bufferIdGlobal);
-    auto val_high = static_cast<uint64_t>(intptr_t(AFU::getOutputBuffer(BufferID)) / 64);
-    AFU::afuManager.writeCSR(REG_CONF_OUT_LOW, val_low);
-    AFU::afuManager.writeCSR(REG_CONF_OUT_HIGH, val_high);
 }
 
 bool AFU::isDone() {
@@ -148,16 +148,6 @@ bool AFU::createOutputBufferSW(int BufferID, size_t nBytes) {
         }
     }
     return false;
-}
-
-AFU &AFU::operator=(const AFU &AFU) {
-    AFU::afuManager = AFU.afuManager;
-    AFU::ID = AFU.ID;
-    AFU::numInputBuffer = AFU.numInputBuffer;
-    AFU::numOutputBuffer = AFU.numOutputBuffer;
-    AFU::Inputbuffers = AFU.Inputbuffers;
-    AFU::Outputbuffers = AFU.Outputbuffers;
-    return *this;
 }
 
 void AFU::clear() {
@@ -255,4 +245,32 @@ void AFU::printDSM() {
         }
         cout << endl;
     }
+}
+
+int AFU::getInputBufferGlobalID(int BufferID){
+    int globalID = 0;
+    for (auto &it : AFU::afuManager.getAFUs()){
+        if(it.first == AFU::getID()) break;
+        globalID += it.second->getNumInputBuffer();
+    }
+    return globalID+BufferID;
+}
+
+int AFU::getOutputBufferGlobalID(int BufferID){
+    int globalID = 0;
+    for (auto &it : AFU::afuManager.getAFUs()){
+        if(it.first == AFU::getID()) break;
+        globalID += it.second->getNumOutputBuffer();
+    }
+    return globalID+BufferID;  
+}
+
+AFU &AFU::operator=(const AFU &AFU) {
+    AFU::afuManager = AFU.afuManager;
+    AFU::ID = AFU.ID;
+    AFU::numInputBuffer = AFU.numInputBuffer;
+    AFU::numOutputBuffer = AFU.numOutputBuffer;
+    AFU::Inputbuffers = AFU.Inputbuffers;
+    AFU::Outputbuffers = AFU.Outputbuffers;
+    return *this;
 }
