@@ -40,6 +40,7 @@ def make_output_queue_controller():
     addr_write_next = m.Reg('addr_write_next',ADDR_WIDTH)
     qtd_data_cl = m.Reg('qtd_data_cl',QTD_WIDTH)
     count_req_cl = m.Reg('count_req_cl',QTD_WIDTH)
+    count_cl = m.Reg('count_cl',QTD_WIDTH)
     write_peding = m.Reg('write_peding',QTD_WIDTH)
     flag_addr_init = m.Reg('flag_addr_init')
     fifo_re = m.Reg('fifo_re')
@@ -62,7 +63,7 @@ def make_output_queue_controller():
     m.Instance(fifo,'fifo',params,con)
 
     end_req_wr_data.assign((count_req_cl >= qtd_data_cl))
-    done.assign(AndList(end_req_wr_data,(write_peding == 0),start))
+    done.assign(AndList((count_cl>=qtd_data_cl),(write_peding == 0),start))
     issue_req_data.assign(AndList(start & conf_ready & ~end_req_wr_data & available_write,Mux(fifo_almostempty,(~fifo_empty&~fifo_re),Int(1,1,2))))
     afu_user_available_write.assign(~fifo_almostfull)
     write_data_valid_queue.assign(AndList(write_data_valid,(write_queue_id == ID_QUEUE)))
@@ -103,7 +104,17 @@ def make_output_queue_controller():
             )
         )
     )
-
+   
+    m.Always(Posedge(clk))(
+        If(rst)(
+            count_cl(0),
+        ).Else(
+             If(write_data_valid_queue)(
+                count_cl.inc()
+            )
+        )
+    )
+   
     m.Always(Posedge(clk))(
         If(rst)(
           fifo_re(Int(0,1,2))

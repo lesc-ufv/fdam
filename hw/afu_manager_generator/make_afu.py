@@ -1,10 +1,9 @@
 from veriloggen import *
 
-from input_queue_controller import make_input_queue_controller
-from make_afu_user import make_afu_user
-
+from make_input_queue_controller import make_input_queue_controller
 from make_output_queue_dsm_controller import make_output_queue_dsm_controller
 from make_output_queue_controller import make_output_queue_controller
+from make_afu_user import make_afu_user
 
 
 def make_afu(afu_id,dsm_controller):

@@ -42,6 +42,7 @@ def make_input_queue_controller():
     addr_read_next = m.Reg('addr_read_next', ADDR_WIDTH)
     qtd_data_cl = m.Reg('qtd_data_cl', QTD_WIDTH)
     count_req_cl = m.Reg('count_req_cl', QTD_WIDTH)
+    count_cl = m.Reg('count_cl', QTD_WIDTH)
     read_peding = m.Reg('read_peding', QTD_WIDTH)
     flag_addr_init = m.Reg('flag_addr_init')
     fifo_we = m.Reg('fifo_we')
@@ -66,7 +67,7 @@ def make_input_queue_controller():
     m.Instance(fifo, 'fifo', params, con)
 
     end_req_rd_data.assign((count_req_cl >= qtd_data_cl))
-    done.assign(AndList(end_req_rd_data, (read_peding == 0), start))
+    done.assign(AndList(count_cl >= qtd_data_cl, (read_peding == 0), start))
     issue_req_data.assign(start & conf_ready & ~end_req_rd_data & available_read & fifo_fit & ~request_read)
     fifo_fit.assign(EmbeddedCode('(read_peding + fifo_count) < FIFO_FULL'))
     afu_user_available_read.assign(Mux(fifo_almostempty,~fifo_empty& ~afu_user_request_read,Int(1,1,2)))
@@ -142,12 +143,14 @@ def make_input_queue_controller():
     m.Always(Posedge(clk))(
         If(rst)(
             fifo_we(Int(0, 1, 2)),
-            din(0)
+            din(0),
+            count_cl(0)
         ).Else(
             fifo_we(Int(0, 1, 2)),
             If(read_data_valid_queue)(
                 fifo_we(Int(1, 1, 2)),
-                din(read_data)
+                din(read_data),
+                count_cl.inc()
             )
         )
     )
