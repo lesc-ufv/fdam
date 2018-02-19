@@ -9,10 +9,10 @@ def make_dsm_controller():
     DSM_DATA_WIDTH = m.Parameter('DSM_DATA_WIDTH', 512)
     NUM_INPUT_QUEUES = m.Parameter('NUM_INPUT_QUEUES', 1)
     NUM_OUTPUT_QUEUES = m.Parameter('NUM_OUTPUT_QUEUES', 1)
-    NUM_CL_DSM_RD = m.Parameter('NUM_CL_DSM_RD', EmbeddedCode('$ceil(NUM_INPUT_QUEUES/8)'))
-    NUM_CL_DSM_WR = m.Parameter('NUM_CL_DSM_WR', EmbeddedCode('$ceil(NUM_OUTPUT_QUEUES/8)'))
+    NUM_CL_DSM_RD = m.Parameter('NUM_CL_DSM_RD', EmbeddedCode('$rtoi($ceil(NUM_INPUT_QUEUES/8))'))
+    NUM_CL_DSM_WR = m.Parameter('NUM_CL_DSM_WR', EmbeddedCode('$rtoi($ceil(NUM_OUTPUT_QUEUES/8))'))
     NUM_CL_DSM_TOTAL = m.Parameter('NUM_CL_DSM_TOTAL', EmbeddedCode('1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR'))
-    NUM_CL_DSM_TOTAL_BITS = m.Parameter('NUM_CL_DSM_TOTAL_BITS', EmbeddedCode('$ceil($clog2(NUM_CL_DSM_TOTAL))'))
+    NUM_CL_DSM_TOTAL_BITS = m.Parameter('NUM_CL_DSM_TOTAL_BITS', EmbeddedCode('$rtoi($ceil($clog2(NUM_CL_DSM_TOTAL)))'))
 
     clk = m.Input('clk')
     rst = m.Input('rst')

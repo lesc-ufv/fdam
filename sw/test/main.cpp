@@ -20,7 +20,8 @@ void testLB_afu(AFUManager &afuManager,afuid_t id){
     
     
     AFU *afu = afuManager.getAFU(id);
-    size_t numdados = 32*4096;
+    size_t numCL = 32;
+    size_t numdados = 32*numCL;
     short dataIn[numdados];
     for(short j = 0;j < afu->getNumInputBuffer();j++){
        for (short i = 0; i < numdados; ++i) {
