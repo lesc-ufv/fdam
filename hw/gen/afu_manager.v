@@ -33,42 +33,55 @@ module afu_manager #
   output reg [512-1:0] info
 );
 
-  reg [1-1:0] rd_req_arbiter_request;
-  wire [1-1:0] rd_req_arbiter_grant;
+  localparam NUM_CL_DSM_RD = 2;
+  localparam NUM_CL_DSM_WR = 2;
+  localparam NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR;
+  localparam NUM_CL_DSM_TOTAL_BITS = 3;
+  localparam DSM_ADDR_WIDTH = 3;
+  localparam DSM_DATA_WIDTH = 512;
+  localparam DSM_NUM_CL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR;
+  localparam FSM_REQ_RD_IDLE = 0;
+  localparam FSM_REQ_RD_WAIT = 1;
+  localparam FSM_REQ_WR_IDLE = 0;
+  localparam FSM_REQ_WR_WAIT = 1;
+
+
+  reg [16-1:0] rd_req_arbiter_request;
+  wire [16-1:0] rd_req_arbiter_grant;
   wire rd_req_arbiter_grant_valid;
-  wire [1-1:0] rd_req_arbiter_grant_encoded;
+  wire [4-1:0] rd_req_arbiter_grant_encoded;
 
 
-  reg [1-1:0] wr_req_arbiter_request;
-  wire [1-1:0] wr_req_arbiter_grant;
+  reg [16-1:0] wr_req_arbiter_request;
+  wire [16-1:0] wr_req_arbiter_grant;
   wire wr_req_arbiter_grant_valid;
-  wire [1-1:0] wr_req_arbiter_grant_encoded;
+  wire [4-1:0] wr_req_arbiter_grant_encoded;
 
 
   genvar idx_req_rd_fifo;
-  reg [1-1:0] req_rd_fifo_re;
-  wire [1-1:0] req_rd_fifo_valid;
-  wire [1-1:0] req_rd_fifo_empty;
-  wire [1-1:0] req_rd_fifo_amostempty;
-  wire [(ADDR_WIDTH+TAG_WIDTH)*1-1:0] req_rd_fifo_dout;
-  wire [1-1:0] afu_req_rd_fifo_we;
-  wire [(ADDR_WIDTH+TAG_WIDTH)*1-1:0] afu_req_rd_fifo_din;
-  wire [1-1:0] afu_req_rd_fifo_full;
-  wire [1-1:0] afu_req_rd_fifo_almostfull;
-  wire [(FIFO_DEPTH_BITS+1)*1-1:0] req_rd_fifo_count;
+  reg [16-1:0] req_rd_fifo_re;
+  wire [16-1:0] req_rd_fifo_valid;
+  wire [16-1:0] req_rd_fifo_empty;
+  wire [16-1:0] req_rd_fifo_amostempty;
+  wire [(ADDR_WIDTH+TAG_WIDTH)*16-1:0] req_rd_fifo_dout;
+  wire [16-1:0] afu_req_rd_fifo_we;
+  wire [(ADDR_WIDTH+TAG_WIDTH)*16-1:0] afu_req_rd_fifo_din;
+  wire [16-1:0] afu_req_rd_fifo_full;
+  wire [16-1:0] afu_req_rd_fifo_almostfull;
+  wire [(FIFO_DEPTH_BITS+1)*16-1:0] req_rd_fifo_count;
 
 
   genvar idx_req_wr_fifo;
-  reg [1-1:0] req_wr_fifo_re;
-  wire [1-1:0] req_wr_fifo_valid;
-  wire [1-1:0] req_wr_fifo_empty;
-  wire [1-1:0] req_wr_fifo_amostempty;
-  wire [(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)*1-1:0] req_wr_fifo_dout;
-  wire [1-1:0] afu_req_wr_fifo_we;
-  wire [(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)*1-1:0] afu_req_wr_fifo_din;
-  wire [1-1:0] afu_req_wr_fifo_full;
-  wire [1-1:0] afu_req_wr_fifo_almostfull;
-  wire [(FIFO_DEPTH_BITS+1)*1-1:0] req_wr_fifo_count;
+  reg [16-1:0] req_wr_fifo_re;
+  wire [16-1:0] req_wr_fifo_valid;
+  wire [16-1:0] req_wr_fifo_empty;
+  wire [16-1:0] req_wr_fifo_amostempty;
+  wire [(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)*16-1:0] req_wr_fifo_dout;
+  wire [16-1:0] afu_req_wr_fifo_we;
+  wire [(ADDR_WIDTH+DATA_WIDTH+TAG_WIDTH)*16-1:0] afu_req_wr_fifo_din;
+  wire [16-1:0] afu_req_wr_fifo_full;
+  wire [16-1:0] afu_req_wr_fifo_almostfull;
+  wire [(FIFO_DEPTH_BITS+1)*16-1:0] req_wr_fifo_count;
 
 
   wire [ADDR_WIDTH+TAG_WIDTH-1:0] req_rd_fifo_sel_dout;
@@ -77,16 +90,12 @@ module afu_manager #
   wire req_wr_fifo_sel_dout_valid;
 
 
-  localparam FSM_REQ_RD_IDLE = 0;
-  localparam FSM_REQ_RD_WAIT = 1;
   reg [1-1:0] fsm_req_rd;
-  localparam FSM_REQ_WR_IDLE = 0;
-  localparam FSM_REQ_WR_WAIT = 1;
   reg [1-1:0] fsm_req_wr;
 
   arbiter
   #(
-    .PORTS(1),
+    .PORTS(16),
     .TYPE("ROUND_ROBIN"),
     .BLOCK("NONE"),
     .LSB_PRIORITY("LOW")
@@ -96,7 +105,7 @@ module afu_manager #
     .clk(clk),
     .rst(rst),
     .request(rd_req_arbiter_request),
-    .acknowledge(1'd0),
+    .acknowledge(16'd0),
     .grant(rd_req_arbiter_grant),
     .grant_valid(rd_req_arbiter_grant_valid),
     .grant_encoded(rd_req_arbiter_grant_encoded)
@@ -105,7 +114,7 @@ module afu_manager #
 
   arbiter
   #(
-    .PORTS(1),
+    .PORTS(16),
     .TYPE("ROUND_ROBIN"),
     .BLOCK("NONE"),
     .LSB_PRIORITY("LOW")
@@ -115,20 +124,20 @@ module afu_manager #
     .clk(clk),
     .rst(rst),
     .request(wr_req_arbiter_request),
-    .acknowledge(1'd0),
+    .acknowledge(16'd0),
     .grant(wr_req_arbiter_grant),
     .grant_valid(wr_req_arbiter_grant_valid),
     .grant_encoded(wr_req_arbiter_grant_encoded)
   );
 
 
-  generate for(idx_req_rd_fifo=0; idx_req_rd_fifo<1; idx_req_rd_fifo=idx_req_rd_fifo+1) begin : gen_req_rd_fifos
+  generate for(idx_req_rd_fifo=0; idx_req_rd_fifo<16; idx_req_rd_fifo=idx_req_rd_fifo+1) begin : gen_req_rd_fifos
 
     fifo
     #(
       .FIFO_WIDTH(ADDR_WIDTH + TAG_WIDTH),
       .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
-      .FIFO_ALMOSTFULL_THRESHOLD(FIFO_FULL - 2),
+      .FIFO_ALMOSTFULL_THRESHOLD(FIFO_FULL - 4),
       .FIFO_ALMOSTEMPTY_THRESHOLD(2)
     )
     req_rd_fifo
@@ -151,13 +160,13 @@ module afu_manager #
   endgenerate
 
 
-  generate for(idx_req_wr_fifo=0; idx_req_wr_fifo<1; idx_req_wr_fifo=idx_req_wr_fifo+1) begin : gen_req_wr_fifos
+  generate for(idx_req_wr_fifo=0; idx_req_wr_fifo<16; idx_req_wr_fifo=idx_req_wr_fifo+1) begin : gen_req_wr_fifos
 
     fifo
     #(
       .FIFO_WIDTH(ADDR_WIDTH + DATA_WIDTH + TAG_WIDTH),
       .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
-      .FIFO_ALMOSTFULL_THRESHOLD(FIFO_FULL - 2),
+      .FIFO_ALMOSTFULL_THRESHOLD(FIFO_FULL - 4),
       .FIFO_ALMOSTEMPTY_THRESHOLD(2)
     )
     req_wr_fifo
@@ -188,28 +197,35 @@ module afu_manager #
     .CONF_ID_QUEUE_WIDTH(CONF_ID_QUEUE_WIDTH),
     .INITIAL_INPUT_QUEUE_ID(0),
     .INITIAL_OUTPUT_QUEUE_ID(0),
-    .NUM_INPUT_QUEUES(1),
-    .NUM_OUTPUT_QUEUES(1),
+    .NUM_INPUT_QUEUES(16),
+    .NUM_OUTPUT_QUEUES(16),
     .TAG_WIDTH(TAG_WIDTH),
     .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
-    .FIFO_FULL(FIFO_FULL)
+    .FIFO_FULL(FIFO_FULL),
+    .DSM_DATA_WIDTH(DSM_DATA_WIDTH),
+    .NUM_CL_DSM_RD(NUM_CL_DSM_RD),
+    .NUM_CL_DSM_WR(NUM_CL_DSM_WR),
+    .NUM_CL_DSM_TOTAL(NUM_CL_DSM_TOTAL),
+    .NUM_CL_DSM_TOTAL_BITS(NUM_CL_DSM_TOTAL_BITS),
+    .DSM_ADDR_WIDTH(DSM_ADDR_WIDTH),
+    .DSM_NUM_CL(DSM_NUM_CL)
   )
-  afu_0_1x1
+  afu_0_16x16
   (
     .clk(clk),
     .rst(rst | rst_afus[0]),
     .start(start_afus[0]),
     .conf_valid(conf_valid),
     .conf(conf),
-    .available_read(~afu_req_rd_fifo_almostfull[0:0]),
-    .request_read(afu_req_rd_fifo_we[0:0]),
-    .request_data(afu_req_rd_fifo_din[1*(0*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:1*(0*(ADDR_WIDTH+TAG_WIDTH))]),
+    .available_read(~afu_req_rd_fifo_almostfull[15:0]),
+    .request_read(afu_req_rd_fifo_we[15:0]),
+    .request_data(afu_req_rd_fifo_din[16*(0*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:16*(0*(ADDR_WIDTH+TAG_WIDTH))]),
     .read_data_valid(resp_rd_valid),
     .read_queue_id(resp_rd_mdata),
     .read_data(resp_rd_data),
-    .available_write(~afu_req_wr_fifo_almostfull[0:0]),
-    .request_write(afu_req_wr_fifo_we[0:0]),
-    .write_data(afu_req_wr_fifo_din[1*(0*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:1*(0*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))]),
+    .available_write(~afu_req_wr_fifo_almostfull[15:0]),
+    .request_write(afu_req_wr_fifo_we[15:0]),
+    .write_data(afu_req_wr_fifo_din[16*(0*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:16*(0*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))]),
     .write_data_valid(resp_wr_valid),
     .write_queue_id(resp_wr_mdata)
   );
@@ -225,6 +241,21 @@ module afu_manager #
     .rst(rst),
     .data_in_valid(req_rd_fifo_valid),
     .data_in_0(req_rd_fifo_dout[(0*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:0*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_1(req_rd_fifo_dout[(1*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:1*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_2(req_rd_fifo_dout[(2*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:2*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_3(req_rd_fifo_dout[(3*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:3*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_4(req_rd_fifo_dout[(4*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:4*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_5(req_rd_fifo_dout[(5*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:5*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_6(req_rd_fifo_dout[(6*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:6*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_7(req_rd_fifo_dout[(7*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:7*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_8(req_rd_fifo_dout[(8*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:8*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_9(req_rd_fifo_dout[(9*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:9*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_10(req_rd_fifo_dout[(10*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:10*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_11(req_rd_fifo_dout[(11*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:11*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_12(req_rd_fifo_dout[(12*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:12*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_13(req_rd_fifo_dout[(13*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:13*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_14(req_rd_fifo_dout[(14*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:14*(ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_15(req_rd_fifo_dout[(15*(ADDR_WIDTH+TAG_WIDTH)+ADDR_WIDTH+TAG_WIDTH)-1:15*(ADDR_WIDTH+TAG_WIDTH)]),
     .data_out_valid(req_rd_fifo_sel_dout_valid),
     .data_out(req_rd_fifo_sel_dout)
   );
@@ -240,6 +271,21 @@ module afu_manager #
     .rst(rst),
     .data_in_valid(req_wr_fifo_valid),
     .data_in_0(req_wr_fifo_dout[(0*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:0*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_1(req_wr_fifo_dout[(1*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:1*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_2(req_wr_fifo_dout[(2*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:2*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_3(req_wr_fifo_dout[(3*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:3*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_4(req_wr_fifo_dout[(4*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:4*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_5(req_wr_fifo_dout[(5*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:5*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_6(req_wr_fifo_dout[(6*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:6*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_7(req_wr_fifo_dout[(7*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:7*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_8(req_wr_fifo_dout[(8*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:8*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_9(req_wr_fifo_dout[(9*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:9*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_10(req_wr_fifo_dout[(10*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:10*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_11(req_wr_fifo_dout[(11*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:11*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_12(req_wr_fifo_dout[(12*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:12*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_13(req_wr_fifo_dout[(13*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:13*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_14(req_wr_fifo_dout[(14*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:14*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
+    .data_in_15(req_wr_fifo_dout[(15*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:15*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
     .data_out_valid(req_wr_fifo_sel_dout_valid),
     .data_out(req_wr_fifo_sel_dout)
   );
@@ -264,7 +310,7 @@ module afu_manager #
           end 
         end
         FSM_REQ_RD_WAIT: begin
-          if(req_rd_en) begin
+          if(|req_rd_fifo_valid) begin
             fsm_req_rd <= FSM_REQ_RD_IDLE;
           end 
         end
@@ -292,7 +338,7 @@ module afu_manager #
           end 
         end
         FSM_REQ_WR_WAIT: begin
-          if(req_wr_en) begin
+          if(|req_wr_fifo_valid) begin
             fsm_req_wr <= FSM_REQ_WR_IDLE;
           end 
         end
@@ -339,7 +385,7 @@ module afu_manager #
     if(rst) begin
       info <= 512'd0;
     end else begin
-      info[15:0] <= {8'd1, 8'd1};
+      info[15:0] <= {8'd16, 8'd16};
 
     end
   end

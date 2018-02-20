@@ -34,6 +34,7 @@ module output_queue_controller #
   reg [ADDR_WIDTH-1:0] addr_write_next;
   reg [QTD_WIDTH-1:0] qtd_data_cl;
   reg [QTD_WIDTH-1:0] count_req_cl;
+  reg [QTD_WIDTH-1:0] count_cl;
   reg [QTD_WIDTH-1:0] write_peding;
   reg flag_addr_init;
   reg fifo_re;
@@ -72,9 +73,9 @@ module output_queue_controller #
   );
 
   assign end_req_rd_data = count_req_cl >= qtd_data_cl;
-  assign done = end_req_rd_data && (write_peding == 0) && start;
-  assign issue_req_data = start & conf_ready & ~end_req_rd_data & available_write && ~fifo_empty && ~fifo_re;
-  assign afu_user_available_write = ~fifo_full & ~afu_user_request_write;
+  assign done = (count_cl >= qtd_data_cl) && (write_peding == 0) && start;
+  assign issue_req_data = start & conf_ready & ~end_req_rd_data & available_write && ((fifo_almostempty)? ~fifo_empty & ~fifo_re : 1'b1);
+  assign afu_user_available_write = ~fifo_almostfull;
   assign write_data_valid_queue = write_data_valid && (write_queue_id == ID_QUEUE);
 
   always @(posedge clk) begin
@@ -108,9 +109,20 @@ module output_queue_controller #
       if(conf_ready & flag_addr_init) begin
         addr_write_next <= addr_base;
         flag_addr_init <= 1'b0;
-      end else if(request_write) begin
+      end else if(fifo_dout_valid) begin
         addr_write_next <= addr_write_next + 1;
         count_req_cl <= count_req_cl + 1;
+      end 
+    end
+  end
+
+
+  always @(posedge clk) begin
+    if(rst) begin
+      count_cl <= 0;
+    end else begin
+      if(write_data_valid_queue) begin
+        count_cl <= count_cl + 1;
       end 
     end
   end

@@ -36,6 +36,7 @@ module input_queue_controller #
   reg [ADDR_WIDTH-1:0] addr_read_next;
   reg [QTD_WIDTH-1:0] qtd_data_cl;
   reg [QTD_WIDTH-1:0] count_req_cl;
+  reg [QTD_WIDTH-1:0] count_cl;
   reg [QTD_WIDTH-1:0] read_peding;
   reg flag_addr_init;
   reg fifo_we;
@@ -74,10 +75,10 @@ module input_queue_controller #
   );
 
   assign end_req_rd_data = count_req_cl >= qtd_data_cl;
-  assign done = end_req_rd_data && (read_peding == 0) && start;
+  assign done = (count_cl >= qtd_data_cl) && (read_peding == 0) && start;
   assign issue_req_data = start & conf_ready & ~end_req_rd_data & available_read & fifo_fit & ~request_read;
-  assign fifo_fit = read_peding + fifo_count < FIFO_FULL;
-  assign afu_user_available_read = ~fifo_empty & ~afu_user_request_read;
+  assign fifo_fit = (read_peding + fifo_count) < FIFO_FULL;
+  assign afu_user_available_read = (fifo_almostempty)? ~fifo_empty & ~afu_user_request_read : 1'b1;
   assign read_data_valid_queue = read_data_valid && (read_queue_id == ID_QUEUE);
 
   always @(posedge clk) begin
@@ -137,7 +138,7 @@ module input_queue_controller #
     if(rst) begin
       read_peding <= 0;
     end else begin
-      case({ read_data_valid_queue, request_read })
+      case({ fifo_we, request_read })
         2'd0: begin
           read_peding <= read_peding;
         end
@@ -159,11 +160,13 @@ module input_queue_controller #
     if(rst) begin
       fifo_we <= 1'b0;
       din <= 0;
+      count_cl <= 0;
     end else begin
       fifo_we <= 1'b0;
       if(read_data_valid_queue) begin
         fifo_we <= 1'b1;
         din <= read_data;
+        count_cl <= count_cl + 1;
       end 
     end
   end

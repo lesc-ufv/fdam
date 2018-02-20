@@ -4,7 +4,7 @@ module afu_0 #
   parameter ADDR_WIDTH = 64,
   parameter QTD_WIDTH = 32,
   parameter DATA_WIDTH = 512,
-  parameter CONF_AFU_ID_WIDTH = 32,
+  parameter CONF_AFU_ID_WIDTH = 64,
   parameter CONF_ID_QUEUE_WIDTH = 32,
   parameter INITIAL_INPUT_QUEUE_ID = 0,
   parameter INITIAL_OUTPUT_QUEUE_ID = 0,
@@ -12,7 +12,14 @@ module afu_0 #
   parameter NUM_OUTPUT_QUEUES = 1,
   parameter TAG_WIDTH = 16,
   parameter FIFO_DEPTH_BITS = 4,
-  parameter FIFO_FULL = 2 ** FIFO_DEPTH_BITS
+  parameter FIFO_FULL = 2 ** FIFO_DEPTH_BITS,
+  parameter NUM_CL_DSM_RD = $rtoi($ceil(NUM_INPUT_QUEUES/8)),
+  parameter NUM_CL_DSM_WR = $rtoi($ceil(NUM_OUTPUT_QUEUES/8)),
+  parameter NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR,
+  parameter NUM_CL_DSM_TOTAL_BITS = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL))),
+  parameter DSM_ADDR_WIDTH = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL))),
+  parameter DSM_DATA_WIDTH = 512,
+  parameter DSM_NUM_CL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR
 )
 (
   input clk,
@@ -33,13 +40,6 @@ module afu_0 #
   input [TAG_WIDTH-1:0] write_queue_id
 );
 
-  localparam NUM_CL_DSM_RD = $ceil(NUM_INPUT_QUEUES/8);
-  localparam NUM_CL_DSM_WR = $ceil(NUM_OUTPUT_QUEUES/8);
-  localparam NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR;
-  localparam NUM_CL_DSM_TOTAL_BITS = $ceil($clog2(NUM_CL_DSM_TOTAL));
-  localparam DSM_ADDR_WIDTH = $ceil($clog2(NUM_CL_DSM_TOTAL));
-  localparam DSM_DATA_WIDTH = 512;
-  localparam DSM_NUM_CL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR;
   wire [NUM_INPUT_QUEUES-1:0] afu_user_available_read;
   wire [NUM_INPUT_QUEUES-1:0] afu_user_request_read;
   wire [DATA_WIDTH*NUM_INPUT_QUEUES-1:0] afu_user_read_data;

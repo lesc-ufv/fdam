@@ -2,7 +2,7 @@
 module output_queue_dsm_controller #
 (
   parameter AFU_ID = 0,
-  parameter CONF_AFU_ID_WIDTH = 32,
+  parameter CONF_AFU_ID_WIDTH = 64,
   parameter ID_QUEUE = 0,
   parameter ADDR_WIDTH = 64,
   parameter QTD_WIDTH = 32,
@@ -45,6 +45,7 @@ module output_queue_dsm_controller #
   reg [ADDR_WIDTH-1:0] addr_write_next;
   reg [QTD_WIDTH-1:0] qtd_data_cl;
   reg [QTD_WIDTH-1:0] count_req_cl;
+  reg [QTD_WIDTH-1:0] count_cl;
   reg [QTD_WIDTH-1:0] write_peding;
   reg flag_addr_init;
   reg fifo_re;
@@ -57,7 +58,6 @@ module output_queue_dsm_controller #
   reg [ADDR_WIDTH-1:0] dsm_addr_base;
   reg [ADDR_WIDTH-1:0] dsm_addr_next;
   reg [(ADDR_WIDTH+CONF_AFU_ID_WIDTH)-1:0] dsm_conf_reg;
-  reg [DSM_ADDR_WIDTH-1:0] afu_dsm_addr_next;
   reg [ADDR_WIDTH+1-1:0] write_peding_dsm;
   wire issue_req_wr_data;
   wire fifo_empty;
@@ -97,12 +97,12 @@ module output_queue_dsm_controller #
   );
 
   assign end_req_wr_data = count_req_cl >= qtd_data_cl;
-  assign done = end_req_wr_data && (write_peding == 0) && start;
-  assign issue_req_wr_data = start & conf_ready & ~end_req_wr_data & available_write && ~fifo_empty && ~fifo_re;
-  assign afu_user_available_write = ~fifo_full & ~afu_user_request_write;
+  assign done = (count_cl >= qtd_data_cl) && (write_peding == 0) && start;
+  assign issue_req_wr_data = start & conf_ready & ~end_req_wr_data & available_write && ((fifo_almostempty)? ~fifo_empty & ~fifo_re : 1'b1);
+  assign afu_user_available_write = ~fifo_almostfull;
   assign write_data_valid_queue = write_data_valid && (write_queue_id == ID_QUEUE);
-  assign end_req_rd_dsm = count_req_dsm >= DSM_NUM_CL;
-  assign issue_req_dsm = start && dsm_conf_ready && available_write && ~end_req_rd_dsm && afu_dsm_update;
+  assign end_req_rd_dsm = afu_dsm_addr == DSM_NUM_CL;
+  assign issue_req_dsm = start && dsm_conf_ready && available_write && ~end_req_rd_dsm && afu_dsm_update && ~afu_dsm_req_rd;
   assign write_data_valid_dsm = write_data_valid && (write_queue_id == TAG_DSM);
 
   always @(posedge clk) begin
@@ -123,7 +123,7 @@ module output_queue_dsm_controller #
           conf_read <= 1'b1;
         end
         2'd3: begin
-          dsm_conf_reg <= conf[DSM_ADDR_WIDTH+CONF_AFU_ID_WIDTH-1:0];
+          dsm_conf_reg <= conf;
           dsm_conf_read <= 1'b1;
         end
         default: begin
@@ -136,7 +136,7 @@ module output_queue_dsm_controller #
         conf_ready <= 1'b1;
       end 
       if((dsm_conf_reg[CONF_AFU_ID_WIDTH-1:0] == AFU_ID) && dsm_conf_read) begin
-        dsm_addr_base <= conf_reg[DSM_ADDR_WIDTH+CONF_AFU_ID_WIDTH-1:CONF_AFU_ID_WIDTH];
+        dsm_addr_base <= dsm_conf_reg[ADDR_WIDTH+CONF_AFU_ID_WIDTH-1:CONF_AFU_ID_WIDTH];
         dsm_conf_read <= 1'b0;
         dsm_conf_ready <= 1'b1;
       end 
@@ -153,9 +153,20 @@ module output_queue_dsm_controller #
       if(conf_ready & flag_addr_init) begin
         addr_write_next <= addr_base;
         flag_addr_init <= 1'b0;
-      end else if(request_write_data) begin
+      end else if(fifo_dout_valid) begin
         addr_write_next <= addr_write_next + 1;
         count_req_cl <= count_req_cl + 1;
+      end 
+    end
+  end
+
+
+  always @(posedge clk) begin
+    if(rst) begin
+      count_cl <= 0;
+    end else begin
+      if(write_data_valid_queue) begin
+        count_cl <= count_cl + 1;
       end 
     end
   end
@@ -170,7 +181,7 @@ module output_queue_dsm_controller #
       afu_dsm_req_rd <= 1'b0;
       if(issue_req_wr_data) begin
         fifo_re <= 1'b1;
-      end else if(issue_req_dsm) begin
+      end else if(issue_req_dsm && ((afu_dsm_addr != DSM_NUM_CL - 1) || (write_peding_dsm == 0))) begin
         afu_dsm_req_rd <= 1'b1;
       end 
     end
@@ -223,7 +234,7 @@ module output_queue_dsm_controller #
 
 
   always @(posedge clk) begin
-    if(rst | ~afu_dsm_update) begin
+    if(rst) begin
       dsm_addr_next <= 0;
       count_req_dsm <= 0;
       flag_addr_dsm_init <= 1'b1;
@@ -240,13 +251,11 @@ module output_queue_dsm_controller #
 
 
   always @(posedge clk) begin
-    if(rst | ~afu_dsm_update) begin
+    if(rst) begin
       afu_dsm_addr <= 0;
-      afu_dsm_addr_next <= 0;
     end else begin
       if(afu_dsm_req_rd) begin
-        afu_dsm_addr <= afu_dsm_addr_next;
-        addr_write_next <= addr_write_next + 1;
+        afu_dsm_addr <= afu_dsm_addr + 1;
       end 
     end
   end
@@ -256,7 +265,7 @@ module output_queue_dsm_controller #
     if(rst) begin
       write_peding_dsm <= 0;
     end else begin
-      case({ write_data_valid_dsm, request_write_dsm })
+      case({ write_data_valid_dsm, afu_dsm_req_rd })
         2'd0: begin
           write_peding_dsm <= write_peding_dsm;
         end
