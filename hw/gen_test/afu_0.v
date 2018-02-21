@@ -48,6 +48,10 @@ module afu_0 #
   wire [NUM_OUTPUT_QUEUES-1:0] afu_user_request_write;
   wire [DATA_WIDTH*NUM_OUTPUT_QUEUES-1:0] afu_user_write_data;
   wire afu_user_done;
+  wire afu_user_done_dsm;
+  wire [NUM_INPUT_QUEUES-1:0] has_peding_rd;
+  wire [NUM_OUTPUT_QUEUES-1:0] has_peding_wr;
+  wire no_has_peding;
   wire [NUM_INPUT_QUEUES-1:0] input_queue_done;
   wire [NUM_OUTPUT_QUEUES-1:0] output_queue_done;
   wire afu_dsm_update;
@@ -79,6 +83,7 @@ module afu_0 #
       .conf_valid(conf_valid),
       .conf(conf),
       .available_read(available_read[idx_in_queue]),
+      .has_peding(has_peding_rd[idx_in_queue]),
       .request_read(request_read[idx_in_queue]),
       .request_data(request_data[idx_in_queue*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH)-1:idx_in_queue*(ADDR_WIDTH+TAG_WIDTH)]),
       .read_data_valid(read_data_valid),
@@ -119,6 +124,7 @@ module afu_0 #
     .conf_valid(conf_valid),
     .conf(conf),
     .available_write(available_write[0]),
+    .has_peding(has_peding_wr[0]),
     .request_write(request_write[0]),
     .write_data(write_data[DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH-1:0]),
     .write_data_valid(write_data_valid),
@@ -156,6 +162,7 @@ module afu_0 #
       .conf_valid(conf_valid),
       .conf(conf),
       .available_write(available_write[idx_out_queue]),
+      .has_peding(has_peding_wr[idx_out_queue]),
       .request_write(request_write[idx_out_queue]),
       .write_data(write_data[idx_out_queue*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:idx_out_queue*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)]),
       .write_data_valid(write_data_valid),
@@ -187,7 +194,7 @@ module afu_0 #
     .rst(rst),
     .done_rd(input_queue_done),
     .done_wr(output_queue_done),
-    .done_afu(afu_user_done),
+    .done_afu(afu_user_done_dsm),
     .afu_req_rd_data_en(afu_user_request_read),
     .afu_req_wr_data_en(afu_user_request_write),
     .afu_dsm_req_rd(afu_dsm_req_rd),
@@ -221,5 +228,7 @@ module afu_0 #
     .afu_user_done(afu_user_done)
   );
 
+  assign no_has_peding = !((&has_peding_rd) && (&has_peding_wr));
+  assign afu_user_done_dsm = afu_user_done && no_has_peding;
 
 endmodule

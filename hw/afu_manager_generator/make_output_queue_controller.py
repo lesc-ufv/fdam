@@ -21,6 +21,7 @@ def make_output_queue_controller():
     conf = m.Input('conf',EmbeddedCode('ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH'))
 
     available_write = m.Input('available_write')
+    has_peding = m.OutputReg('has_peding')
     request_write = m.OutputReg('request_write')
     write_data = m.OutputReg('write_data',DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)
 
@@ -67,6 +68,14 @@ def make_output_queue_controller():
     issue_req_data.assign(AndList(start & conf_ready & ~end_req_wr_data & available_write,Mux(fifo_almostempty,(~fifo_empty&~fifo_re),Int(1,1,2))))
     afu_user_available_write.assign(~fifo_almostfull)
     write_data_valid_queue.assign(AndList(write_data_valid,(write_queue_id == ID_QUEUE)))
+    
+    m.Always(Posedge(clk))(
+        If(rst)(
+            has_peding(0)
+        ).Else(
+           has_peding(Mux(write_peding > 0,Int(1,1,2),Int(0,1,2)))
+        )
+    ) 
 
     m.Always(Posedge(clk))(
         If(rst)(

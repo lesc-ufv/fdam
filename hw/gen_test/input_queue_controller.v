@@ -17,6 +17,7 @@ module input_queue_controller #
   input [2-1:0] conf_valid,
   input [ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0] conf,
   input available_read,
+  output reg has_peding,
   output reg request_read,
   output reg [ADDR_WIDTH+TAG_WIDTH-1:0] request_data,
   input read_data_valid,
@@ -80,6 +81,15 @@ module input_queue_controller #
   assign fifo_fit = (read_peding + fifo_count) < FIFO_FULL;
   assign afu_user_available_read = (fifo_almostempty)? ~fifo_empty & ~afu_user_request_read : 1'b1;
   assign read_data_valid_queue = read_data_valid && (read_queue_id == ID_QUEUE);
+
+  always @(posedge clk) begin
+    if(rst) begin
+      has_peding <= 0;
+    end else begin
+      has_peding <= (read_peding > 0)? 1'b1 : 1'b0;
+    end
+  end
+
 
   always @(posedge clk) begin
     if(rst) begin

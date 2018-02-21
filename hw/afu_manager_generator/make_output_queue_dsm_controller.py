@@ -27,6 +27,7 @@ def make_output_queue_dsm_controller():
     conf = m.Input('conf', EmbeddedCode('ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH'))
 
     available_write = m.Input('available_write')
+    has_peding = m.OutputReg('has_peding')
     request_write = m.OutputReg('request_write')
     write_data = m.OutputReg('write_data', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)
 
@@ -102,6 +103,14 @@ def make_output_queue_dsm_controller():
     end_req_rd_dsm.assign(afu_dsm_addr == DSM_NUM_CL)
     issue_req_dsm.assign(AndList(start,dsm_conf_ready,available_write,~end_req_rd_dsm,afu_dsm_update,(~afu_dsm_req_rd)))
     write_data_valid_dsm.assign(AndList(write_data_valid,(write_queue_id == TAG_DSM)))
+
+    m.Always(Posedge(clk))(
+        If(rst)(
+            has_peding(0)
+        ).Else(
+           has_peding(Mux(write_peding > 0,Int(1,1,2),Int(0,1,2)))
+        )
+    ) 
 
     m.Always(Posedge(clk))(
         If(rst)(

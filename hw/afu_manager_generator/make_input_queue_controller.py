@@ -22,6 +22,7 @@ def make_input_queue_controller():
     conf = m.Input('conf', EmbeddedCode('ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH'))
 
     available_read = m.Input('available_read')
+    has_peding = m.OutputReg('has_peding')
     request_read = m.OutputReg('request_read')
     request_data = m.OutputReg('request_data', ADDR_WIDTH + TAG_WIDTH)
 
@@ -72,7 +73,15 @@ def make_input_queue_controller():
     fifo_fit.assign(EmbeddedCode('(read_peding + fifo_count) < FIFO_FULL'))
     afu_user_available_read.assign(Mux(fifo_almostempty,~fifo_empty& ~afu_user_request_read,Int(1,1,2)))
     read_data_valid_queue.assign(AndList(read_data_valid, read_queue_id == ID_QUEUE))
-
+   
+    m.Always(Posedge(clk))(
+        If(rst)(
+            has_peding(0)
+        ).Else(
+           has_peding(Mux(read_peding > 0,Int(1,1,2),Int(0,1,2)))
+        )
+    )    
+        
     m.Always(Posedge(clk))(
         If(rst)(
             addr_base(0),
