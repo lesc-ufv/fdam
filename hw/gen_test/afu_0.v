@@ -51,7 +51,7 @@ module afu_0 #
   wire afu_user_done_dsm;
   wire [NUM_INPUT_QUEUES-1:0] has_peding_rd;
   wire [NUM_OUTPUT_QUEUES-1:0] has_peding_wr;
-  wire no_has_peding;
+  wire has_peding;
   wire [NUM_INPUT_QUEUES-1:0] input_queue_done;
   wire [NUM_OUTPUT_QUEUES-1:0] output_queue_done;
   wire afu_dsm_update;
@@ -228,7 +228,7 @@ module afu_0 #
     .afu_user_done(afu_user_done)
   );
 
-  assign no_has_peding = !((&has_peding_rd) && (&has_peding_wr));
-  assign afu_user_done_dsm = afu_user_done && no_has_peding;
+  assign has_peding = |{has_peding_rd,has_peding_wr};
+  assign afu_user_done_dsm = afu_user_done && ~has_peding;
 
 endmodule

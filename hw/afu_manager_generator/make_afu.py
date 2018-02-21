@@ -58,7 +58,7 @@ def make_afu(afu_id,dsm_controller):
     afu_user_done_dsm = m.Wire('afu_user_done_dsm')
     has_peding_rd = m.Wire('has_peding_rd',NUM_INPUT_QUEUES)
     has_peding_wr = m.Wire('has_peding_wr',NUM_OUTPUT_QUEUES)
-    no_has_peding = m.Wire('no_has_peding')
+    has_peding = m.Wire('has_peding')
     
     input_queue_done = m.Wire('input_queue_done', NUM_INPUT_QUEUES)
     output_queue_done = m.Wire('output_queue_done', NUM_OUTPUT_QUEUES)
@@ -154,7 +154,7 @@ def make_afu(afu_id,dsm_controller):
            ('afu_user_done', afu_user_done)]
     m.Instance(afu_user, 'afu_user_%d' % afu_id, params, con)
     
-    no_has_peding.assign(EmbeddedCode('!((&has_peding_rd) && (&has_peding_wr))'))
-    afu_user_done_dsm.assign(AndList(afu_user_done,no_has_peding))
+    has_peding.assign(EmbeddedCode('|{has_peding_rd,has_peding_wr}'))
+    afu_user_done_dsm.assign(AndList(afu_user_done,~has_peding))
     
     return m
