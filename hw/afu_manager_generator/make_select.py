@@ -2,59 +2,9 @@ from math import ceil
 from veriloggen import *
 
 
-def make_select(num_input):
-    m = Module('select_%d' % num_input)
-    DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
-    clk = m.Input('clk')
-    rst = m.Input('rst')
-    data_in_valid = m.Input('data_in_valid', num_input)
-    inputs = []
-    for i in range(num_input):
-        inputs.append(m.Input('data_in_%d' % i, DATA_WIDTH))
-
-    data_out = m.OutputReg('data_out', DATA_WIDTH)
-    data_out_valid = m.OutputReg('data_out_valid')
-    id = 1
-    code = 'case(data_in_valid)\n'
-    for i in range(num_input):
-        code = code + '     %d: data_out <= data_in_%d;\n' % (id, i)
-        id = id * 2
-    code = code + '     default:data_out <= 0;\nendcase'
-    m.Always(Posedge(clk))(
-        If(rst)(
-            data_out(0)
-        ).Else(
-            EmbeddedCode(code)
-        )
-    )
-    m.Always(Posedge(clk))(
-        If(rst)(
-            data_out_valid(0)
-        ).Else(
-            data_out_valid(EmbeddedCode('|data_in_valid'))
-        )
-    )
-    return m
-
-
-def make_select_tree_array(num_input, array):
-    m_array = []
-    while num_input > 8:
-        m_array.append(8)
-        num_input = num_input - 8
-    else:
-        m_array.append(num_input)
-
-    array.append(m_array)
-    if len(m_array) == 1:
-        return array
-    else:
-        return make_select_tree_array(len(m_array), array)
-
-
-def make_select_tree(num_input):
+def make_select_tree(radix, num_input):
     array = []
-    array = make_select_tree_array(num_input, array)
+    array = make_select_tree_array(radix, num_input, array)
     m = Module('select_ff')
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
     clk = m.Input('clk')
@@ -103,9 +53,10 @@ def make_select_tree(num_input):
                         con.append(('data_in_%d' % p, inputs['data_in_%d' % cc]))
                         cc += 1
                 else:
-                    con = [('clk', clk), ('rst', rst), ('data_in_valid',data_out_valid_wires[i-1][cc:cc + sel_level[j]])]
+                    con = [('clk', clk), ('rst', rst),
+                           ('data_in_valid', data_out_valid_wires[i - 1][cc:cc + sel_level[j]])]
                     for p in range(sel_level[j]):
-                        con.append(('data_in_%d' % p, data_out_wires[i-1][cc]))
+                        con.append(('data_in_%d' % p, data_out_wires[i - 1][cc]))
                         cc += 1
                 con.append(('data_out_valid', data_out_valid_wires[i][sel_idx]))
                 con.append(('data_out', data_out_wires[i][sel_idx]))
@@ -126,3 +77,55 @@ def make_select_tree(num_input):
         m.Instance(sel, 'sel_%d_%d' % (len(array) - 1, 0), m.get_params(), con)
 
     return m
+
+
+def make_select(num_input):
+    m = Module('select_%d' % num_input)
+    DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
+    clk = m.Input('clk')
+    rst = m.Input('rst')
+    data_in_valid = m.Input('data_in_valid', num_input)
+    inputs = []
+    for i in range(num_input):
+        inputs.append(m.Input('data_in_%d' % i, DATA_WIDTH))
+
+    data_out = m.OutputReg('data_out', DATA_WIDTH)
+    data_out_valid = m.OutputReg('data_out_valid')
+    id = 1
+    code = 'case(data_in_valid)\n'
+    for i in range(num_input):
+        code = code + '     %d: data_out <= data_in_%d;\n' % (id, i)
+        id = id * 2
+    code = code + '     default:data_out <= 0;\nendcase'
+    m.Always(Posedge(clk))(
+        If(rst)(
+            data_out(0)
+        ).Else(
+            EmbeddedCode(code)
+        )
+    )
+    m.Always(Posedge(clk))(
+        If(rst)(
+            data_out_valid(0)
+        ).Else(
+            data_out_valid(EmbeddedCode('|data_in_valid'))
+        )
+    )
+    return m
+
+
+def make_select_tree_array(radix, num_input, array):
+    if radix < 2:
+        raise Exception("The radix parameter needs greater than 1, found: %d"%radix)
+    m_array = []
+    while num_input > radix:
+        m_array.append(radix)
+        num_input = num_input - radix
+    else:
+        m_array.append(num_input)
+
+    array.append(m_array)
+    if len(m_array) == 1:
+        return array
+    else:
+        return make_select_tree_array(radix, len(m_array), array)

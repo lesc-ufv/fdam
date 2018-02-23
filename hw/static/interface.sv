@@ -45,9 +45,13 @@ module app_afu(
 );
     // Local reset to reduce fan-out
     logic reset = 1'b1;
+    logic [2:0]reset_pipe;
     always @(posedge clk)
     begin
-        reset <= fiu.reset;
+        reset_pipe[0] <= fiu.reset;
+        reset_pipe[1] <= reset_pipe[0];
+        reset_pipe[2] <= reset_pipe[1];
+        reset <= reset_pipe[2];
     end
     //
     // Convert between byte addresses and line addresses.  The conversion
@@ -225,6 +229,8 @@ module app_afu(
         
         fiu.c1Tx = cci_mpf_genC1TxWriteReq(wr_hdr,req_wr_data,req_wr_en);
     end 
+    
+    
     afu_manager afu_manager(
     
       .clk(clk),

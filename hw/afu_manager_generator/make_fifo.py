@@ -96,11 +96,13 @@ def make_fifo():
             )
         )
     )
-
+    m.EmbeddedCode('//synthesis translate_off')
+    m.Always(Posedge(clk))(
+        If(we & full)(EmbeddedCode('$fatal("overflow");')),
+        If(re & empty)(EmbeddedCode('$fatal("underflow");'))
+    )
+    m.EmbeddedCode('//synthesis translate_on')
     return m
-
-
-
 
 '''
 def make_fifo():

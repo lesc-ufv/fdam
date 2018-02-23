@@ -22,7 +22,7 @@ module output_queue_dsm_controller #
   input [2-1:0] conf_valid,
   input [ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0] conf,
   input available_write,
-  output reg has_peding,
+  output reg has_wr_peding,
   output reg request_write,
   output reg [DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH-1:0] write_data,
   input write_data_valid,
@@ -39,9 +39,9 @@ module output_queue_dsm_controller #
 );
 
   localparam TAG_DSM = 65535;
+  localparam CONF_TYPE_OUT = 2;
+  localparam CONF_TYPE_DSM = 3;
   reg conf_ready;
-  reg conf_read;
-  reg [((ADDR_WIDTH+QTD_WIDTH)+CONF_ID_QUEUE_WIDTH)-1:0] conf_reg;
   reg [ADDR_WIDTH-1:0] addr_base;
   reg [ADDR_WIDTH-1:0] addr_write_next;
   reg [QTD_WIDTH-1:0] qtd_data_cl;
@@ -53,12 +53,10 @@ module output_queue_dsm_controller #
   reg request_write_data;
   reg request_write_dsm;
   reg flag_addr_dsm_init;
-  reg dsm_conf_read;
   reg dsm_conf_ready;
   reg [DSM_ADDR_WIDTH-1:0] count_req_dsm;
   reg [ADDR_WIDTH-1:0] dsm_addr_base;
   reg [ADDR_WIDTH-1:0] dsm_addr_next;
-  reg [(ADDR_WIDTH+CONF_AFU_ID_WIDTH)-1:0] dsm_conf_reg;
   reg [ADDR_WIDTH+1-1:0] write_peding_dsm;
   wire issue_req_wr_data;
   wire fifo_empty;
@@ -73,6 +71,10 @@ module output_queue_dsm_controller #
   wire write_data_valid_dsm;
   wire end_req_rd_dsm;
   wire issue_req_dsm;
+  wire conf_rd_valid_data;
+  wire [((ADDR_WIDTH+QTD_WIDTH)+CONF_ID_QUEUE_WIDTH)-1:0] conf_rd_data;
+  wire conf_rd_valid_dsm;
+  wire [(ADDR_WIDTH+CONF_AFU_ID_WIDTH)-1:0] conf_rd_dsm;
 
   fifo
   #(
@@ -84,7 +86,7 @@ module output_queue_dsm_controller #
   fifo
   (
     .clk(clk),
-    .rst(rst),
+    .rst(conf_rd_valid_data),
     .we(afu_user_request_write),
     .din(afu_user_write_data),
     .re(fifo_re),
@@ -97,6 +99,42 @@ module output_queue_dsm_controller #
     .almostempty(fifo_almostempty)
   );
 
+
+  conf_receiver
+  #(
+    .CONF_TYPE(CONF_TYPE_OUT),
+    .CONF_ID(ID_QUEUE),
+    .CONF_ID_WIDTH(CONF_ID_QUEUE_WIDTH),
+    .CONF_WIDTH(ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH)
+  )
+  conf_receiver_data
+  (
+    .clk(clk),
+    .rst(rst),
+    .conf_in_valid(conf_valid),
+    .conf_in_data(conf),
+    .conf_out_valid(conf_rd_valid_data),
+    .conf_out_data(conf_rd_data)
+  );
+
+
+  conf_receiver
+  #(
+    .CONF_TYPE(CONF_TYPE_DSM),
+    .CONF_ID(AFU_ID),
+    .CONF_ID_WIDTH(CONF_AFU_ID_WIDTH),
+    .CONF_WIDTH(ADDR_WIDTH + CONF_AFU_ID_WIDTH)
+  )
+  conf_receiver_dsm
+  (
+    .clk(clk),
+    .rst(rst),
+    .conf_in_valid(conf_valid),
+    .conf_in_data(conf),
+    .conf_out_valid(conf_rd_valid_dsm),
+    .conf_out_data(conf_rd_dsm)
+  );
+
   assign end_req_wr_data = count_req_cl >= qtd_data_cl;
   assign done = (count_cl >= qtd_data_cl) && (write_peding == 0) && start;
   assign issue_req_wr_data = start & conf_ready & ~end_req_wr_data & available_write && ((fifo_almostempty)? ~fifo_empty & ~fifo_re : 1'b1);
@@ -107,10 +145,10 @@ module output_queue_dsm_controller #
   assign write_data_valid_dsm = write_data_valid && (write_queue_id == TAG_DSM);
 
   always @(posedge clk) begin
-    if(rst) begin
-      has_peding <= 0;
+    if(conf_rd_valid_data) begin
+      has_wr_peding <= 0;
     end else begin
-      has_peding <= (write_peding > 0)? 1'b1 : 1'b0;
+      has_wr_peding <= ((write_peding > 0) && (write_peding_dsm > 0))? 1'b1 : 1'b0;
     end
   end
 
@@ -119,35 +157,17 @@ module output_queue_dsm_controller #
     if(rst) begin
       addr_base <= 0;
       qtd_data_cl <= 0;
-      conf_reg <= 0;
-      conf_read <= 1'b0;
       conf_ready <= 1'b0;
       dsm_addr_base <= 0;
-      dsm_conf_reg <= 0;
-      dsm_conf_read <= 1'b0;
       dsm_conf_ready <= 1'b0;
     end else begin
-      case(conf_valid)
-        2'd2: begin
-          conf_reg <= conf;
-          conf_read <= 1'b1;
-        end
-        2'd3: begin
-          dsm_conf_reg <= conf;
-          dsm_conf_read <= 1'b1;
-        end
-        default: begin
-        end
-      endcase
-      if((conf_reg[CONF_ID_QUEUE_WIDTH-1:0] == ID_QUEUE) && conf_read) begin
-        qtd_data_cl <= conf_reg[CONF_ID_QUEUE_WIDTH+QTD_WIDTH-1:CONF_ID_QUEUE_WIDTH];
-        addr_base <= conf_reg[CONF_ID_QUEUE_WIDTH+QTD_WIDTH+ADDR_WIDTH-1:CONF_ID_QUEUE_WIDTH+QTD_WIDTH];
-        conf_read <= 1'b0;
+      if(conf_rd_valid_data) begin
+        qtd_data_cl <= conf_rd_data[CONF_ID_QUEUE_WIDTH+QTD_WIDTH-1:CONF_ID_QUEUE_WIDTH];
+        addr_base <= conf_rd_data[CONF_ID_QUEUE_WIDTH+QTD_WIDTH+ADDR_WIDTH-1:CONF_ID_QUEUE_WIDTH+QTD_WIDTH];
         conf_ready <= 1'b1;
       end 
-      if((dsm_conf_reg[CONF_AFU_ID_WIDTH-1:0] == AFU_ID) && dsm_conf_read) begin
-        dsm_addr_base <= dsm_conf_reg[ADDR_WIDTH+CONF_AFU_ID_WIDTH-1:CONF_AFU_ID_WIDTH];
-        dsm_conf_read <= 1'b0;
+      if(conf_rd_valid_dsm) begin
+        dsm_addr_base <= conf_rd_dsm[ADDR_WIDTH+CONF_AFU_ID_WIDTH-1:CONF_AFU_ID_WIDTH];
         dsm_conf_ready <= 1'b1;
       end 
     end
@@ -155,35 +175,31 @@ module output_queue_dsm_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       addr_write_next <= 0;
       count_req_cl <= 0;
       flag_addr_init <= 1'b1;
-    end else begin
-      if(conf_ready & flag_addr_init) begin
-        addr_write_next <= addr_base;
-        flag_addr_init <= 1'b0;
-      end else if(fifo_dout_valid) begin
-        addr_write_next <= addr_write_next + 1;
-        count_req_cl <= count_req_cl + 1;
-      end 
-    end
+    end else if(conf_ready & flag_addr_init) begin
+      addr_write_next <= addr_base;
+      flag_addr_init <= 1'b0;
+    end else if(fifo_dout_valid) begin
+      addr_write_next <= addr_write_next + 1;
+      count_req_cl <= count_req_cl + 1;
+    end 
   end
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       count_cl <= 0;
-    end else begin
-      if(write_data_valid_queue) begin
-        count_cl <= count_cl + 1;
-      end 
-    end
+    end else if(write_data_valid_queue) begin
+      count_cl <= count_cl + 1;
+    end 
   end
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       fifo_re <= 1'b0;
       afu_dsm_req_rd <= 1'b0;
     end else begin
@@ -199,7 +215,7 @@ module output_queue_dsm_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       write_peding <= 0;
     end else begin
       case({ write_data_valid_queue, request_write_data })
@@ -221,7 +237,7 @@ module output_queue_dsm_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       request_write <= 1'b0;
       request_write_data <= 1'b0;
       request_write_dsm <= 1'b0;
@@ -244,35 +260,31 @@ module output_queue_dsm_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       dsm_addr_next <= 0;
       count_req_dsm <= 0;
       flag_addr_dsm_init <= 1'b1;
-    end else begin
-      if(dsm_conf_ready & flag_addr_dsm_init) begin
-        dsm_addr_next <= dsm_addr_base;
-        flag_addr_dsm_init <= 1'b0;
-      end else if(request_write_dsm) begin
-        dsm_addr_next <= dsm_addr_next + 1;
-        count_req_dsm <= count_req_dsm + 1;
-      end 
-    end
+    end else if(dsm_conf_ready & flag_addr_dsm_init) begin
+      dsm_addr_next <= dsm_addr_base;
+      flag_addr_dsm_init <= 1'b0;
+    end else if(request_write_dsm) begin
+      dsm_addr_next <= dsm_addr_next + 1;
+      count_req_dsm <= count_req_dsm + 1;
+    end 
   end
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       afu_dsm_addr <= 0;
-    end else begin
-      if(afu_dsm_req_rd) begin
-        afu_dsm_addr <= afu_dsm_addr + 1;
-      end 
-    end
+    end else if(afu_dsm_req_rd) begin
+      afu_dsm_addr <= afu_dsm_addr + 1;
+    end 
   end
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid_data) begin
       write_peding_dsm <= 0;
     end else begin
       case({ write_data_valid_dsm, afu_dsm_req_rd })

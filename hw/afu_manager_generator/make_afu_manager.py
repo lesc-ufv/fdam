@@ -2,6 +2,7 @@ from math import ceil
 from veriloggen import *
 
 from make_arbiter import make_arbiter
+from make_conf_receiver import make_conf_receiver
 from make_dsm_controller import make_dsm_controller
 from make_fifo import make_fifo
 from make_afu import make_afu
@@ -32,6 +33,7 @@ def afu_manager_args_process(afus):
 def make_afu_manager(afus):
     try:
         afu_count, qtd_in_queue, qtd_out_queue = afu_manager_args_process(afus)
+        RADIX = 4
         m = Module('afu_manager')
         ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 64)
         QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
@@ -185,11 +187,12 @@ def make_afu_manager(afus):
         genReqWrFifos.Instance(fifo, 'req_wr_fifo', params, con)
 
         dsm_controller_afus = make_dsm_controller()
+        conf_receiver = make_conf_receiver()
         afu_id = 0
         ini_in_queue_id = 0
         ini_out_queue_id = 0
         for num_in_queue, num_out_queue in afus:
-            afu = make_afu(afu_id, dsm_controller_afus)
+            afu = make_afu(afu_id, dsm_controller_afus,conf_receiver)
             range1 = '%d*(%d*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:%d*(%d*(ADDR_WIDTH+TAG_WIDTH))' % (
                 num_in_queue, ini_in_queue_id, num_in_queue, ini_in_queue_id)
             range2 = '%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))' % (
@@ -218,7 +221,7 @@ def make_afu_manager(afus):
             ini_in_queue_id = ini_in_queue_id + num_in_queue
             ini_out_queue_id = ini_out_queue_id + num_out_queue
 
-        req_rd_fifo_sel = make_select_tree(qtd_in_queue)
+        req_rd_fifo_sel = make_select_tree(RADIX, qtd_in_queue)
         params = [('DATA_WIDTH', ADDR_WIDTH + TAG_WIDTH)]
         con = [('clk', clk), ('rst', rst), ('data_in_valid', req_rd_fifo_valid)]
         for i in range(qtd_in_queue):
@@ -230,7 +233,7 @@ def make_afu_manager(afus):
 
         req_wr_fifo_sel = req_rd_fifo_sel
         if qtd_in_queue != qtd_out_queue:
-            req_wr_fifo_sel = make_select_tree(qtd_out_queue)
+            req_wr_fifo_sel = make_select_tree(RADIX, qtd_out_queue)
         params = [('DATA_WIDTH', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]
         con = [('clk', clk), ('rst', rst), ('data_in_valid', req_wr_fifo_valid)]
         for i in range(qtd_out_queue):

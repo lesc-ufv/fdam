@@ -6,7 +6,7 @@ from make_output_queue_controller import make_output_queue_controller
 from make_afu_user import make_afu_user
 
 
-def make_afu(afu_id,dsm_controller):
+def make_afu(afu_id,dsm_controller,conf_receiver):
     m = Module('afu_%d' % afu_id)
     ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 64)
     QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
@@ -45,6 +45,11 @@ def make_afu(afu_id,dsm_controller):
     write_data_valid = m.Input('write_data_valid')
     write_queue_id = m.Input('write_queue_id', TAG_WIDTH)
 
+    rst_reg = m.Reg('rst_reg')
+    start_reg = m.Reg('start_reg')
+    conf_valid_reg = m.Reg('conf_valid_reg', 2)
+    conf_reg = m.Reg('conf_reg', EmbeddedCode('ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH'))
+
     afu_user_available_read = m.Wire('afu_user_available_read', NUM_INPUT_QUEUES)
     afu_user_request_read = m.Wire('afu_user_request_read', NUM_INPUT_QUEUES)
     afu_user_read_data = m.Wire('afu_user_read_data', EmbeddedCode('DATA_WIDTH*NUM_INPUT_QUEUES'))
@@ -59,7 +64,7 @@ def make_afu(afu_id,dsm_controller):
     has_peding_rd = m.Wire('has_peding_rd',NUM_INPUT_QUEUES)
     has_peding_wr = m.Wire('has_peding_wr',NUM_OUTPUT_QUEUES)
     has_peding = m.Wire('has_peding')
-    
+
     input_queue_done = m.Wire('input_queue_done', NUM_INPUT_QUEUES)
     output_queue_done = m.Wire('output_queue_done', NUM_OUTPUT_QUEUES)
 
@@ -72,12 +77,12 @@ def make_afu(afu_id,dsm_controller):
     idx_in_queue = m.Genvar('idx_in_queue')
     idx_out_queue = m.Genvar('idx_out_queue')
 
-    input_queue_controller = make_input_queue_controller()
+    input_queue_controller = make_input_queue_controller(conf_receiver)
     params = [('ID_QUEUE', INITIAL_INPUT_QUEUE_ID + idx_in_queue), ('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH),
               ('DATA_WIDTH', DATA_WIDTH), ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('TAG_WIDTH', TAG_WIDTH),
               ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS), ('FIFO_FULL', FIFO_FULL)]
-    con = [('clk', clk), ('rst', rst), ('start', start), ('conf_valid', conf_valid), ('conf', conf),
-           ('available_read', available_read[idx_in_queue]),('has_peding',has_peding_rd[idx_in_queue]) ,
+    con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('conf_valid', conf_valid_reg), ('conf', conf_reg),
+           ('available_read', available_read[idx_in_queue]),('has_rd_peding',has_peding_rd[idx_in_queue]),
            ('request_read', request_read[idx_in_queue]),
            ('request_data', request_data[
                             idx_in_queue * (ADDR_WIDTH + TAG_WIDTH):idx_in_queue * (ADDR_WIDTH + TAG_WIDTH) + (
@@ -92,7 +97,7 @@ def make_afu(afu_id,dsm_controller):
                                   'gen_in_queue_controller')
     genInputQueue.Instance(input_queue_controller, 'input_queue_controller', params, con)
 
-    output_queue_controller_0 = make_output_queue_dsm_controller()
+    output_queue_controller_0 = make_output_queue_dsm_controller(conf_receiver)
 
     params = [('AFU_ID', afu_id), ('CONF_AFU_ID_WIDTH', CONF_AFU_ID_WIDTH), ('ID_QUEUE', INITIAL_OUTPUT_QUEUE_ID),
               ('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH),
@@ -100,8 +105,9 @@ def make_afu(afu_id,dsm_controller):
               ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS), ('FIFO_FULL', FIFO_FULL), ('DSM_ADDR_WIDTH', DSM_ADDR_WIDTH),
               ('DSM_DATA_WIDTH', DSM_DATA_WIDTH), ('DSM_NUM_CL', DSM_NUM_CL)]
 
-    con = [('clk', clk), ('rst', rst), ('start', start), ('conf_valid', conf_valid), ('conf', conf),
-           ('available_write', available_write[0]), ('has_peding',has_peding_wr[0]) ,('request_write', request_write[0]),
+    con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('conf_valid', conf_valid_reg), ('conf', conf_reg),
+           ('available_write', available_write[0]), ('has_wr_peding',has_peding_wr[0]),
+           ('request_write', request_write[0]),
            ('write_data', write_data[0:(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]),
            ('write_data_valid', write_data_valid), ('write_queue_id', write_queue_id),
            ('afu_user_available_write', afu_user_available_write[0]),
@@ -112,13 +118,13 @@ def make_afu(afu_id,dsm_controller):
 
     m.Instance(output_queue_controller_0, 'output_queue_dsm_controller', params, con)
 
-    output_queue_controller = make_output_queue_controller()
+    output_queue_controller = make_output_queue_controller(conf_receiver)
     params = [('ID_QUEUE', INITIAL_OUTPUT_QUEUE_ID + idx_out_queue), ('ADDR_WIDTH', ADDR_WIDTH),
               ('QTD_WIDTH', QTD_WIDTH),
               ('DATA_WIDTH', DATA_WIDTH), ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('TAG_WIDTH', TAG_WIDTH),
               ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS), ('FIFO_FULL', FIFO_FULL)]
-    con = [('clk', clk), ('rst', rst), ('start', start), ('conf_valid', conf_valid), ('conf', conf),
-           ('available_write', available_write[idx_out_queue]),('has_peding',has_peding_wr[idx_out_queue]),
+    con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('conf_valid', conf_valid_reg), ('conf', conf_reg),
+           ('available_write', available_write[idx_out_queue]),('has_wr_peding',has_peding_wr[idx_out_queue]),
            ('request_write', request_write[idx_out_queue]),
            ('write_data', write_data[idx_out_queue * (DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH):idx_out_queue * (
                    DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH) + (DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]),
@@ -136,7 +142,7 @@ def make_afu(afu_id,dsm_controller):
               ('NUM_OUTPUT_QUEUES',NUM_OUTPUT_QUEUES),('NUM_CL_DSM_RD',NUM_CL_DSM_RD),('NUM_CL_DSM_WR',NUM_CL_DSM_WR),
               ('NUM_CL_DSM_TOTAL',NUM_CL_DSM_TOTAL),('NUM_CL_DSM_TOTAL_BITS',NUM_CL_DSM_TOTAL_BITS)]
 
-    con = [('clk',clk),('rst',rst),('done_rd',input_queue_done),('done_wr',output_queue_done),('done_afu',afu_user_done_dsm),
+    con = [('clk',clk),('rst',rst_reg),('done_rd',input_queue_done),('done_wr',output_queue_done),('done_afu',afu_user_done_dsm),
            ('afu_req_rd_data_en',afu_user_request_read),('afu_req_wr_data_en',afu_user_request_write),
            ('afu_dsm_req_rd',afu_dsm_req_rd),('afu_dsm_addr',afu_dsm_addr),('afu_dsm_update',afu_dsm_update),
            ('afu_dsm_valid',afu_dsm_valid),('afu_dsm_data',afu_dsm_data)]
@@ -146,15 +152,22 @@ def make_afu(afu_id,dsm_controller):
     afu_user = make_afu_user(afu_id)
     params = [('DATA_WIDTH', DATA_WIDTH), ('NUM_INPUT_QUEUES', NUM_INPUT_QUEUES),
               ('NUM_OUTPUT_QUEUES', NUM_OUTPUT_QUEUES)]
-    con = [('clk', clk), ('rst', rst), ('start', start), ('afu_user_done_rd_data', input_queue_done),
+    con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('afu_user_done_rd_data', input_queue_done),
            ('afu_user_done_wr_data', output_queue_done), ('afu_user_available_read', afu_user_available_read),
            ('afu_user_request_read', afu_user_request_read), ('afu_user_read_data_valid', afu_user_read_data_valid),
            ('afu_user_read_data', afu_user_read_data), ('afu_user_available_write', afu_user_available_write),
            ('afu_user_request_write', afu_user_request_write), ('afu_user_write_data', afu_user_write_data),
            ('afu_user_done', afu_user_done)]
     m.Instance(afu_user, 'afu_user_%d' % afu_id, params, con)
-    
+
     has_peding.assign(EmbeddedCode('|{has_peding_rd,has_peding_wr}'))
     afu_user_done_dsm.assign(AndList(afu_user_done,~has_peding))
-    
+
+    m.Always(Posedge(clk))(
+        rst_reg(rst),
+        start_reg(start),
+        conf_valid_reg(conf_valid),
+        conf_reg(conf)
+    )
+
     return m

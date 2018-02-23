@@ -17,7 +17,7 @@ module input_queue_controller #
   input [2-1:0] conf_valid,
   input [ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0] conf,
   input available_read,
-  output reg has_peding,
+  output reg has_rd_peding,
   output reg request_read,
   output reg [ADDR_WIDTH+TAG_WIDTH-1:0] request_data,
   input read_data_valid,
@@ -30,9 +30,8 @@ module input_queue_controller #
   output done
 );
 
+  localparam CONF_TYPE_IN = 1;
   reg conf_ready;
-  reg conf_read;
-  reg [((ADDR_WIDTH+QTD_WIDTH)+CONF_ID_QUEUE_WIDTH)-1:0] conf_reg;
   reg [ADDR_WIDTH-1:0] addr_base;
   reg [ADDR_WIDTH-1:0] addr_read_next;
   reg [QTD_WIDTH-1:0] qtd_data_cl;
@@ -51,6 +50,8 @@ module input_queue_controller #
   wire fifo_almostfull;
   wire fifo_almostempty;
   wire end_req_rd_data;
+  wire conf_rd_valid;
+  wire [((ADDR_WIDTH+QTD_WIDTH)+CONF_ID_QUEUE_WIDTH)-1:0] conf_rd;
 
   fifo
   #(
@@ -62,7 +63,7 @@ module input_queue_controller #
   fifo
   (
     .clk(clk),
-    .rst(rst),
+    .rst(conf_rd_valid),
     .we(fifo_we),
     .din(din),
     .re(afu_user_request_read),
@@ -75,18 +76,44 @@ module input_queue_controller #
     .almostempty(fifo_almostempty)
   );
 
+
+  conf_receiver
+  #(
+    .CONF_TYPE(CONF_TYPE_IN),
+    .CONF_ID(ID_QUEUE),
+    .CONF_ID_WIDTH(CONF_ID_QUEUE_WIDTH),
+    .CONF_WIDTH(ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH)
+  )
+  conf_receiver
+  (
+    .clk(clk),
+    .rst(rst),
+    .conf_in_valid(conf_valid),
+    .conf_in_data(conf),
+    .conf_out_valid(conf_rd_valid),
+    .conf_out_data(conf_rd)
+  );
+   
+  wire [DATA_WIDTH-1:0]add_out;
+
+  add #(.DATA_WIDTH(DATA_WIDTH))add(
+     .a(read_peding),
+     .b(fifo_count),
+     .out(add_out)
+  );
+   
   assign end_req_rd_data = count_req_cl >= qtd_data_cl;
   assign done = (count_cl >= qtd_data_cl) && (read_peding == 0) && start;
   assign issue_req_data = start & conf_ready & ~end_req_rd_data & available_read & fifo_fit & ~request_read;
-  assign fifo_fit = (read_peding + fifo_count) < FIFO_FULL;
+  assign fifo_fit = add_out < FIFO_FULL;
   assign afu_user_available_read = (fifo_almostempty)? ~fifo_empty & ~afu_user_request_read : 1'b1;
   assign read_data_valid_queue = read_data_valid && (read_queue_id == ID_QUEUE);
 
   always @(posedge clk) begin
-    if(rst) begin
-      has_peding <= 0;
+    if(conf_rd_valid) begin
+      has_rd_peding <= 0;
     end else begin
-      has_peding <= (read_peding > 0)? 1'b1 : 1'b0;
+      has_rd_peding <= (read_peding > 0)? 1'b1 : 1'b0;
     end
   end
 
@@ -95,18 +122,11 @@ module input_queue_controller #
     if(rst) begin
       addr_base <= 0;
       qtd_data_cl <= 0;
-      conf_reg <= 0;
-      conf_read <= 1'b0;
       conf_ready <= 1'b0;
     end else begin
-      if(conf_valid == 2'd1) begin
-        conf_reg <= conf;
-        conf_read <= 1'b1;
-      end 
-      if((conf_reg[CONF_ID_QUEUE_WIDTH-1:0] == ID_QUEUE) && conf_read) begin
-        qtd_data_cl <= conf_reg[CONF_ID_QUEUE_WIDTH+QTD_WIDTH-1:CONF_ID_QUEUE_WIDTH];
-        addr_base <= conf_reg[CONF_ID_QUEUE_WIDTH+QTD_WIDTH+ADDR_WIDTH-1:CONF_ID_QUEUE_WIDTH+QTD_WIDTH];
-        conf_read <= 1'b0;
+      if(conf_rd_valid) begin
+        qtd_data_cl <= conf_rd[CONF_ID_QUEUE_WIDTH+QTD_WIDTH-1:CONF_ID_QUEUE_WIDTH];
+        addr_base <= conf_rd[CONF_ID_QUEUE_WIDTH+QTD_WIDTH+ADDR_WIDTH-1:CONF_ID_QUEUE_WIDTH+QTD_WIDTH];
         conf_ready <= 1'b1;
       end 
     end
@@ -114,24 +134,21 @@ module input_queue_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid) begin
       addr_read_next <= 0;
       count_req_cl <= 0;
       flag_addr_init <= 1'b1;
-    end else begin
-      if(conf_ready & flag_addr_init) begin
-        addr_read_next <= addr_base;
-        flag_addr_init <= 1'b0;
-      end else if(request_read) begin
-        addr_read_next <= addr_read_next + 1;
-        count_req_cl <= count_req_cl + 1;
-      end 
-    end
+    end else if(conf_ready & flag_addr_init) begin
+      addr_read_next <= addr_base;
+      flag_addr_init <= 1'b0;
+    end else if(request_read) begin
+      addr_read_next <= addr_read_next + 1;
+      count_req_cl <= count_req_cl + 1;
+    end 
   end
 
-
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid) begin
       request_read <= 1'b0;
       request_data <= 0;
     end else begin
@@ -145,7 +162,7 @@ module input_queue_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid) begin
       read_peding <= 0;
     end else begin
       case({ fifo_we, request_read })
@@ -167,7 +184,7 @@ module input_queue_controller #
 
 
   always @(posedge clk) begin
-    if(rst) begin
+    if(conf_rd_valid) begin
       fifo_we <= 1'b0;
       din <= 0;
       count_cl <= 0;

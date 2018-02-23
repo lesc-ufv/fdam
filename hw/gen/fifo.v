@@ -95,5 +95,17 @@ module fifo #
     end
   end
 
+  //synthesis translate_off
+
+  always @(posedge clk) begin
+    if(we & full) begin
+      $fatal("overflow");
+    end 
+    if(re & empty) begin
+      $fatal("underflow");
+    end 
+  end
+
+  //synthesis translate_on
 
 endmodule
