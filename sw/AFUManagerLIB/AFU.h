@@ -21,7 +21,7 @@ private:
     void **Inputbuffers;
     void **Outputbuffers;
     void *dsm;
-    size_t  dsm_size;
+    int  dsm_size;
     int *sizeOfInputBuffers;
     int *sizeOfOutputBuffers;
 
@@ -32,7 +32,8 @@ private:
     
     void clearDSM();
     
-    size_t getSizeDsm();
+    int getDsmSize();
+
     
 public:
     AFU(AFUManager_t &afuManager, afuid_t id, int numInputBuffer, int numOutputBuffer);
@@ -66,7 +67,7 @@ public:
     int getSizeOfInputBuffer(int BufferID);
 
     int getSizeOfOutputBuffer(int BufferID);
-
+    
     void waitDone(int64_t timeWaitMax);
     
     bool isDone();

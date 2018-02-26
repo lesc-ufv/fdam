@@ -33,7 +33,7 @@ module select_4 #
 
   always @(posedge clk) begin
     if(rst) begin
-      data_out_valid <= 0;
+      data_out_valid <= 1'b0;
     end else begin
       data_out_valid <= |data_in_valid;
     end

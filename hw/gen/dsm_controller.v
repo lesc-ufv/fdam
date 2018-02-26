@@ -5,33 +5,34 @@ module dsm_controller #
   parameter DSM_DATA_WIDTH = 512,
   parameter NUM_INPUT_QUEUES = 1,
   parameter NUM_OUTPUT_QUEUES = 1,
-  parameter NUM_CL_DSM_RD = $rtoi($ceil(NUM_INPUT_QUEUES/8)),
-  parameter NUM_CL_DSM_WR = $rtoi($ceil(NUM_OUTPUT_QUEUES/8)),
+  parameter NUM_CL_DSM_RD = $rtoi($ceil(NUM_INPUT_QUEUES/16)),
+  parameter NUM_CL_DSM_WR = $rtoi($ceil(NUM_OUTPUT_QUEUES/16)),
   parameter NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR,
   parameter NUM_CL_DSM_TOTAL_BITS = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL)))
 )
 (
   input clk,
   input rst,
+  input start,
   input [NUM_INPUT_QUEUES-1:0] done_rd,
   input [NUM_OUTPUT_QUEUES-1:0] done_wr,
   input done_afu,
+  input has_pending_wr,
   input [NUM_INPUT_QUEUES-1:0] afu_req_rd_data_en,
   input [NUM_OUTPUT_QUEUES-1:0] afu_req_wr_data_en,
-  input afu_dsm_req_rd,
-  input [NUM_CL_DSM_TOTAL_BITS-1:0] afu_dsm_addr,
-  output reg afu_dsm_update,
-  output reg afu_dsm_valid,
-  output reg [DSM_DATA_WIDTH-1:0] afu_dsm_data
+  input afu_dsm_available_write,
+  output reg afu_dsm_request_write,
+  output reg [DSM_DATA_WIDTH-1:0] afu_dsm_write_data
 );
 
   reg [DSM_DATA_WIDTH-1:0] dsm_data [0:NUM_CL_DSM_TOTAL-1];
   reg [DSM_DATA_WIDTH-1:0] done;
   reg [DSM_DATA_WIDTH-1:0] done_last;
-  reg [1-1:0] fsm_update_dsm;
+  reg [2-1:0] fsm_update_dsm;
+  reg [NUM_CL_DSM_TOTAL_BITS+1-1:0] afu_req_wr_count;
   wire update_dsm;
-  wire [QTD_WIDTH-1:0] afu_in_rd_count [0:(NUM_CL_DSM_RD*8)-1];
-  wire [QTD_WIDTH-1:0] afu_in_wr_count [0:(NUM_CL_DSM_WR*8)-1];
+  wire [QTD_WIDTH-1:0] afu_in_rd_count [0:(NUM_CL_DSM_RD*16)-1];
+  wire [QTD_WIDTH-1:0] afu_in_wr_count [0:(NUM_CL_DSM_WR*16)-1];
   wire [DSM_DATA_WIDTH-1:0] dsm_data_wire [0:NUM_CL_DSM_TOTAL-1];
   integer idx;
   genvar i;
@@ -72,26 +73,26 @@ module dsm_controller #
   endgenerate
 
 
-  generate for(i=(NUM_CL_DSM_RD*8)-1; i>=NUM_INPUT_QUEUES; i=i-1) begin : gen_zero_rd_count
+  generate for(i=(NUM_CL_DSM_RD*16)-1; i>=NUM_INPUT_QUEUES; i=i-1) begin : gen_zero_rd_count
     assign afu_in_rd_count[i] = { QTD_WIDTH{ 1'b0 } };
   end
   endgenerate
 
 
-  generate for(i=(NUM_CL_DSM_WR*8)-1; i>=NUM_OUTPUT_QUEUES; i=i-1) begin : gen_zero_wr_count
+  generate for(i=(NUM_CL_DSM_WR*16)-1; i>=NUM_OUTPUT_QUEUES; i=i-1) begin : gen_zero_wr_count
     assign afu_in_wr_count[i] = { QTD_WIDTH{ 1'b0 } };
   end
   endgenerate
 
 
   generate for(i=0; i<NUM_CL_DSM_RD; i=i+1) begin : gen_dsm_data_rd
-    assign dsm_data_wire[i] = { afu_in_rd_count[i * 8 + 7], afu_in_rd_count[i * 8 + 6], afu_in_rd_count[i * 8 + 5], afu_in_rd_count[i * 8 + 4], afu_in_rd_count[i * 8 + 3], afu_in_rd_count[i * 8 + 2], afu_in_rd_count[i * 8 + 1], afu_in_rd_count[i * 8 + 0] };
+    assign dsm_data_wire[i] = { afu_in_rd_count[i * 16 + 15], afu_in_rd_count[i * 16 + 14], afu_in_rd_count[i * 16 + 13], afu_in_rd_count[i * 16 + 12], afu_in_rd_count[i * 16 + 11], afu_in_rd_count[i * 16 + 10], afu_in_rd_count[i * 16 + 9], afu_in_rd_count[i * 16 + 8], afu_in_rd_count[i * 16 + 7], afu_in_rd_count[i * 16 + 6], afu_in_rd_count[i * 16 + 5], afu_in_rd_count[i * 16 + 4], afu_in_rd_count[i * 16 + 3], afu_in_rd_count[i * 16 + 2], afu_in_rd_count[i * 16 + 1], afu_in_rd_count[i * 16 + 0] };
   end
   endgenerate
 
 
   generate for(i=0; i<NUM_CL_DSM_WR; i=i+1) begin : gen_dsm_data_wr
-    assign dsm_data_wire[i + NUM_CL_DSM_WR] = { afu_in_wr_count[i * 8 + 7], afu_in_wr_count[i * 8 + 6], afu_in_wr_count[i * 8 + 5], afu_in_wr_count[i * 8 + 4], afu_in_wr_count[i * 8 + 3], afu_in_wr_count[i * 8 + 2], afu_in_wr_count[i * 8 + 1], afu_in_wr_count[i * 8 + 0] };
+    assign dsm_data_wire[i + NUM_CL_DSM_WR] = { afu_in_wr_count[i * 16 + 15], afu_in_wr_count[i * 16 + 14], afu_in_wr_count[i * 16 + 13], afu_in_wr_count[i * 16 + 12], afu_in_wr_count[i * 16 + 11], afu_in_wr_count[i * 16 + 10], afu_in_wr_count[i * 16 + 9], afu_in_wr_count[i * 16 + 8], afu_in_wr_count[i * 16 + 7], afu_in_wr_count[i * 16 + 6], afu_in_wr_count[i * 16 + 5], afu_in_wr_count[i * 16 + 4], afu_in_wr_count[i * 16 + 3], afu_in_wr_count[i * 16 + 2], afu_in_wr_count[i * 16 + 1], afu_in_wr_count[i * 16 + 0] };
   end
   endgenerate
 
@@ -108,40 +109,55 @@ module dsm_controller #
 
 
   always @(posedge clk) begin
-    afu_dsm_valid <= 1'b0;
     for(idx=0; idx<NUM_CL_DSM_TOTAL; idx=idx+1) begin
       dsm_data[idx] <= dsm_data_wire[idx];
     end
-    if(afu_dsm_req_rd) begin
-      afu_dsm_data <= dsm_data[afu_dsm_addr];
-      afu_dsm_valid <= 1'b1;
-    end 
   end
 
 
   always @(posedge clk) begin
     if(rst) begin
-      afu_dsm_update <= 1'b0;
+      afu_dsm_request_write <= 1'b0;
       fsm_update_dsm <= 2'd0;
       done_last <= 512'd0;
+      afu_req_wr_count <= 0;
+      afu_dsm_write_data <= 0;
     end else begin
-      case(fsm_update_dsm)
-        2'd0: begin
-          if(update_dsm) begin
-            afu_dsm_update <= 1'b1;
-            done_last <= done;
-            fsm_update_dsm <= 2'd1;
-          end 
-        end
-        2'd1: begin
-          if(afu_dsm_req_rd && (afu_dsm_addr == NUM_CL_DSM_TOTAL - 1)) begin
-            fsm_update_dsm <= 2'd0;
-            afu_dsm_update <= 1'b0;
-          end 
-        end
-        default: begin
-        end
-      endcase
+      if(start) begin
+        afu_dsm_request_write <= 1'b0;
+        case(fsm_update_dsm)
+          2'd0: begin
+            if(update_dsm) begin
+              done_last <= done;
+              fsm_update_dsm <= 2'd1;
+              afu_req_wr_count <= 0;
+            end 
+          end
+          2'd1: begin
+            if(afu_dsm_available_write) begin
+              afu_dsm_request_write <= 1'b1;
+              afu_dsm_write_data <= dsm_data[afu_req_wr_count];
+              afu_req_wr_count <= afu_req_wr_count + 1;
+            end 
+            if(afu_req_wr_count == NUM_CL_DSM_TOTAL - 2) begin
+              fsm_update_dsm <= 2'd2;
+            end 
+          end
+          2'd2: begin
+            if(has_pending_wr) begin
+              fsm_update_dsm <= 2'd3;
+            end 
+          end
+          2'd3: begin
+            if(!has_pending_wr) begin
+              afu_dsm_request_write <= 1'b1;
+              afu_dsm_write_data <= dsm_data[afu_req_wr_count];
+              afu_req_wr_count <= afu_req_wr_count + 1;
+              fsm_update_dsm <= 2'd0;
+            end 
+          end
+        endcase
+      end 
     end
   end
 

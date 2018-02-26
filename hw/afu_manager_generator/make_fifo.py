@@ -1,5 +1,7 @@
 from veriloggen import *
 
+from util import make_const
+
 
 def make_fifo():
     m = Module('fifo')
@@ -19,7 +21,7 @@ def make_fifo():
     almostempty = m.OutputReg('almostempty')
     full = m.OutputReg('full')
     almostfull = m.OutputReg('almostfull')
-    count = m.OutputReg('count', FIFO_DEPTH_BITS+1)
+    count = m.OutputReg('count', FIFO_DEPTH_BITS + 1)
 
     rp = m.Reg('rp', FIFO_DEPTH_BITS)
     wp = m.Reg('wp', FIFO_DEPTH_BITS)
@@ -31,19 +33,19 @@ def make_fifo():
             almostempty(Int(1, 1, 2)),
             full(Int(0, 1, 2)),
             almostfull(Int(0, 1, 2)),
-            rp(0),
-            wp(0),
-            count(0)
+            rp(make_const(0,FIFO_DEPTH_BITS)),
+            wp(make_const(0,FIFO_DEPTH_BITS)),
+            count(make_const(0,FIFO_DEPTH_BITS+1))
         ).Else(
             Case(Cat(we, re))(
                 When(Int(3, 2, 2))(
-                    rp.inc(),
-                    wp.inc(),
+                    rp(rp + make_const(1,FIFO_DEPTH_BITS)),
+                    wp(wp + make_const(1,FIFO_DEPTH_BITS)),
                 ),
                 When(Int(2, 2, 2))(
                     If(~full)(
-                        wp.inc(),
-                        count.inc(),
+                        wp(wp + make_const(1, FIFO_DEPTH_BITS)),
+                        count(count + make_const(1,FIFO_DEPTH_BITS+1)),
                         empty(Int(0, 1, 2)),
                         If(count == (FIFO_ALMOSTEMPTY_THRESHOLD - 1))(
                             almostempty(Int(0, 1, 2))
@@ -59,13 +61,13 @@ def make_fifo():
                 ),
                 When(Int(1, 2, 2))(
                     If(~empty)(
-                        rp.inc(),
-                        count(count - 1),
+                        rp(rp + make_const(1, FIFO_DEPTH_BITS)),
+                        count(count - make_const(1,FIFO_DEPTH_BITS+1)),
                         full(Int(0, 1, 2)),
                         If(count == FIFO_ALMOSTFULL_THRESHOLD)(
                             almostfull(Int(0, 1, 2))
                         ),
-                        If(count == 1)(
+                        If(count == make_const(1,FIFO_DEPTH_BITS+1))(
                             empty(Int(1, 1, 2))
                         ),
                         If(count == FIFO_ALMOSTEMPTY_THRESHOLD)(
@@ -83,16 +85,16 @@ def make_fifo():
     )
     m.Always(Posedge(clk))(
         If(rst)(
-            dout(0),
-            valid(Int(0,1,2))
+            dout(make_const(0,FIFO_WIDTH)),
+            valid(Int(0, 1, 2))
         ).Else(
-            valid(Int(0,1,2)),
+            valid(Int(0, 1, 2)),
             If(we == Int(1, 1, 2))(
                 mem[wp](din)
             ),
             If(re == Int(1, 1, 2))(
-               dout(mem[rp]),
-               valid(Int(1,1,2))
+                dout(mem[rp]),
+                valid(Int(1, 1, 2))
             )
         )
     )
@@ -103,6 +105,7 @@ def make_fifo():
     )
     m.EmbeddedCode('//synthesis translate_on')
     return m
+
 
 '''
 def make_fifo():

@@ -1,11 +1,12 @@
-from math import ceil
 from veriloggen import *
+
+from util import make_const
 
 
 def make_select_tree(radix, num_input):
     array = []
     array = make_select_tree_array(radix, num_input, array)
-    m = Module('select_ff')
+    m = Module('select_top_%d' % num_input)
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -99,14 +100,14 @@ def make_select(num_input):
     code = code + '     default:data_out <= 0;\nendcase'
     m.Always(Posedge(clk))(
         If(rst)(
-            data_out(0)
+            data_out(make_const(0, DATA_WIDTH))
         ).Else(
             EmbeddedCode(code)
         )
     )
     m.Always(Posedge(clk))(
         If(rst)(
-            data_out_valid(0)
+            data_out_valid(Int(0,1,2))
         ).Else(
             data_out_valid(EmbeddedCode('|data_in_valid'))
         )
@@ -116,7 +117,7 @@ def make_select(num_input):
 
 def make_select_tree_array(radix, num_input, array):
     if radix < 2:
-        raise Exception("The radix parameter needs greater than 1, found: %d"%radix)
+        raise Exception("The radix parameter needs greater than 1, found: %d" % radix)
     m_array = []
     while num_input > radix:
         m_array.append(radix)
@@ -129,3 +130,5 @@ def make_select_tree_array(radix, num_input, array):
         return array
     else:
         return make_select_tree_array(radix, len(m_array), array)
+
+# make_select_tree(4,17).to_verilog('../select_tree_test')

@@ -66,24 +66,26 @@ void AFU::sendConfOut(int BufferID) {
 }
 
 void AFU::createDSM() {
-    AFU::dsm_size = static_cast<size_t>(CL(1.0 + ceil(AFU::numInputBuffer / 8.0) + ceil(AFU::numOutputBuffer / 8.0)));
+    AFU::dsm_size = static_cast<size_t>(CL(1.0 + ceil(AFU::numInputBuffer / 16.0) + ceil(AFU::numOutputBuffer / 16.0)));
     AFU::dsm = AFU::afuManager.fpgaAllocBuffer(AFU::dsm_size);
 }
 
 void AFU::sendConfDSM() {
 
-    auto val_low = AFU::getID();
+    int bufferIdGlobal = AFU::getID();
+    auto numCl = static_cast<uint64_t>(AFU::getDsmSize() / 64);
+    auto val_low = static_cast<uint64_t>(numCl << 32 | bufferIdGlobal);
     auto val_high = static_cast<uint64_t>(intptr_t(AFU::getDsm()) / 64);
     AFU::afuManager.writeCSR(REG_CONF_DSM_LOW, val_low);
     AFU::afuManager.writeCSR(REG_CONF_DSM_HIGH, val_high);
 }
 
-size_t AFU::getSizeDsm() {
+int  AFU::getDsmSize() {
     return AFU::dsm_size;
 }
 
 void AFU::clearDSM() {
-    memset(AFU::getDsm(), 0, AFU::getSizeDsm());
+    memset(AFU::getDsm(), 0, AFU::getDsmSize());
 }
 
 bool AFU::isDone() {
@@ -240,8 +242,8 @@ void AFU::printDSM() {
     MSG("AFU " << AFU::getID() << " DSM:");
     for (int i = 0; i < dsmNumCL; ++i) {
         cout << "  [APP]  ";
-        for (int j = 7; j >= 0; --j) {
-            cout << std::hex << dsm[GET_INDEX(i, j, 16)] << " ";
+        for (int j = 15; j >= 0; --j) {
+            cout << dsm[GET_INDEX(i, j, 16)] << " ";
         }
         cout << endl;
     }

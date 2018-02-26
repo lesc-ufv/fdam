@@ -1,5 +1,7 @@
 from veriloggen import *
 
+from util import make_const
+
 
 def make_counter():
     m = Module('afu_counter')
@@ -10,9 +12,9 @@ def make_counter():
     dout = m.OutputReg('dout', DEPTH_BITS)
     m.Always(Posedge(clk))(
         If(rst)(
-            dout(0)
+            dout(make_const(0, DEPTH_BITS))
         ).Elif(en)(
-          dout.inc()
+            dout(dout + make_const(1, DEPTH_BITS))
         )
     )
     return m

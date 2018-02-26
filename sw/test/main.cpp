@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
 
     auto *afuManager = new AFUManager("9f81ba12-1d38-4cc7-953a-dafeef45065b");
     testLB_afu(*afuManager,0);
+    //testLB_afu(*afuManager,1);
     afuManager->printInfoAFUManager();
     afuManager->printStatics();
 
@@ -20,7 +21,7 @@ void testLB_afu(AFUManager &afuManager,afuid_t id){
     
     
     AFU *afu = afuManager.getAFU(id);
-    size_t numCL = 32;
+    size_t numCL = 4;
     size_t numdados = 32*numCL;
     short dataIn[numdados];
     for(short j = 0;j < afu->getNumInputBuffer();j++){

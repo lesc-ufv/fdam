@@ -1,5 +1,5 @@
 
-module select_ff #
+module select_top_4 #
 (
   parameter DATA_WIDTH = 32
 )

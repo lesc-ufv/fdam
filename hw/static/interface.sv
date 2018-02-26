@@ -31,6 +31,7 @@
 `include "cci_mpf_if.vh"
 `include "csr_mgr.vh"
 
+//`define PRINT_CL
 
 module app_afu(
     input  logic clk,
@@ -132,6 +133,10 @@ module app_afu(
       REG_RESET_AFUs
     }CSR_WR;
     
+    localparam CONF_TYPE_IN_DATA = 1;
+    localparam CONF_TYPE_OUT_DATA = 2;
+    localparam CONF_TYPE_OUT_DSM = 3;
+    
     logic [63:0] start_afus;
     logic [63:0] rst_afus;
     logic [127:0] conf;
@@ -155,7 +160,7 @@ module app_afu(
             if(csrs.cpu_wr_csrs[REG_CONF_IN_HIGH].en)
             begin
               conf[127:64] <= csrs.cpu_wr_csrs[REG_CONF_IN_HIGH].data;
-              conf_valid <= 2'd1;
+              conf_valid <= CONF_TYPE_IN_DATA;
             end   
             if(csrs.cpu_wr_csrs[REG_CONF_OUT_LOW].en)
             begin
@@ -164,7 +169,7 @@ module app_afu(
             if(csrs.cpu_wr_csrs[REG_CONF_OUT_HIGH].en)
             begin
               conf[127:64] <= csrs.cpu_wr_csrs[REG_CONF_OUT_HIGH].data;
-              conf_valid <= 2'd2;
+              conf_valid <= CONF_TYPE_OUT_DATA;
             end 
             if(csrs.cpu_wr_csrs[REG_CONF_DSM_LOW].en)
             begin
@@ -173,7 +178,7 @@ module app_afu(
             if(csrs.cpu_wr_csrs[REG_CONF_DSM_HIGH].en)
             begin
               conf[127:64] <= csrs.cpu_wr_csrs[REG_CONF_DSM_HIGH].data;
-              conf_valid <= 2'd3;
+              conf_valid <= CONF_TYPE_OUT_DSM;
             end 
             if (csrs.cpu_wr_csrs[REG_START_AFUs].en)
             begin       
@@ -275,28 +280,34 @@ module app_afu(
           if(|start_afus)begin 
              total_clocks <= total_clocks + 64'd1;
           end
-          
-          if(fiu.c1Tx.valid) begin 
-             $display("%d:REQ WR:%d %x DATA %x",total_clocks,fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
-          end 
-          
           if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
              total_cl_wr <= total_cl_wr + 64'd1;
-             $display("%d:RESP WR:%d",total_clocks,fiu.c1Rx.hdr.mdata); 
           end
-          
-          if(fiu.c0Tx.valid) begin
-             $display("%d:pediu: %x - %x",total_clocks,clAddrToByteAddr(fiu.c0Tx.hdr.base.address),req_rd_addr);
-          end 
-          
           if(cci_c0Rx_isReadRsp(fiu.c0Rx))
           begin
              total_cl_rd <= total_cl_rd + 64'd1;
-            $display("%d:chegou:%d %x",total_clocks,fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
           end
        end 
     end 
-    
+`ifdef PRINT_CL
+  //synthesis translate_off
+  always_ff @(posedge clk)  begin          
+          if(fiu.c1Tx.valid) begin 
+             $display("%d:REQ WR:%d %x DATA %x",total_clocks,fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
+          end       
+          if(fiu.c0Tx.valid) begin
+             $display("%d:pediu: %x - %x",total_clocks,clAddrToByteAddr(fiu.c0Tx.hdr.base.address),req_rd_addr);
+          end 
+          if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
+             $display("%d:RESP WR:%d",total_clocks,fiu.c1Rx.hdr.mdata); 
+          end
+          if(cci_c0Rx_isReadRsp(fiu.c0Rx))
+          begin
+            $display("%d:chegou:%d %x",total_clocks,fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
+          end
+  end 
+  //synthesis translate_on 
+`endif
     //
     // This AFU never handles MMIO reads.  MMIO is managed in the CSR module.
     //    
