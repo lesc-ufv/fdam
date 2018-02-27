@@ -31,7 +31,7 @@
 `include "cci_mpf_if.vh"
 `include "csr_mgr.vh"
 
-//`define PRINT_CL
+`define PRINT_CL
 
 module app_afu(
     input  logic clk,
@@ -296,14 +296,14 @@ module app_afu(
              $display("%d:REQ WR:%d %x DATA %x",total_clocks,fiu.c1Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c1Tx.hdr.base.address), fiu.c1Tx.data); 
           end       
           if(fiu.c0Tx.valid) begin
-             $display("%d:pediu: %x - %x",total_clocks,clAddrToByteAddr(fiu.c0Tx.hdr.base.address),req_rd_addr);
+             $display("%d:REQ READ:%d  %x - %x",total_clocks,fiu.c0Tx.hdr.base.mdata,clAddrToByteAddr(fiu.c0Tx.hdr.base.address),req_rd_addr);
           end 
           if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
              $display("%d:RESP WR:%d",total_clocks,fiu.c1Rx.hdr.mdata); 
           end
           if(cci_c0Rx_isReadRsp(fiu.c0Rx))
           begin
-            $display("%d:chegou:%d %x",total_clocks,fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
+            $display("%d:RESP READ:%d %x",total_clocks,fiu.c0Rx.hdr.mdata,fiu.c0Rx.data);
           end
   end 
   //synthesis translate_on 
