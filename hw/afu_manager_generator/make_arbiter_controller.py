@@ -135,12 +135,14 @@ def make_arbiter_controller(num_input):
     OUT_FIFO_ALMOSTFULL_THRESHOLD = m.Localparam('OUT_FIFO_ALMOSTFULL_THRESHOLD',
                                                  EmbeddedCode('2 ** OUTPUT_FIFO_DEPTH_BITS - 6'))
     OUT_FIFO_ALMOSTEMPTY_THRESHOLD = m.Localparam('OUT_FIFO_ALMOSTEMPTY_THRESHOLD', 2)
-
+    m.EmbeddedCode('')
     in_fifo_empty = m.Wire('in_fifo_empty', NUM_INPUT)
     in_fifo_count = m.Wire('in_fifo_count', EmbeddedCode('(INPUT_FIFO_DEPTH_BITS + 1) * %d' % NUM_INPUT))
     in_fifo_full = m.Wire('in_fifo_full', NUM_INPUT)
     in_fifo_almostfull = m.Wire('in_fifo_almostfull', NUM_INPUT)
     in_fifo_almostempty = m.Wire('in_fifo_almostempty', NUM_INPUT)
+    m.EmbeddedCode('')
+    rst_reg = m.Reg('rst_reg')
     m.EmbeddedCode('')
     in_fifo_we = m.Reg('in_fifo_we', NUM_INPUT)
     in_fifo_din = m.Reg('in_fifo_din', DATA_WIDTH * NUM_INPUT)
@@ -182,7 +184,7 @@ def make_arbiter_controller(num_input):
     params = [('FIFO_WIDTH', DATA_WIDTH), ('FIFO_DEPTH_BITS', INPUT_FIFO_DEPTH_BITS),
               ('FIFO_ALMOSTFULL_THRESHOLD', IN_FIFO_ALMOSTFULL_THRESHOLD),
               ('FIFO_ALMOSTEMPTY_THRESHOLD', IN_FIFO_ALMOSTEMPTY_THRESHOLD)]
-    con = [('clk', clk), ('rst', rst), ('we', in_fifo_we[idx]),
+    con = [('clk', clk), ('rst', rst_reg), ('we', in_fifo_we[idx]),
            ('din', in_fifo_din[idx * (DATA_WIDTH):idx * (DATA_WIDTH) + (DATA_WIDTH)]),
            ('re', in_fifo_re[idx]), ('valid', in_fifo_dout_valid[idx]),
            ('dout', in_fifo_dout[idx * (DATA_WIDTH):idx * (DATA_WIDTH) + (DATA_WIDTH)]),
@@ -195,7 +197,7 @@ def make_arbiter_controller(num_input):
 
     select = make_select_tree(4, NUM_INPUT)
     params = [('DATA_WIDTH', DATA_WIDTH)]
-    con = [('clk', clk), ('rst', rst), ('data_in_valid', in_fifo_dout_valid)]
+    con = [('clk', clk), ('rst', rst_reg), ('data_in_valid', in_fifo_dout_valid)]
     for i in range(NUM_INPUT):
         ran = '(DATA_WIDTH+DATA_WIDTH*%d)-1:DATA_WIDTH*%d' % (i, i)
         con.append(('data_in_%d' % i, in_fifo_dout[EmbeddedCode(ran)]))
@@ -206,7 +208,7 @@ def make_arbiter_controller(num_input):
     params = [('FIFO_WIDTH', DATA_WIDTH), ('FIFO_DEPTH_BITS', OUTPUT_FIFO_DEPTH_BITS),
               ('FIFO_ALMOSTFULL_THRESHOLD', OUT_FIFO_ALMOSTFULL_THRESHOLD),
               ('FIFO_ALMOSTEMPTY_THRESHOLD', OUT_FIFO_ALMOSTEMPTY_THRESHOLD)]
-    con = [('clk', clk), ('rst', rst), ('we', out_fifo_we), ('din', out_fifo_din), ('re', out_fifo_re),
+    con = [('clk', clk), ('rst', rst_reg), ('we', out_fifo_we), ('din', out_fifo_din), ('re', out_fifo_re),
            ('valid', out_fifo_dout_valid),
            ('dout', out_fifo_dout), ('count', out_fifo_count), ('empty', out_fifo_empty), ('full', out_fifo_full),
            ('almostfull', out_fifo_almostfull),
@@ -215,12 +217,12 @@ def make_arbiter_controller(num_input):
 
     arbiter = make_arbiter()
     params = [('PORTS', NUM_INPUT), ('TYPE', "ROUND_ROBIN"), ('BLOCK', "NONE"), ('LSB_PRIORITY', "LOW")]
-    con = [('clk', clk), ('rst', rst), ('request', arbiter_request), ('acknowledge', Repeat(Int(0, 1, 2), NUM_INPUT)),
+    con = [('clk', clk), ('rst', rst_reg), ('request', arbiter_request), ('acknowledge', Repeat(Int(0, 1, 2), NUM_INPUT)),
            ('grant', arbiter_grant), ('grant_valid', arbiter_grant_valid),
            ('grant_encoded', arbiter_grant_encoded)]
     m.Instance(arbiter, 'arbiter', params, con)
     params = [('PORTS', NUM_INPUT), ('TYPE', "ROUND_ROBIN"), ('BLOCK', "NONE"), ('LSB_PRIORITY', "LOW")]
-    con = [('clk', clk), ('rst', rst), ('request', arbiter_request_tt),
+    con = [('clk', clk), ('rst', rst_reg), ('request', arbiter_request_tt),
            ('acknowledge', Repeat(Int(0, 1, 2), NUM_INPUT)),
            ('grant', arbiter_grant_tt), ('grant_valid', arbiter_grant_valid_tt),
            ('grant_encoded', arbiter_grant_encoded_tt)]
@@ -231,7 +233,11 @@ def make_arbiter_controller(num_input):
     gen.Assign(arbiter_request_tt[idx](~in_fifo_almostempty[idx] & ~out_fifo_almostfull))
 
     m.Always(Posedge(clk))(
-        If(rst)(
+        rst_reg(rst)
+    )
+
+    m.Always(Posedge(clk))(
+        If(rst_reg)(
             req_wr_available_in(Int(0, NUM_INPUT, 10))
         ).Else(
             For(it(0), it < NUM_INPUT, it.inc())(
@@ -240,7 +246,7 @@ def make_arbiter_controller(num_input):
         )
     )
     m.Always(Posedge(clk))(
-        If(rst)(
+        If(rst_reg)(
             in_fifo_we(Int(0, NUM_INPUT, 10)),
             in_fifo_din(Repeat(Int(0, 1, 2), EmbeddedCode('DATA_WIDTH*%d' % NUM_INPUT))),
             in_fifo_re((Int(0, NUM_INPUT, 10))),
@@ -255,7 +261,8 @@ def make_arbiter_controller(num_input):
             in_fifo_din(req_wr_data_in),
             out_fifo_we(select_dout_valid),
             out_fifo_din(select_dout),
-            out_fifo_re(Mux(out_fifo_almostempty, req_wr_available_out & ~out_fifo_empty & ~out_fifo_re,req_wr_available_out)),
+            out_fifo_re(
+                Mux(out_fifo_almostempty, req_wr_available_out & ~out_fifo_empty & ~out_fifo_re, req_wr_available_out)),
             req_wr_en_out(out_fifo_dout_valid),
             req_wr_data_out(out_fifo_dout),
             in_fifo_re((Int(0, NUM_INPUT, 10))),

@@ -1,16 +1,13 @@
 
-module select_4 #
+module select_1 #
 (
   parameter DATA_WIDTH = 32
 )
 (
   input clk,
   input rst,
-  input [4-1:0] data_in_valid,
+  input [1-1:0] data_in_valid,
   input [DATA_WIDTH-1:0] data_in_0,
-  input [DATA_WIDTH-1:0] data_in_1,
-  input [DATA_WIDTH-1:0] data_in_2,
-  input [DATA_WIDTH-1:0] data_in_3,
   output reg [DATA_WIDTH-1:0] data_out,
   output reg data_out_valid
 );
@@ -22,9 +19,6 @@ module select_4 #
     end else begin
       case(data_in_valid)
            1: data_out <= data_in_0;
-           2: data_out <= data_in_1;
-           4: data_out <= data_in_2;
-           8: data_out <= data_in_3;
            default:data_out <= 0;
       endcase
     end

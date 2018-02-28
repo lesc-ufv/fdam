@@ -45,6 +45,7 @@ def make_input_queue_controller(conf_receiver):
     count_req_cl = m.Reg('count_req_cl', QTD_WIDTH)
     count_cl = m.Reg('count_cl', QTD_WIDTH)
     read_peding = m.Reg('read_peding', FIFO_DEPTH_BITS + 1)
+    read_peding_1 = m.Reg('read_peding_1', DATA_WIDTH)
     flag_addr_init = m.Reg('flag_addr_init')
     fifo_we = m.Reg('fifo_we')
     din = m.Reg('din', DATA_WIDTH)
@@ -102,7 +103,7 @@ def make_input_queue_controller(conf_receiver):
         If(rst_internal)(
             has_rd_peding(Int(0, 1, 2))
         ).Else(
-            has_rd_peding(Mux(read_peding > make_const(0, FIFO_DEPTH_BITS + 1), Int(1, 1, 2), Int(0, 1, 2)))
+            has_rd_peding(Mux(read_peding_1 > make_const(0,DATA_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
         )
     )
     m.Always(Posedge(clk))(
@@ -152,7 +153,8 @@ def make_input_queue_controller(conf_receiver):
     )
     m.Always(Posedge(clk))(
         If(rst_internal)(
-            read_peding(make_const(0, FIFO_DEPTH_BITS + 1))
+            read_peding(make_const(0, FIFO_DEPTH_BITS + 1)),
+            read_peding_1(make_const(0,DATA_WIDTH))
         ).Else(
             Case(Cat(afu_user_request_read, request_read))(
                 When(Int(0, 2, 10))(
@@ -166,6 +168,20 @@ def make_input_queue_controller(conf_receiver):
                 ),
                 When(Int(3, 2, 10))(
                     read_peding(read_peding)
+                )
+            ),
+            Case(Cat(read_data_valid_queue, request_read))(
+                When(Int(0, 2, 10))(
+                    read_peding_1(read_peding_1)
+                ),
+                When(Int(1, 2, 10))(
+                    read_peding_1(read_peding_1 + make_const(1, FIFO_DEPTH_BITS + 1))
+                ),
+                When(Int(2, 2, 10))(
+                    read_peding_1(read_peding_1 - make_const(1, FIFO_DEPTH_BITS + 1))
+                ),
+                When(Int(3, 2, 10))(
+                    read_peding_1(read_peding_1)
                 )
             )
         )

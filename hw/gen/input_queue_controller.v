@@ -38,6 +38,7 @@ module input_queue_controller #
   reg [QTD_WIDTH-1:0] count_req_cl;
   reg [QTD_WIDTH-1:0] count_cl;
   reg [FIFO_DEPTH_BITS+1-1:0] read_peding;
+  reg [DATA_WIDTH-1:0] read_peding_1;
   reg flag_addr_init;
   reg fifo_we;
   reg [DATA_WIDTH-1:0] din;
@@ -123,7 +124,7 @@ module input_queue_controller #
     if(rst_internal) begin
       has_rd_peding <= 1'b0;
     end else begin
-      has_rd_peding <= (read_peding > 0)? 1'b1 : 1'b0;
+      has_rd_peding <= (read_peding_1 > 0)? 1'b1 : 1'b0;
     end
   end
 
@@ -182,6 +183,7 @@ module input_queue_controller #
   always @(posedge clk) begin
     if(rst_internal) begin
       read_peding <= 0;
+      read_peding_1 <= 0;
     end else begin
       case({ afu_user_request_read, request_read })
         2'd0: begin
@@ -195,6 +197,20 @@ module input_queue_controller #
         end
         2'd3: begin
           read_peding <= read_peding;
+        end
+      endcase
+      case({ read_data_valid_queue, request_read })
+        2'd0: begin
+          read_peding_1 <= read_peding_1;
+        end
+        2'd1: begin
+          read_peding_1 <= read_peding_1 + 1;
+        end
+        2'd2: begin
+          read_peding_1 <= read_peding_1 - 1;
+        end
+        2'd3: begin
+          read_peding_1 <= read_peding_1;
         end
       endcase
     end

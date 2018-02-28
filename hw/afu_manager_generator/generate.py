@@ -4,7 +4,7 @@ from make_afu_manager import make_afu_manager
 numAFU = 1
 afus = []
 for i in range(numAFU):
-    afus.append((16,16))
+    afus.append((1,1))
 
 # path = '/opt/intelFPGA/intel-fpga-bbb/samples/tutorial/07_loopback_1x1/hw/rtl_gen'
 path = '../gen'
