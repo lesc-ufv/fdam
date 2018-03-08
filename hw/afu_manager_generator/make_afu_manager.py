@@ -91,9 +91,9 @@ def make_afu_manager(afus):
         req_wr_en_out = m.Wire('req_wr_en_out')
         req_wr_data_out = m.Wire('req_wr_data_out', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)
         m.EmbeddedCode('')
-        req_rd_en_in = m.Wire('req_rd_en_in', qtd_out_queue)
-        req_rd_data_in = m.Wire('req_rd_data_in', EmbeddedCode('(ADDR_WIDTH + TAG_WIDTH) * %d' % qtd_out_queue))
-        req_rd_available_in = m.Wire('req_rd_available_in', qtd_out_queue)
+        req_rd_en_in = m.Wire('req_rd_en_in', qtd_in_queue)
+        req_rd_data_in = m.Wire('req_rd_data_in', EmbeddedCode('(ADDR_WIDTH + TAG_WIDTH) * %d' % qtd_in_queue))
+        req_rd_available_in = m.Wire('req_rd_available_in', qtd_in_queue)
         m.EmbeddedCode('')
         req_rd_available_out = m.Wire('req_rd_available_out')
         req_rd_en_out = m.Wire('req_rd_en_out')
@@ -193,7 +193,7 @@ def make_afu_manager(afus):
         j = 0
         code = ''
         for i in afus:
-            code = code + 'info[%d:%d] <= {8\'d%d, 8\'d%d};\n' % (j + 15, j, i[0], i[1])
+            code = code + 'info[%d:%d] <= {8\'d%d, 8\'d%d};\n' % (j + 15, j, i[1], i[0])
             j = j + 16
         m.Always(Posedge(clk))(
             If(rst)(

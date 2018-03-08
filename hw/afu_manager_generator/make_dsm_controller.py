@@ -31,6 +31,7 @@ def make_dsm_controller():
     afu_dsm_write_data = m.OutputReg('afu_dsm_write_data', DSM_DATA_WIDTH)
 
     dsm_data = m.Reg('dsm_data', DSM_DATA_WIDTH, NUM_CL_DSM_TOTAL)
+    dsm_data_last = m.Reg('dsm_data_last', DSM_DATA_WIDTH)
     done = m.Reg('done', DSM_DATA_WIDTH)
     done_last = m.Reg('done_last', DSM_DATA_WIDTH)
     fsm_update_dsm = m.Reg('fsm_update_dsm', 2)
@@ -77,7 +78,8 @@ def make_dsm_controller():
 
     dsm_data_wire[NUM_CL_DSM_RD + NUM_CL_DSM_WR].assign(done)
 
-    update_dsm.assign((done ^ done_last) & done),
+    update_dsm.assign(Uor((done ^ done_last) & done)),
+
 
     m.Always(Posedge(clk))(
         If(rst)(
@@ -99,7 +101,8 @@ def make_dsm_controller():
             fsm_update_dsm(Int(0,fsm_update_dsm.width, 10)),
             done_last(Int(0, DSM_DATA_WIDTH.value, 10)),
             afu_req_wr_count(make_const(0,NUM_CL_DSM_TOTAL_BITS + 1)),
-            afu_dsm_write_data(0)
+            afu_dsm_write_data(0),
+            dsm_data_last(0),
         ).Elif(start)(
             afu_dsm_request_write(Int(0, 1, 2)),
             Case(fsm_update_dsm)(
@@ -114,6 +117,7 @@ def make_dsm_controller():
                     If(afu_dsm_available_write)(
                         afu_dsm_request_write(Int(1, 1, 2)),
                         afu_dsm_write_data(dsm_data[afu_req_wr_count]),
+                        dsm_data_last(dsm_data[NUM_CL_DSM_TOTAL-1]),
                         afu_req_wr_count(afu_req_wr_count + make_const(1,NUM_CL_DSM_TOTAL_BITS + 1))
                     ),
                     If(afu_req_wr_count == NUM_CL_DSM_TOTAL - 2)(
@@ -128,7 +132,7 @@ def make_dsm_controller():
                 When(Int(3,fsm_update_dsm.width, 10))(
                     If(AndList(Not(has_pending_wr)))(
                         afu_dsm_request_write(Int(1, 1, 2)),
-                        afu_dsm_write_data(dsm_data[afu_req_wr_count]),
+                        afu_dsm_write_data(dsm_data_last),
                         afu_req_wr_count(afu_req_wr_count + make_const(1, NUM_CL_DSM_TOTAL_BITS + 1)),
                         fsm_update_dsm(Int(0,fsm_update_dsm.width, 10)),
                     )

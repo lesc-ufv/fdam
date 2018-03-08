@@ -42,7 +42,8 @@ LDFLAGS  += -L$(DESTDIR)$(prefix)/lib -Wl,-rpath-link -Wl,$(prefix)/lib -Wl,-rpa
 endif
 
 CPPFLAGS += -std=c++11
-LDFLAGS += -lboost_program_options -luuid -lMPF -std=c++11
+#LDFLAGS += -lboost_program_options -luuid -lMPF -std=c++11
+LDFLAGS +=  -luuid -lMPF -std=c++11
 
 FPGA_LIBS = -lopae-c -ljson-c
 ASE_LIBS = -lopae-c-ase

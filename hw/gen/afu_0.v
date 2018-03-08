@@ -230,7 +230,7 @@ module afu_0 #
     .afu_user_done(afu_user_done)
   );
 
-  assign has_peding = |{has_peding_rd,has_peding_wr};
+  assign has_peding = |{ has_peding_rd, has_peding_wr };
   assign afu_user_done_dsm = afu_user_done && ~has_peding;
 
   always @(posedge clk) begin

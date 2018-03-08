@@ -91,7 +91,19 @@ void AFU::clearDSM() {
 bool AFU::isDone() {
     auto dsmNumCL = AFU::dsm_size / 64;
     auto *done = (int *) AFU::dsm;
-    return (done[GET_INDEX(dsmNumCL - 1, 0, 16)] & 1) == 1;
+    return (done[GET_INDEX(dsmNumCL - 1, 0, 16)] & 1) == 1L;
+}
+
+bool AFU::isDoneInputBuffer(int BufferID){
+    auto dsmNumCL = AFU::getDsmSize() / 64;
+    auto *done = (int *)(AFU::getDsm());
+    return (done[GET_INDEX(dsmNumCL - 1, 0, 16)] & (2 << BufferID)) == (2 << BufferID);
+}
+    
+bool AFU::isDoneOutputBuffer(int BufferID){
+    auto dsmNumCL = AFU::getDsmSize() / 64;
+    auto *done = (int *)(AFU::getDsm());
+    return (done[GET_INDEX(dsmNumCL - 1, 0, 16)] & (2 << (BufferID+AFU::getNumInputBuffer()))) == (2 << (BufferID+AFU::getNumInputBuffer()));
 }
 
 void AFU::waitDone(int64_t timeWaitMax) {

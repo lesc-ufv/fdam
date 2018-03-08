@@ -159,7 +159,7 @@ def make_afu(afu_id, input_queue_controller, output_queue_controller, output_que
            ('afu_user_done', afu_user_done)]
     m.Instance(afu_user, 'afu_user_%d' % afu_id, params, con)
 
-    has_peding.assign(EmbeddedCode('|{has_peding_rd,has_peding_wr}'))
+    has_peding.assign(Uor(Cat(has_peding_rd,has_peding_wr)))
     afu_user_done_dsm.assign(AndList(afu_user_done, ~has_peding))
 
     m.Always(Posedge(clk))(

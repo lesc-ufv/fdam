@@ -71,6 +71,10 @@ public:
     void waitDone(int64_t timeWaitMax);
     
     bool isDone();
+    
+    bool isDoneInputBuffer(int BufferID);
+    
+    bool isDoneOutputBuffer(int BufferID);
 
     void clear();
 

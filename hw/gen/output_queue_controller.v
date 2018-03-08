@@ -25,7 +25,7 @@ module output_queue_controller #
   output afu_user_available_write,
   input afu_user_request_write,
   input [DATA_WIDTH-1:0] afu_user_write_data,
-  output done
+  output reg done
 );
 
   localparam CONF_TYPE_OUT_DATA = 2;
@@ -96,15 +96,16 @@ module output_queue_controller #
   );
 
   assign end_req_rd_data = count_req_cl >= qtd_data_cl;
-  assign done = (count_cl >= qtd_data_cl) && start;
   assign issue_req_data = start & conf_ready & ~end_req_rd_data & available_write && ((fifo_almostempty)? ~fifo_empty & ~fifo_re : 1'b1);
   assign afu_user_available_write = ~fifo_almostfull;
   assign write_data_valid_queue = write_data_valid && (write_queue_id == ID_QUEUE);
 
   always @(posedge clk) begin
     if(rst_internal) begin
+      done <= 1'b0;
       has_wr_peding <= 1'b0;
     end else begin
+      done <= (count_cl >= qtd_data_cl) && start && fifo_empty;
       has_wr_peding <= (write_peding > 0)? 1'b1 : 1'b0;
     end
   end

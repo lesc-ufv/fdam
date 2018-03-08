@@ -45,7 +45,7 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
         afu_dsm_request_write = m.Input('afu_dsm_request_write')
         afu_dsm_write_data = m.Input('afu_dsm_write_data', DATA_WIDTH)
 
-    done = m.Output('done')
+    done = m.OutputReg('done')
 
     CONF_TYPE_OUT_DATA = m.Localparam('CONF_TYPE_OUT_DATA', 2)
     CONF_TYPE_OUT_DSM = m.Localparam('CONF_TYPE_OUT_DSM', 3)
@@ -126,14 +126,13 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
         params = [('FIFO_WIDTH', DATA_WIDTH), ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
                   ('FIFO_ALMOSTFULL_THRESHOLD', FIFO_FULL - 4), ('FIFO_ALMOSTEMPTY_THRESHOLD', 2)]
         con = [('clk', clk), ('rst', dsm_rst_internal), ('we', afu_dsm_request_write), ('din', afu_dsm_write_data),
-               ('re', dsm_fifo_re),('valid', dsm_fifo_dout_valid), ('dout', dsm_fifo_dout), ('count', dsm_fifo_count),
+               ('re', dsm_fifo_re), ('valid', dsm_fifo_dout_valid), ('dout', dsm_fifo_dout), ('count', dsm_fifo_count),
                ('empty', dsm_fifo_empty), ('full', dsm_fifo_full), ('almostfull', dsm_fifo_almostfull),
                ('almostempty', dsm_fifo_almostempty)]
 
         m.Instance(fifo, 'dms_fifo', params, con)
 
     end_req_wr_data.assign((count_req_cl >= qtd_data_cl))
-    done.assign(AndList((count_cl >= qtd_data_cl), start))
     issue_req_data.assign(AndList(start & conf_ready & ~end_req_wr_data & available_write,
                                   Mux(fifo_almostempty, (~fifo_empty & ~fifo_re), Int(1, 1, 2))))
     afu_user_available_write.assign(~fifo_almostfull)
@@ -141,31 +140,33 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
 
     if isDsmOutput:
         dsm_end_req_wr_data.assign((dsm_count_req_cl >= dsm_qtd_data_cl))
-        dsm_issue_req_data.assign(AndList(start & dsm_conf_ready & ~dsm_end_req_wr_data & available_write,
+        dsm_issue_req_data.assign(AndList(start & dsm_conf_ready & available_write,
                                           Mux(dsm_fifo_almostempty, (~dsm_fifo_empty & ~dsm_fifo_re), Int(1, 1, 2))))
         afu_dsm_available_write.assign(~dsm_fifo_almostfull)
         dsm_write_data_valid_queue.assign(
             AndList(write_data_valid, (write_queue_id == Cat(Int(1, 1, 2), AFU_ID[0:TAG_WIDTH - 1]))))
         m.Always(Posedge(clk))(
             If(dsm_rst_internal)(
-                dsm_has_wr_peding(Int(0,1,2))
+                dsm_has_wr_peding(Int(0, 1, 2))
             ).Else(
-                dsm_has_wr_peding(Mux(dsm_write_peding > make_const(0,QTD_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
+                dsm_has_wr_peding(Mux(dsm_write_peding > make_const(0, QTD_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
             )
         )
 
-    m.Always(Posedge(clk))(
-        If(rst_internal)(
-            has_wr_peding(Int(0,1,2))
-        ).Else(
-            has_wr_peding(Mux(write_peding > make_const(0,QTD_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
+        m.Always(Posedge(clk))(
+            If(rst_internal)(
+                done(Int(0, 1, 2)),
+                has_wr_peding(Int(0, 1, 2))
+            ).Else(
+                done(AndList((count_cl >= qtd_data_cl), start, fifo_empty, dsm_fifo_empty)),
+                has_wr_peding(Mux(write_peding > make_const(0, QTD_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
+            )
         )
-    )
-    if isDsmOutput:
+
         m.Always(Posedge(clk))(
             If(dsm_rst_internal)(
-                dsm_addr_base(make_const(0,ADDR_WIDTH)),
-                dsm_qtd_data_cl(make_const(0,QTD_WIDTH)),
+                dsm_addr_base(make_const(0, ADDR_WIDTH)),
+                dsm_qtd_data_cl(make_const(0, QTD_WIDTH)),
                 dsm_conf_ready(Int(0, 1, 2)),
             ).Else(
                 If(dsm_conf_rd_valid)(
@@ -176,11 +177,21 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
                 )
             )
         )
+    else:
+        m.Always(Posedge(clk))(
+            If(rst_internal)(
+                done(Int(0, 1, 2)),
+                has_wr_peding(Int(0, 1, 2))
+            ).Else(
+                done(AndList((count_cl >= qtd_data_cl), start, fifo_empty)),
+                has_wr_peding(Mux(write_peding > make_const(0, QTD_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
+            )
+        )
 
     m.Always(Posedge(clk))(
         If(rst_internal)(
-            addr_base(make_const(0,ADDR_WIDTH)),
-            qtd_data_cl(make_const(0,QTD_WIDTH)),
+            addr_base(make_const(0, ADDR_WIDTH)),
+            qtd_data_cl(make_const(0, QTD_WIDTH)),
             conf_ready(Int(0, 1, 2)),
         ).Else(
             If(conf_rd_valid)(
@@ -193,32 +204,33 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
     if isDsmOutput:
         m.Always(Posedge(clk))(
             If(dsm_rst_internal)(
-                dsm_addr_write_next(make_const(0,ADDR_WIDTH)),
-                dsm_count_req_cl(make_const(0,QTD_WIDTH)),
+                dsm_addr_write_next(make_const(0, ADDR_WIDTH)),
+                dsm_count_req_cl(make_const(0, QTD_WIDTH)),
                 dsm_flag_addr_init(Int(1, 1, 2))
             ).Else(
-                If(dsm_conf_ready & dsm_flag_addr_init)(
+                If(AndList(dsm_conf_ready,dsm_flag_addr_init|dsm_end_req_wr_data))(
                     dsm_addr_write_next(dsm_addr_base),
-                    dsm_flag_addr_init(Int(0, 1, 2))
+                    dsm_flag_addr_init(Int(0, 1, 2)),
+                    dsm_count_req_cl(make_const(0, QTD_WIDTH)),
                 ).Elif(dsm_fifo_dout_valid)(
-                    dsm_addr_write_next(dsm_addr_write_next + make_const(1,ADDR_WIDTH)),
-                    dsm_count_req_cl(dsm_count_req_cl + make_const(1,QTD_WIDTH))
+                    dsm_addr_write_next(dsm_addr_write_next + make_const(1, ADDR_WIDTH)),
+                    dsm_count_req_cl(dsm_count_req_cl + make_const(1, QTD_WIDTH))
                 )
             )
         )
 
     m.Always(Posedge(clk))(
         If(rst_internal)(
-            addr_write_next(make_const(0,ADDR_WIDTH)),
-            count_req_cl(make_const(0,QTD_WIDTH)),
+            addr_write_next(make_const(0, ADDR_WIDTH)),
+            count_req_cl(make_const(0, QTD_WIDTH)),
             flag_addr_init(Int(1, 1, 2))
         ).Else(
             If(conf_ready & flag_addr_init)(
                 addr_write_next(addr_base),
                 flag_addr_init(Int(0, 1, 2))
             ).Elif(fifo_dout_valid)(
-                addr_write_next(addr_write_next + make_const(1,ADDR_WIDTH)),
-                count_req_cl(count_req_cl + make_const(1,QTD_WIDTH))
+                addr_write_next(addr_write_next + make_const(1, ADDR_WIDTH)),
+                count_req_cl(count_req_cl + make_const(1, QTD_WIDTH))
             )
         )
     )
@@ -226,20 +238,20 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
     if isDsmOutput:
         m.Always(Posedge(clk))(
             If(dsm_rst_internal)(
-                dsm_count_cl(make_const(0,QTD_WIDTH)),
+                dsm_count_cl(make_const(0, QTD_WIDTH)),
             ).Else(
                 If(dsm_write_data_valid_queue)(
-                    dsm_count_cl(dsm_count_cl + make_const(0,QTD_WIDTH))
+                    dsm_count_cl(dsm_count_cl + make_const(0, QTD_WIDTH))
                 )
             )
         )
 
     m.Always(Posedge(clk))(
         If(rst_internal)(
-            count_cl(make_const(0,QTD_WIDTH)),
+            count_cl(make_const(0, QTD_WIDTH)),
         ).Else(
             If(write_data_valid_queue)(
-                count_cl(count_cl + make_const(1,QTD_WIDTH))
+                count_cl(count_cl + make_const(1, QTD_WIDTH))
             )
         )
     )
@@ -269,17 +281,17 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
     if isDsmOutput:
         m.Always(Posedge(clk))(
             If(dsm_rst_internal)(
-                dsm_write_peding(make_const(0,QTD_WIDTH))
+                dsm_write_peding(make_const(0, QTD_WIDTH))
             ).Else(
                 Case(Cat(dsm_write_data_valid_queue, dsm_fifo_dout_valid))(
                     When(Int(0, 2, 10))(
                         dsm_write_peding(dsm_write_peding)
                     ),
                     When(Int(1, 2, 10))(
-                        dsm_write_peding(dsm_write_peding + make_const(1,QTD_WIDTH))
+                        dsm_write_peding(dsm_write_peding + make_const(1, QTD_WIDTH))
                     ),
                     When(Int(2, 2, 10))(
-                        dsm_write_peding(dsm_write_peding - make_const(1,QTD_WIDTH))
+                        dsm_write_peding(dsm_write_peding - make_const(1, QTD_WIDTH))
                     ),
                     When(Int(3, 2, 10))(
                         dsm_write_peding(dsm_write_peding)
@@ -290,14 +302,14 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
 
     m.Always(Posedge(clk))(
         If(rst_internal)(
-            write_peding(make_const(0,QTD_WIDTH))
+            write_peding(make_const(0, QTD_WIDTH))
         ).Else(
             Case(Cat(write_data_valid_queue, fifo_dout_valid))(
                 When(Int(0, 2, 10))(
                     write_peding(write_peding)
                 ),
                 When(Int(1, 2, 10))(
-                    write_peding(write_peding + make_const(1,QTD_WIDTH))
+                    write_peding(write_peding + make_const(1, QTD_WIDTH))
                 ),
                 When(Int(2, 2, 10))(
                     write_peding(write_peding - make_const(1, QTD_WIDTH))
@@ -310,7 +322,7 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
     )
     if isDsmOutput:
         m.Always(Posedge(clk))(
-            If(rst_internal)(
+            If(dsm_rst_internal)(
                 request_write(Int(0, 1, 2)),
                 write_data(make_const(0, DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH))
             ).Else(
@@ -328,7 +340,7 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
         m.Always(Posedge(clk))(
             If(rst_internal)(
                 request_write(Int(0, 1, 2)),
-                write_data(make_const(0,DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH))
+                write_data(make_const(0, DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH))
             ).Else(
                 request_write(Int(0, 1, 2)),
                 If(fifo_dout_valid)(
