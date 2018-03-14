@@ -8,7 +8,6 @@ def numBits(n):
     return count
 
 def make_const(value,width):
-
-    bits_value = numBits(value)
-    const = Cat(Repeat(Int(0,1,2),width-bits_value),Int(value,bits_value,10))
+    #bits_value = numBits(value)
+    #const = Cat(Repeat(Int(0,1,2),width-bits_value),Int(value,bits_value,10))
     return value

@@ -36,7 +36,7 @@ module output_queue_controller #
   reg [QTD_WIDTH-1:0] qtd_data_cl;
   reg [QTD_WIDTH-1:0] count_req_cl;
   reg [QTD_WIDTH-1:0] count_cl;
-  reg [QTD_WIDTH-1:0] write_peding;
+  reg [16-1:0] write_peding;
   reg flag_addr_init;
   reg fifo_re;
   wire issue_req_data;

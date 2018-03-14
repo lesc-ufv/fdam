@@ -12,10 +12,6 @@ module afu_0 #
   parameter TAG_WIDTH = 16,
   parameter FIFO_DEPTH_BITS = 4,
   parameter FIFO_FULL = 2 ** FIFO_DEPTH_BITS,
-  parameter NUM_CL_DSM_RD = $rtoi($ceil(NUM_INPUT_QUEUES/8)),
-  parameter NUM_CL_DSM_WR = $rtoi($ceil(NUM_OUTPUT_QUEUES/8)),
-  parameter NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR,
-  parameter NUM_CL_DSM_TOTAL_BITS = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL))),
   parameter DSM_DATA_WIDTH = 512
 )
 (
@@ -184,11 +180,7 @@ module afu_0 #
     .QTD_WIDTH(QTD_WIDTH),
     .DSM_DATA_WIDTH(DSM_DATA_WIDTH),
     .NUM_INPUT_QUEUES(NUM_INPUT_QUEUES),
-    .NUM_OUTPUT_QUEUES(NUM_OUTPUT_QUEUES),
-    .NUM_CL_DSM_RD(NUM_CL_DSM_RD),
-    .NUM_CL_DSM_WR(NUM_CL_DSM_WR),
-    .NUM_CL_DSM_TOTAL(NUM_CL_DSM_TOTAL),
-    .NUM_CL_DSM_TOTAL_BITS(NUM_CL_DSM_TOTAL_BITS)
+    .NUM_OUTPUT_QUEUES(NUM_OUTPUT_QUEUES)
   )
   dsm_controller
   (

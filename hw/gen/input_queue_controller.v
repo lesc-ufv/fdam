@@ -38,7 +38,7 @@ module input_queue_controller #
   reg [QTD_WIDTH-1:0] count_req_cl;
   reg [QTD_WIDTH-1:0] count_cl;
   reg [FIFO_DEPTH_BITS+1-1:0] read_peding;
-  reg [DATA_WIDTH-1:0] read_peding_1;
+  reg [FIFO_DEPTH_BITS+1-1:0] read_peding_1;
   reg flag_addr_init;
   reg fifo_we;
   reg [DATA_WIDTH-1:0] din;

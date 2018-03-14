@@ -6,6 +6,6 @@ afus = []
 for i in range(numAFU):
     afus.append((1,1))
 
-# path = '/opt/intelFPGA/intel-fpga-bbb/samples/tutorial/07_loopback_1x1/hw/rtl_gen'
 path = '../gen'
+
 make_afu_manager(afus).to_verilog(path)

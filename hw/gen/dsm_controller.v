@@ -4,11 +4,7 @@ module dsm_controller #
   parameter QTD_WIDTH = 32,
   parameter DSM_DATA_WIDTH = 512,
   parameter NUM_INPUT_QUEUES = 1,
-  parameter NUM_OUTPUT_QUEUES = 1,
-  parameter NUM_CL_DSM_RD = $rtoi($ceil(NUM_INPUT_QUEUES/16)),
-  parameter NUM_CL_DSM_WR = $rtoi($ceil(NUM_OUTPUT_QUEUES/16)),
-  parameter NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR,
-  parameter NUM_CL_DSM_TOTAL_BITS = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL)))
+  parameter NUM_OUTPUT_QUEUES = 1
 )
 (
   input clk,
@@ -25,13 +21,16 @@ module dsm_controller #
   output reg [DSM_DATA_WIDTH-1:0] afu_dsm_write_data
 );
 
+  localparam NUM_CL_DSM_RD = $rtoi($ceil(NUM_INPUT_QUEUES/16.0));
+  localparam NUM_CL_DSM_WR = $rtoi($ceil(NUM_OUTPUT_QUEUES/16.0));
+  localparam NUM_CL_DSM_TOTAL = NUM_CL_DSM_RD + NUM_CL_DSM_WR;
+  localparam NUM_CL_DSM_TOTAL_BITS = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL)));
   reg [DSM_DATA_WIDTH-1:0] dsm_data [0:NUM_CL_DSM_TOTAL-1];
-  reg [DSM_DATA_WIDTH-1:0] dsm_data_last;
   reg [DSM_DATA_WIDTH-1:0] done;
   reg [DSM_DATA_WIDTH-1:0] done_last;
   reg [2-1:0] fsm_update_dsm;
   reg [NUM_CL_DSM_TOTAL_BITS+1-1:0] afu_req_wr_count;
-  wire update_dsm;
+  reg update_dsm;
   wire [QTD_WIDTH-1:0] afu_in_rd_count [0:(NUM_CL_DSM_RD*16)-1];
   wire [QTD_WIDTH-1:0] afu_in_wr_count [0:(NUM_CL_DSM_WR*16)-1];
   wire [DSM_DATA_WIDTH-1:0] dsm_data_wire [0:NUM_CL_DSM_TOTAL-1];
@@ -97,14 +96,14 @@ module dsm_controller #
   end
   endgenerate
 
-  assign dsm_data_wire[NUM_CL_DSM_RD + NUM_CL_DSM_WR] = done;
-  assign update_dsm = |(done ^ done_last & done);
 
   always @(posedge clk) begin
     if(rst) begin
       done <= 512'd0;
+      update_dsm <= 1'b0;
     end else begin
       done <= { { DSM_DATA_WIDTH - (NUM_INPUT_QUEUES + NUM_OUTPUT_QUEUES + 1){ 1'b0 } }, done_wr, done_rd, done_afu };
+      update_dsm <= |(done ^ done_last & done);
     end
   end
 
@@ -123,7 +122,6 @@ module dsm_controller #
       done_last <= 512'd0;
       afu_req_wr_count <= 0;
       afu_dsm_write_data <= 0;
-      dsm_data_last <= 0;
     end else begin
       if(start) begin
         afu_dsm_request_write <= 1'b0;
@@ -139,10 +137,9 @@ module dsm_controller #
             if(afu_dsm_available_write) begin
               afu_dsm_request_write <= 1'b1;
               afu_dsm_write_data <= dsm_data[afu_req_wr_count];
-              dsm_data_last <= dsm_data[NUM_CL_DSM_TOTAL - 1];
               afu_req_wr_count <= afu_req_wr_count + 1;
             end 
-            if(afu_req_wr_count == NUM_CL_DSM_TOTAL - 2) begin
+            if(afu_req_wr_count == NUM_CL_DSM_TOTAL - 1) begin
               fsm_update_dsm <= 2'd2;
             end 
           end
@@ -154,8 +151,7 @@ module dsm_controller #
           2'd3: begin
             if(!has_pending_wr) begin
               afu_dsm_request_write <= 1'b1;
-              afu_dsm_write_data <= dsm_data_last;
-              afu_req_wr_count <= afu_req_wr_count + 1;
+              afu_dsm_write_data <= done_last;
               fsm_update_dsm <= 2'd0;
             end 
           end

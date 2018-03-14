@@ -16,10 +16,6 @@ def make_afu(afu_id, input_queue_controller, output_queue_controller, output_que
     TAG_WIDTH = m.Parameter('TAG_WIDTH', 16)
     FIFO_DEPTH_BITS = m.Parameter('FIFO_DEPTH_BITS', 4)
     FIFO_FULL = m.Parameter('FIFO_FULL', EmbeddedCode('2 ** FIFO_DEPTH_BITS'))
-    NUM_CL_DSM_RD = m.Parameter('NUM_CL_DSM_RD', EmbeddedCode('$rtoi($ceil(NUM_INPUT_QUEUES/8))'))
-    NUM_CL_DSM_WR = m.Parameter('NUM_CL_DSM_WR', EmbeddedCode('$rtoi($ceil(NUM_OUTPUT_QUEUES/8))'))
-    NUM_CL_DSM_TOTAL = m.Parameter('NUM_CL_DSM_TOTAL', EmbeddedCode('1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR'))
-    NUM_CL_DSM_TOTAL_BITS = m.Parameter('NUM_CL_DSM_TOTAL_BITS', EmbeddedCode('$rtoi($ceil($clog2(NUM_CL_DSM_TOTAL)))'))
     DSM_DATA_WIDTH = m.Parameter('DSM_DATA_WIDTH', DATA_WIDTH)
 
     clk = m.Input('clk')
@@ -135,9 +131,7 @@ def make_afu(afu_id, input_queue_controller, output_queue_controller, output_que
     m.Instance(output_queue_controller_dsm, 'output_queue_controller_dsm', params, con)
 
     params = [('QTD_WIDTH', QTD_WIDTH), ('DSM_DATA_WIDTH', DSM_DATA_WIDTH), ('NUM_INPUT_QUEUES', NUM_INPUT_QUEUES),
-              ('NUM_OUTPUT_QUEUES', NUM_OUTPUT_QUEUES), ('NUM_CL_DSM_RD', NUM_CL_DSM_RD),
-              ('NUM_CL_DSM_WR', NUM_CL_DSM_WR), ('NUM_CL_DSM_TOTAL', NUM_CL_DSM_TOTAL),
-              ('NUM_CL_DSM_TOTAL_BITS', NUM_CL_DSM_TOTAL_BITS)]
+              ('NUM_OUTPUT_QUEUES', NUM_OUTPUT_QUEUES)]
 
     con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('done_rd', input_queue_done),
            ('done_wr', output_queue_done),

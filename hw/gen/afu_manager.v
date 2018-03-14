@@ -1,7 +1,7 @@
 
 module afu_manager #
 (
-  parameter ADDR_WIDTH = 64,
+  parameter ADDR_WIDTH = 48,
   parameter QTD_WIDTH = 32,
   parameter DATA_WIDTH = 512,
   parameter CONF_ID_QUEUE_WIDTH = 32,
@@ -12,10 +12,10 @@ module afu_manager #
 (
   input clk,
   input rst,
-  input [1-1:0] rst_afus,
-  input [1-1:0] start_afus,
+  input [64-1:0] rst_afus,
+  input [64-1:0] start_afus,
   input [2-1:0] conf_valid,
-  input [ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0] conf,
+  input [128-1:0] conf,
   output reg req_rd_en,
   output reg [ADDR_WIDTH-1:0] req_rd_addr,
   output reg [TAG_WIDTH-1:0] req_rd_mdata,
@@ -33,10 +33,6 @@ module afu_manager #
   output reg [512-1:0] info
 );
 
-  localparam NUM_CL_DSM_RD = 1;
-  localparam NUM_CL_DSM_WR = 1;
-  localparam NUM_CL_DSM_TOTAL = 1 + NUM_CL_DSM_RD + NUM_CL_DSM_WR;
-  localparam NUM_CL_DSM_TOTAL_BITS = 2;
   localparam DSM_DATA_WIDTH = 512;
 
   wire [1-1:0] req_wr_en_in;
@@ -69,11 +65,7 @@ module afu_manager #
     .TAG_WIDTH(TAG_WIDTH),
     .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
     .FIFO_FULL(FIFO_FULL),
-    .DSM_DATA_WIDTH(DSM_DATA_WIDTH),
-    .NUM_CL_DSM_RD(NUM_CL_DSM_RD),
-    .NUM_CL_DSM_WR(NUM_CL_DSM_WR),
-    .NUM_CL_DSM_TOTAL(NUM_CL_DSM_TOTAL),
-    .NUM_CL_DSM_TOTAL_BITS(NUM_CL_DSM_TOTAL_BITS)
+    .DSM_DATA_WIDTH(DSM_DATA_WIDTH)
   )
   afu_0_1x1
   (
@@ -81,7 +73,7 @@ module afu_manager #
     .rst(rst | rst_afus[0]),
     .start(start_afus[0]),
     .conf_valid(conf_valid),
-    .conf(conf),
+    .conf(conf[ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0]),
     .available_read(req_rd_available_in[0:0]),
     .request_read(req_rd_en_in[0:0]),
     .request_data(req_rd_data_in[1*(0*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:1*(0*(ADDR_WIDTH+TAG_WIDTH))]),
@@ -139,8 +131,8 @@ module afu_manager #
   always @(posedge clk) begin
     if(rst) begin
       req_rd_en <= 1'b0;
-      req_rd_addr <= { ADDR_WIDTH{ 1'b0 } };
-      req_rd_mdata <= { TAG_WIDTH{ 1'b0 } };
+      req_rd_addr <= 0;
+      req_rd_mdata <= 0;
     end else begin
       req_rd_en <= req_rd_en_out;
       req_rd_addr <= req_rd_data_out[TAG_WIDTH+ADDR_WIDTH-1:TAG_WIDTH];
@@ -152,9 +144,9 @@ module afu_manager #
   always @(posedge clk) begin
     if(rst) begin
       req_wr_en <= 1'b0;
-      req_wr_addr <= { ADDR_WIDTH{ 1'b0 } };
-      req_wr_mdata <= { TAG_WIDTH{ 1'b0 } };
-      req_wr_data <= { DATA_WIDTH{ 1'b0 } };
+      req_wr_addr <= 0;
+      req_wr_mdata <= 0;
+      req_wr_data <= 0;
     end else begin
       req_wr_en <= req_wr_en_out;
       req_wr_data <= req_wr_data_out[DATA_WIDTH+TAG_WIDTH+ADDR_WIDTH-1:TAG_WIDTH+ADDR_WIDTH];

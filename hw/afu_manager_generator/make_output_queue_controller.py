@@ -56,7 +56,7 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
     qtd_data_cl = m.Reg('qtd_data_cl', QTD_WIDTH)
     count_req_cl = m.Reg('count_req_cl', QTD_WIDTH)
     count_cl = m.Reg('count_cl', QTD_WIDTH)
-    write_peding = m.Reg('write_peding', QTD_WIDTH)
+    write_peding = m.Reg('write_peding', 16)
     flag_addr_init = m.Reg('flag_addr_init')
     fifo_re = m.Reg('fifo_re')
     issue_req_data = m.Wire('issue_req_data')
@@ -158,7 +158,7 @@ def make_output_queue_controller(conf_receiver, isDsmOutput):
                 done(Int(0, 1, 2)),
                 has_wr_peding(Int(0, 1, 2))
             ).Else(
-                done(AndList((count_cl >= qtd_data_cl), start, fifo_empty, dsm_fifo_empty)),
+                done(AndList((count_cl >= qtd_data_cl), start)),
                 has_wr_peding(Mux(write_peding > make_const(0, QTD_WIDTH), Int(1, 1, 2), Int(0, 1, 2)))
             )
         )

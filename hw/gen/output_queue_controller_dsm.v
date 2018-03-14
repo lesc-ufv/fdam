@@ -41,7 +41,7 @@ module output_queue_controller_dsm #
   reg [QTD_WIDTH-1:0] qtd_data_cl;
   reg [QTD_WIDTH-1:0] count_req_cl;
   reg [QTD_WIDTH-1:0] count_cl;
-  reg [QTD_WIDTH-1:0] write_peding;
+  reg [16-1:0] write_peding;
   reg flag_addr_init;
   reg fifo_re;
   wire issue_req_data;
@@ -188,7 +188,7 @@ module output_queue_controller_dsm #
       done <= 1'b0;
       has_wr_peding <= 1'b0;
     end else begin
-      done <= (count_cl >= qtd_data_cl) && start && fifo_empty && dsm_fifo_empty;
+      done <= (count_cl >= qtd_data_cl) && start;
       has_wr_peding <= (write_peding > 0)? 1'b1 : 1'b0;
     end
   end

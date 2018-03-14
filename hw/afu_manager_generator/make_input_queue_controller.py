@@ -45,7 +45,7 @@ def make_input_queue_controller(conf_receiver):
     count_req_cl = m.Reg('count_req_cl', QTD_WIDTH)
     count_cl = m.Reg('count_cl', QTD_WIDTH)
     read_peding = m.Reg('read_peding', FIFO_DEPTH_BITS + 1)
-    read_peding_1 = m.Reg('read_peding_1', DATA_WIDTH)
+    read_peding_1 = m.Reg('read_peding_1', FIFO_DEPTH_BITS + 1)
     flag_addr_init = m.Reg('flag_addr_init')
     fifo_we = m.Reg('fifo_we')
     din = m.Reg('din', DATA_WIDTH)
