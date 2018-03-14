@@ -1,0 +1,2 @@
+/usr/bin/ar qc libafumanager.a  CMakeFiles/afumanager.dir/lib/AFU.cpp.o CMakeFiles/afumanager.dir/lib/AFUManager.cpp.o CMakeFiles/afumanager.dir/lib/opae_svc_wrapper.cpp.o
+/usr/bin/ranlib libafumanager.a
