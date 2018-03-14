@@ -1,21 +1,21 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.5)
 
 project(AFUManager)
 
-include_directories(
-	"${CMAKE_SOURCE_DIR}"
-)
-
 set(CMAKE_CXX_STANDARD 11)
 
+include_directories(
+	"${CMAKE_SOURCE_DIR}/lib"	
+	"${CMAKE_SOURCE_DIR}/include"
+)
 add_library(
     afumanager
-    AFU.cpp
-    AFU.h
-    AFUManager.cpp
-    AFUManager.h
-    AFUManagerDEFS.h
-    csr_mgr.h
-    opae_svc_wrapper.cpp
-    opae_svc_wrapper.h
+    lib/AFU.cpp
+    include/AFU.h
+    lib/AFUManager.cpp
+    include/AFUManager.h
+    include/AFUManagerDEFS.h
+    include/csr_mgr.h
+    lib/opae_svc_wrapper.cpp
+    include/opae_svc_wrapper.h
 )

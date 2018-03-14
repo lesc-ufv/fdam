@@ -60,9 +60,13 @@ public:
 
     void *getDsm();
 
-    bool copyInputBuffer(int BufferID, void * data);
+    bool copyFromInputBuffer(int BufferID, void * data,size_t nBytes);
 
-    bool copyOutputBuffer(int BufferID, void * data);
+    bool copyFromOutputBuffer(int BufferID, void * data,size_t nBytes);
+    
+    bool copyToInputBuffer(int BufferID, void * data,size_t nBytes);
+
+    bool copyToOutputBuffer(int BufferID, void * data,size_t nBytes);
 
     int getSizeOfInputBuffer(int BufferID);
 

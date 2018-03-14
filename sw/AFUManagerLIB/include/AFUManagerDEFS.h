@@ -20,6 +20,8 @@
 #define MB(x) ((x) << 20) // the same as x*1024*1024
 #define GB(x) ((x) << 30) // the same as x*1024*1024*1024
 
+#define UUID_AFU_MANAGER "9f81ba12-1d38-4cc7-953a-dafeef45065b"
+
 typedef unsigned short afuid_t;
 typedef class AFUManager AFUManager_t;
 

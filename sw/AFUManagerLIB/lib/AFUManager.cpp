@@ -3,9 +3,9 @@
 //
 #include "AFUManager.h"
 
-AFUManager::AFUManager(const char *accel_uuid) {
+AFUManager::AFUManager() {
 
-    AFUManager::fpga = new OPAE_SVC_WRAPPER(accel_uuid);
+    AFUManager::fpga = new OPAE_SVC_WRAPPER(UUID_AFU_MANAGER);
     assert(AFUManager::fpga->isOk());
     AFUManager::csrs = new CSR_MGR(*AFUManager::fpga);
     AFUManager::readInfoHwAfu();

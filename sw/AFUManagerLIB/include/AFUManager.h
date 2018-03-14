@@ -39,7 +39,7 @@ private:
 public:
     int afuInfo[AFU_INF_SIZE];
 
-    explicit AFUManager(const char *accel_uuid);
+    explicit AFUManager();
 
     ~AFUManager();
 

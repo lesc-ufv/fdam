@@ -97,6 +97,7 @@ bool AFU::isDone() {
 bool AFU::isDoneInputBuffer(int BufferID){
     auto dsmNumCL = AFU::getDsmSize() / 64;
     auto *done = (int *)(AFU::getDsm());
+    MSG(done[GET_INDEX(dsmNumCL - 1, 0, 16)]);
     return (done[GET_INDEX(dsmNumCL - 1, 0, 16)] & (2 << BufferID)) == (2 << BufferID);
 }
     
@@ -224,25 +225,46 @@ int AFU::getSizeOfOutputBuffer(int BufferID) {
     return 0;
 }
 
-bool AFU::copyInputBuffer(int BufferID, void *data) {
+bool AFU::copyFromInputBuffer(int BufferID, void *data, size_t nBytes) {
     if (BufferID >= 0 && BufferID < AFU::numInputBuffer) {
         if (AFU::Inputbuffers[BufferID] != nullptr) {
-            memcpy(data, AFU::Inputbuffers[BufferID], static_cast<size_t>(AFU::sizeOfInputBuffers[BufferID]));
+            memcpy(data, AFU::Inputbuffers[BufferID], nBytes);
             return true;
         }
     }
     return false;
 }
 
-bool AFU::copyOutputBuffer(int BufferID, void *data) {
+bool AFU::copyFromOutputBuffer(int BufferID, void *data, size_t nBytes) {
     if (BufferID >= 0 && BufferID < AFU::numOutputBuffer) {
         if (AFU::Outputbuffers[BufferID] != nullptr) {
-            memcpy(data, AFU::Outputbuffers[BufferID], static_cast<size_t>(AFU::sizeOfOutputBuffers[BufferID]));
+            memcpy(data, AFU::Outputbuffers[BufferID], nBytes);
             return true;
         }
     }
     return false;
 }
+
+bool AFU::copyToInputBuffer(int BufferID, void *data, size_t nBytes) {
+    if (BufferID >= 0 && BufferID < AFU::numInputBuffer) {
+        if (AFU::Inputbuffers[BufferID] != nullptr) {
+            memcpy(AFU::Inputbuffers[BufferID],data,nBytes);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool AFU::copyToOutputBuffer(int BufferID, void *data, size_t nBytes) {
+    if (BufferID >= 0 && BufferID < AFU::numOutputBuffer) {
+        if (AFU::Outputbuffers[BufferID] != nullptr) {
+            memcpy(AFU::Outputbuffers[BufferID],data, nBytes);
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void *AFU::getDsm() {
     return AFU::dsm;
@@ -252,13 +274,18 @@ void AFU::printDSM() {
     auto dsmNumCL = AFU::dsm_size / 64;
     auto * dsm = static_cast<uint32_t *>(AFU::getDsm());
     MSG("AFU " << AFU::getID() << " DSM:");
-    for (int i = 0; i < dsmNumCL; ++i) {
+    for (int i = 0; i < dsmNumCL-1; ++i) {
         cout << "  [APP]  ";
         for (int j = 15; j >= 0; --j) {
             cout << dsm[GET_INDEX(i, j, 16)] << " ";
         }
         cout << endl;
     }
+    cout << "  [APP]  ";
+    for (int j = 15; j >= 0; --j) {
+        cout << std::hex << dsm[GET_INDEX(dsmNumCL-1, j, 16)] << " ";
+    }
+    cout << endl;
 }
 
 int AFU::getInputBufferGlobalID(int BufferID){
