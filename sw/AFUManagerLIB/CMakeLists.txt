@@ -3,10 +3,13 @@ cmake_minimum_required(VERSION 3.5)
 project(AFUManager)
 
 set(CMAKE_CXX_STANDARD 11)
+#Descomentar alinha abaixo para compilar no harp2
+set(CMAKE_PREFIX_PATH "/upb/departments/pc2/users/h/h2lucas/usr/local")
 
 include_directories(
 	"${CMAKE_SOURCE_DIR}/lib"	
 	"${CMAKE_SOURCE_DIR}/include"
+	"${CMAKE_PREFIX_PATH}/include"
 )
 add_library(
     afumanager

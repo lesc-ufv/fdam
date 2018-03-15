@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 #Descomentar a linha abaixo para compilar no harp2
-#set(CMAKE_PREFIX_PATH "/upb/departments/pc2/users/h/h2lucas/usr/local")
+set(CMAKE_PREFIX_PATH "/upb/departments/pc2/users/h/h2lucas/usr/local")
 
 include_directories(
 	"${CMAKE_PREFIX_PATH}/include"
