@@ -11,10 +11,25 @@ void dataflow_exec(int ** constants, int *num_constants ,unsigned short **data_i
 int main(int argc, char *argv[]){
 
     int aux[4];
-    if(argc > 1 ) aux[0] = 32*atoi(argv[1]);
-    if(argc > 2 ) aux[1] = 32*atoi(argv[2]);
-    if(argc > 3 ) aux[2] = 32*atoi(argv[3]);
-    if(argc > 4 ) aux[3] = 32*atoi(argv[4]);
+    if(argc > 4 ){
+        if(atoi(argv[1]) >= 16){
+           aux[0] = 32*atoi(argv[1]);
+           aux[1] = 32*atoi(argv[2]);
+           aux[2] = 32*atoi(argv[3]);
+           aux[3] = 32*atoi(argv[4]);
+            
+        }else{
+           cout << "invalid args!!!"<<endl;
+           cout << "Minimum number of lines to fir16 is 16 found "<< atoi(argv[1]) << "." << endl;
+           exit(255);
+        }
+    }
+    else{
+        cout << "invalid args!!!"<<endl;
+        cout << "usage: <num cache lines for fir16> <num cache lines for gourand> <num cache lines for paeth> <num cache lines for reduce sum>" << endl;
+        exit(255);
+    }
+    
     int num_copies = 4;
     int num_constants[] = {16,6,2,1};
     int num_data_in[]= {aux[0],32,aux[2],aux[3]};

@@ -10,13 +10,22 @@ void dataflow_exec(int ** constants, int num_constants ,unsigned short **data_in
 
 int main(int argc, char *argv[]){
 
+    int auxx = 0;
     int aux = 0;
-    if(argc > 1 ) aux = 32*atoi(argv[1]);
+    if(argc > 2 ){
+       auxx = atoi(argv[1]); 
+       aux = 32*atoi(argv[2]);
+    } 
+    else{
+        cout << "invalid args!!!"<<endl;
+        cout << "usage: <num copies> <num cache lines>" << endl;
+        exit(255);
+    }
 
-    int num_copies = 1;
+    int num_copies = auxx;
     int num_constants = 6;
     int num_data_in = 32;
-    int num_data_out = 4*4096;//aux;
+    int num_data_out = aux;
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
     auto ** data_out = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);

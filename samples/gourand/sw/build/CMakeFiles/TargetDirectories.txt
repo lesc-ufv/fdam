@@ -1,4 +1,0 @@
-/home/lucas/Documentos/afu-manager/samples/gourand/sw/build/CMakeFiles/rebuild_cache.dir
-/home/lucas/Documentos/afu-manager/samples/gourand/sw/build/CMakeFiles/main_ase.dir
-/home/lucas/Documentos/afu-manager/samples/gourand/sw/build/CMakeFiles/edit_cache.dir
-/home/lucas/Documentos/afu-manager/samples/gourand/sw/build/CMakeFiles/main.dir
