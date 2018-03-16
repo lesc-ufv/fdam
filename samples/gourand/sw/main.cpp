@@ -21,7 +21,6 @@ int main(int argc, char *argv[]){
         cout << "usage: <num copies> <num cache lines>" << endl;
         exit(255);
     }
-
     int num_copies = auxx;
     int num_constants = 6;
     int num_data_in = 32;
@@ -43,7 +42,7 @@ int main(int argc, char *argv[]){
 
     for (int i = 0; i < num_copies; i++){
         for (int j = 0; j < num_data_in; j++){
-            data_in[i][j] = 1 << 12;
+            data_in[i][j] = 4096;
         }
         for (int j = 0; j < num_constants; j++){
             gourand_const[i][j] = constants[j];

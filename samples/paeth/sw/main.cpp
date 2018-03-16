@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
     int num_copies = auxx;
     int num_constants = 2;
     int num_data_in = aux;
-    int num_data_out = num_data_in/4;
+    int num_data_out = num_data_in/2;
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
     auto ** data_out = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);

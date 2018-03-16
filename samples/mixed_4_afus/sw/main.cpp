@@ -13,7 +13,7 @@ int main(int argc, char *argv[]){
     int aux[4];
     if(argc > 4 ){
         if(atoi(argv[1]) >= 16){
-           aux[0] = 32*atoi(argv[1]);
+           aux[0] = atoi(argv[1]);
            aux[1] = 32*atoi(argv[2]);
            aux[2] = 32*atoi(argv[3]);
            aux[3] = 32*atoi(argv[4]);            
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
     int num_copies = 4;
     int num_constants[] = {16,6,2,1};
     int num_data_in[]= {aux[0],32,aux[2],aux[3]};
-    int num_data_out[] = {aux[0]/16,aux[1],aux[2]/4,1};
+    int num_data_out[] = {32*(aux[0]-16),aux[1],aux[2]/2,1};
     bool flag_error = false;
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
