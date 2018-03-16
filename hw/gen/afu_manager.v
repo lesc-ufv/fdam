@@ -35,17 +35,17 @@ module afu_manager #
 
   localparam DSM_DATA_WIDTH = 512;
 
-  wire [1-1:0] req_wr_en_in;
-  wire [(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)*1-1:0] req_wr_data_in;
-  wire [1-1:0] req_wr_available_in;
+  wire [4-1:0] req_wr_en_in;
+  wire [(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)*4-1:0] req_wr_data_in;
+  wire [4-1:0] req_wr_available_in;
 
   wire req_wr_available_out;
   wire req_wr_en_out;
   wire [DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH-1:0] req_wr_data_out;
 
-  wire [1-1:0] req_rd_en_in;
-  wire [(ADDR_WIDTH+TAG_WIDTH)*1-1:0] req_rd_data_in;
-  wire [1-1:0] req_rd_available_in;
+  wire [4-1:0] req_rd_en_in;
+  wire [(ADDR_WIDTH+TAG_WIDTH)*4-1:0] req_rd_data_in;
+  wire [4-1:0] req_rd_available_in;
 
   wire req_rd_available_out;
   wire req_rd_en_out;
@@ -88,7 +88,115 @@ module afu_manager #
   );
 
 
-  arbiter_controller_top_1
+  afu_1
+  #(
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .QTD_WIDTH(QTD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .CONF_ID_QUEUE_WIDTH(CONF_ID_QUEUE_WIDTH),
+    .INITIAL_INPUT_QUEUE_ID(1),
+    .INITIAL_OUTPUT_QUEUE_ID(1),
+    .NUM_INPUT_QUEUES(1),
+    .NUM_OUTPUT_QUEUES(1),
+    .TAG_WIDTH(TAG_WIDTH),
+    .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
+    .FIFO_FULL(FIFO_FULL),
+    .DSM_DATA_WIDTH(DSM_DATA_WIDTH)
+  )
+  afu_1_1x1
+  (
+    .clk(clk),
+    .rst(rst | rst_afus[1]),
+    .start(start_afus[1]),
+    .conf_valid(conf_valid),
+    .conf(conf[ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0]),
+    .available_read(req_rd_available_in[1:1]),
+    .request_read(req_rd_en_in[1:1]),
+    .request_data(req_rd_data_in[1*(1*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:1*(1*(ADDR_WIDTH+TAG_WIDTH))]),
+    .read_data_valid(resp_rd_valid),
+    .read_queue_id(resp_rd_mdata),
+    .read_data(resp_rd_data),
+    .available_write(req_wr_available_in[1:1]),
+    .request_write(req_wr_en_in[1:1]),
+    .write_data(req_wr_data_in[1*(1*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:1*(1*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))]),
+    .write_data_valid(resp_wr_valid),
+    .write_queue_id(resp_wr_mdata)
+  );
+
+
+  afu_2
+  #(
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .QTD_WIDTH(QTD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .CONF_ID_QUEUE_WIDTH(CONF_ID_QUEUE_WIDTH),
+    .INITIAL_INPUT_QUEUE_ID(2),
+    .INITIAL_OUTPUT_QUEUE_ID(2),
+    .NUM_INPUT_QUEUES(1),
+    .NUM_OUTPUT_QUEUES(1),
+    .TAG_WIDTH(TAG_WIDTH),
+    .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
+    .FIFO_FULL(FIFO_FULL),
+    .DSM_DATA_WIDTH(DSM_DATA_WIDTH)
+  )
+  afu_2_1x1
+  (
+    .clk(clk),
+    .rst(rst | rst_afus[2]),
+    .start(start_afus[2]),
+    .conf_valid(conf_valid),
+    .conf(conf[ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0]),
+    .available_read(req_rd_available_in[2:2]),
+    .request_read(req_rd_en_in[2:2]),
+    .request_data(req_rd_data_in[1*(2*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:1*(2*(ADDR_WIDTH+TAG_WIDTH))]),
+    .read_data_valid(resp_rd_valid),
+    .read_queue_id(resp_rd_mdata),
+    .read_data(resp_rd_data),
+    .available_write(req_wr_available_in[2:2]),
+    .request_write(req_wr_en_in[2:2]),
+    .write_data(req_wr_data_in[1*(2*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:1*(2*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))]),
+    .write_data_valid(resp_wr_valid),
+    .write_queue_id(resp_wr_mdata)
+  );
+
+
+  afu_3
+  #(
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .QTD_WIDTH(QTD_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH),
+    .CONF_ID_QUEUE_WIDTH(CONF_ID_QUEUE_WIDTH),
+    .INITIAL_INPUT_QUEUE_ID(3),
+    .INITIAL_OUTPUT_QUEUE_ID(3),
+    .NUM_INPUT_QUEUES(1),
+    .NUM_OUTPUT_QUEUES(1),
+    .TAG_WIDTH(TAG_WIDTH),
+    .FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
+    .FIFO_FULL(FIFO_FULL),
+    .DSM_DATA_WIDTH(DSM_DATA_WIDTH)
+  )
+  afu_3_1x1
+  (
+    .clk(clk),
+    .rst(rst | rst_afus[3]),
+    .start(start_afus[3]),
+    .conf_valid(conf_valid),
+    .conf(conf[ADDR_WIDTH+QTD_WIDTH+CONF_ID_QUEUE_WIDTH-1:0]),
+    .available_read(req_rd_available_in[3:3]),
+    .request_read(req_rd_en_in[3:3]),
+    .request_data(req_rd_data_in[1*(3*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:1*(3*(ADDR_WIDTH+TAG_WIDTH))]),
+    .read_data_valid(resp_rd_valid),
+    .read_queue_id(resp_rd_mdata),
+    .read_data(resp_rd_data),
+    .available_write(req_wr_available_in[3:3]),
+    .request_write(req_wr_en_in[3:3]),
+    .write_data(req_wr_data_in[1*(3*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:1*(3*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))]),
+    .write_data_valid(resp_wr_valid),
+    .write_queue_id(resp_wr_mdata)
+  );
+
+
+  arbiter_controller_top_4
   #(
     .DATA_WIDTH(ADDR_WIDTH + TAG_WIDTH),
     .INPUT_FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
@@ -107,7 +215,7 @@ module afu_manager #
   );
 
 
-  arbiter_controller_top_1
+  arbiter_controller_top_4
   #(
     .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH),
     .INPUT_FIFO_DEPTH_BITS(FIFO_DEPTH_BITS),
@@ -161,6 +269,9 @@ module afu_manager #
       info <= 512'd0;
     end else begin
       info[15:0] <= {8'd1, 8'd1};
+      info[31:16] <= {8'd1, 8'd1};
+      info[47:32] <= {8'd1, 8'd1};
+      info[63:48] <= {8'd1, 8'd1};
 
     end
   end
