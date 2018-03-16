@@ -14,7 +14,12 @@ int main(int argc, char *argv[]){
     int aux = 0;
     if(argc > 2 ){
        auxx = atoi(argv[1]); 
-       aux = 32*atoi(argv[2]);
+       aux = atoi(argv[2]);
+       if(aux < 16){
+           cout << "invalid args!!!"<<endl;
+           cout << "Minimum number of lines to fir16 is 16 found "<< atoi(argv[1]) << "." << endl;
+           exit(255);
+       }
     } 
     else{
         cout << "invalid args!!!"<<endl;
@@ -25,8 +30,8 @@ int main(int argc, char *argv[]){
     
     int num_copies = auxx;
     int num_constants = 16;
-    int num_data_in = aux;
-    int num_data_out = num_data_in/16;
+    int num_data_in = 32*aux;
+    int num_data_out = 32*(aux-15);
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
     auto ** data_out = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
