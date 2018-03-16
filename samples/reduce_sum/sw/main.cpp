@@ -65,10 +65,10 @@ int main(int argc, char *argv[]){
 
     for (int i = 0; i < num_copies; i++){
         if(data_out[i][0] != sum[i]){
-            MSG("AFU " << i << ": REDUCE SUM error: "<< data_out[i][0] << " != "<< sum[i]);
+            MSG("AFU " << i << ": Reduce sum error: "<< data_out[i][0] << " != "<< sum[i]);
         }
         else{
-            MSG("AFU " << i << ": REDUCE SUM success!");
+            MSG("AFU " << i << ": Reduce sum success!");
         }
     }
     return 0;

@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
     int num_copies = auxx;
     int num_constants = 2;
     int num_data_in = aux;
-    int num_data_out = num_data_in/3;
+    int num_data_out = num_data_in/4;
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
     auto ** data_out = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
@@ -60,12 +60,12 @@ int main(int argc, char *argv[]){
     for (int i = 0; i < num_copies; i++){
         for (int j = 0; j < num_data_out; j++){
             if(data_out[i][j] != 1){
-                MSG("AFU " << i << ": error: "<< data_out[i][j] << " != 1");
+                MSG("AFU " << i << ": Paeth error: "<< data_out[i][j] << " != 1");
                 flag_error = true;
             }
         }
         if(!flag_error){
-            MSG("AFU " << i << ": sucess!");
+            MSG("AFU " << i << ": Paeth success!");
         }
     }
     return 0;

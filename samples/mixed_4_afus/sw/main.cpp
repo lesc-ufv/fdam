@@ -16,8 +16,7 @@ int main(int argc, char *argv[]){
            aux[0] = 32*atoi(argv[1]);
            aux[1] = 32*atoi(argv[2]);
            aux[2] = 32*atoi(argv[3]);
-           aux[3] = 32*atoi(argv[4]);
-            
+           aux[3] = 32*atoi(argv[4]);            
         }else{
            cout << "invalid args!!!"<<endl;
            cout << "Minimum number of lines to fir16 is 16 found "<< atoi(argv[1]) << "." << endl;
@@ -33,7 +32,7 @@ int main(int argc, char *argv[]){
     int num_copies = 4;
     int num_constants[] = {16,6,2,1};
     int num_data_in[]= {aux[0],32,aux[2],aux[3]};
-    int num_data_out[] = {aux[0]/16,aux[1],aux[2]/3,1};
+    int num_data_out[] = {aux[0]/16,aux[1],aux[2]/4,1};
     bool flag_error = false;
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
@@ -101,25 +100,25 @@ int main(int argc, char *argv[]){
     //FIR16 CHECK OUTPUT
     for (int j = 0; j < num_data_out[0]; j++){
        if(data_out[0][j] != 272){
-            MSG("FIR16 error: "<< data_out[0][j] << " != 272");
+            MSG("Fir16 error: "<< data_out[0][j] << " != 272");
             flag_error = true;
        }
     }
     if(!flag_error){
-        MSG("FIR16 success!");
+        MSG("Fir16 success!");
     }
     //GOURAND CHECK OUTPUT
     flag_error = false;
     for (int j = 0; j < num_data_out[1]-1; j+=2){
         if(data_out[1][j] != 4228 || data_out[1][j+1] != 4096){
             cout << data_out[1][j] << " "<< data_out[1][j+1] << " ";
-            MSG("GOURAND error: "<< data_out[1][j] << " != 4228 || " << data_out[1][j+1] << " != 4096" );
+            MSG("Gourand error: "<< data_out[1][j] << " != 4228 || " << data_out[1][j+1] << " != 4096" );
             flag_error = true;
             break;
         }
     }
     if(!flag_error){
-        MSG("GOURAND success!");
+        MSG("Gourand success!");
     }
     //PAETH CHECK OUTPUT
     flag_error = false;    
@@ -130,14 +129,14 @@ int main(int argc, char *argv[]){
         }
     }
     if(!flag_error){
-        MSG("PAETH success!");
+        MSG("Paeth success!");
     }
    
     if(data_out[3][0] != sum){
-        MSG("REDUCE SUM error: "<< data_out[3][0] << " != "<< sum );
+        MSG("Reduce sum error: "<< data_out[3][0] << " != "<< sum );
     }
     else{
-        MSG("REDUCE SUM success!");
+        MSG("Reduce sum success!");
     }     
     
     return 0;

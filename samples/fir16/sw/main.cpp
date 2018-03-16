@@ -63,12 +63,12 @@ int main(int argc, char *argv[]){
     for (int i = 0; i < num_copies; i++){
         for (int j = 0; j < num_data_out; j++){
             if(data_out[i][j] != 272){
-                MSG("Error: "<< data_out[i][j] << " != 272");
+                MSG("AFU " << i << " Fir16 error: "<< data_out[i][j] << " != 272");
                 flag_error = true;
             }
         }
         if(!flag_error){
-            MSG(i << ": Sucess!");
+            MSG("AFU "<< i << ": Fir16 success!");
         }
 
     }

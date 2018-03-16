@@ -63,13 +63,13 @@ int main(int argc, char *argv[]){
         for (int j = 0; j < num_data_out-1; j+=2){
             if(data_out[i][j] != 4228 || data_out[i][j+1] != 4096){
                 cout << data_out[i][j] << " "<< data_out[i][j+1] << " ";
-                MSG("Error: "<< data_out[i][j] << " != 4228 || " << data_out[i][j+1] << " != 4096" );
+                MSG("AFU "<< i << ": Gourand error: "<< data_out[i][j] << " != 4228 || " << data_out[i][j+1] << " != 4096" );
                 flag_error = true;
                 break;
             }
         }
         if(!flag_error){
-            MSG(i << ": Sucess!");
+            MSG("AFU " << i << ": Gourand success!");
         }
     }
     return 0;
