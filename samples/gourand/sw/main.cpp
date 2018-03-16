@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <chrono>
 #include <AFUManager.h>
 
@@ -9,14 +9,14 @@ using namespace std::chrono;
 void dataflow_exec(int ** constants, int num_constants ,unsigned short **data_in, int num_data_in,unsigned short **data_out, int num_data_out, int num_copies, bool printAFUStatus);
 
 int main(int argc, char *argv[]){
-    
+
     int aux = 0;
-    if(argc > 1 ) aux = atoi(argv[1]); 
-    
-    int num_copies = 4;
+    if(argc > 1 ) aux = 32*atoi(argv[1]);
+
+    int num_copies = 1;
     int num_constants = 6;
     int num_data_in = 32;
-    int num_data_out = aux;
+    int num_data_out = 4*4096;//aux;
 
     auto ** data_in = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
     auto ** data_out = (unsigned short **)malloc(sizeof(unsigned short *)*num_copies);
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
 
     bool flag_error = false;
 
-     int constants[6] = { 0x101, 0x202, 0x303, 0xf80004, 0x505, 0xa06};
+    int constants[6] = { 0x101, 0x202, 0x303, 0xf80004, 0x505, 0xa06};
 
     for (int i = 0; i < num_copies; i++){
         for (int j = 0; j < num_data_in; j++){
@@ -49,12 +49,13 @@ int main(int argc, char *argv[]){
     diff = high_resolution_clock::now() - s;
     MSG("Execution Time: " << diff.count() * 1000<< "ms");
 
-    for (int i = 0; i < num_copies; i+=2){
-        for (int j = 0; j < num_data_out; j++){
+    for (int i = 0; i < num_copies; i++){
+        flag_error = false;
+        for (int j = 0; j < num_data_out-1; j+=2){
             if(data_out[i][j] != 4228 || data_out[i][j+1] != 4096){
                 cout << data_out[i][j] << " "<< data_out[i][j+1] << " ";
                 MSG("Error: "<< data_out[i][j] << " != 4228 || " << data_out[i][j+1] << " != 4096" );
-                flag_error = true; 
+                flag_error = true;
                 break;
             }
         }
