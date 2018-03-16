@@ -1,4 +1,0 @@
-/upb/departments/pc2/users/h/h2lucas/home/afu-manager/samples/gourand/sw/build/CMakeFiles/edit_cache.dir
-/upb/departments/pc2/users/h/h2lucas/home/afu-manager/samples/gourand/sw/build/CMakeFiles/rebuild_cache.dir
-/upb/departments/pc2/users/h/h2lucas/home/afu-manager/samples/gourand/sw/build/CMakeFiles/main.dir
-/upb/departments/pc2/users/h/h2lucas/home/afu-manager/samples/gourand/sw/build/CMakeFiles/main_ase.dir

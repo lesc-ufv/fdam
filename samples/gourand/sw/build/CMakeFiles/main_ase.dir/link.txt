@@ -1,1 +1,0 @@
-/usr/bin/c++      CMakeFiles/main_ase.dir/main.cpp.o  -o main_ase ../../../../sw/AFUManagerLIB/libafumanager.a /upb/departments/pc2/users/h/h2lucas/usr/local/lib/libopae-c-ase.so /usr/lib/x86_64-linux-gnu/libuuid.so /upb/departments/pc2/users/h/h2lucas/usr/local/lib/libMPF.so -Wl,-rpath,/upb/departments/pc2/users/h/h2lucas/usr/local/lib 
