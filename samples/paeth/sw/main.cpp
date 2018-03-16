@@ -9,7 +9,7 @@ using namespace std::chrono;
 void dataflow_exec(int ** constants, int num_constants ,unsigned short **data_in, int num_data_in,unsigned short **data_out, int num_data_out, int num_copies, bool printAFUStatus);
 
 int main(int argc, char *argv[]){
-    int num_copies = 8;
+    int num_copies = 4;
     int num_constants = 2;
     int num_data_in = 99;
     int num_data_out = num_data_in/3;
@@ -26,25 +26,14 @@ int main(int argc, char *argv[]){
 
     bool flag_error = false;
 
-    int constants[][num_copies] =
-            {
-                    { 0x202, 0x001},
-                    { 0x202, 0x001},
-                    { 0x202, 0x001},
-                    { 0x202, 0x001},
-                    { 0x202, 0x001},
-                    { 0x202, 0x001},
-                    { 0x202, 0x001},
-                    { 0x202, 0x001}
-            };
-
+    int constants[] = { 0x202, 0x001};
 
     for (int i = 0; i < num_copies; i++){
         for (int j = 0; j < num_data_in; j++){
             data_in[i][j] = 1;
         }
         for (int j = 0; j < num_constants; j++){
-            paeth_const[i][j] = constants[i][j];
+            paeth_const[i][j] = constants[j];
         }
     }
     high_resolution_clock::time_point s;
