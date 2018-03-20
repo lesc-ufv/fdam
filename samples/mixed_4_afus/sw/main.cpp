@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
     
     int num_copies = 4;
     int num_constants[] = {16,6,2,1};
-    int num_data_in[]= {aux[0],32,aux[2],aux[3]};
+    int num_data_in[]= {32*aux[0],32,aux[2],aux[3]};
     int num_data_out[] = {32*(aux[0]-16),aux[1],aux[2]/2,1};
     bool flag_error = false;
 
@@ -144,9 +144,9 @@ int main(int argc, char *argv[]){
 
 
 void dataflow_exec(int ** constants, int *num_constants ,unsigned short **data_in, int *num_data_in,unsigned short **data_out, int *num_data_out, int num_copies, bool printAFUStatus) {
-
-    auto *afuManager = new AFUManager();
-
+    
+    auto *afuManager = new AFUManager(); 
+    
     for(int i=0;i < num_copies;i++){
         AFU *afu = afuManager->getAFU(static_cast<afuid_t>(i));
         int num_constants_align = 0;

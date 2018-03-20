@@ -26,8 +26,7 @@ int main(int argc, char *argv[]){
         cout << "usage: <num copies> <num cache lines>" << endl;
         exit(255);
     }
-    
-    
+        
     int num_copies = auxx;
     int num_constants = 16;
     int num_data_in = 32*aux;
@@ -95,10 +94,10 @@ void dataflow_exec(int ** constants, int num_constants ,unsigned short **data_in
         int *constants_align =  nullptr;
 
         size_t numBytes = num_constants_align*sizeof(int) + num_data_in*sizeof(unsigned short) + CL(1);
-
+        
         afu->createInputBufferSW(0, numBytes, nullptr);
         afu->createOutputBufferSW(0, num_data_out*sizeof(unsigned short));
-
+        
         int context[] = {num_constants_align,num_data_in,num_data_out,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
         auto *inPtr = (uint8_t*)afu->getInputBuffer(0);
