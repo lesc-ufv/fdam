@@ -130,7 +130,7 @@ bool AFU::createInputBufferSW(int BufferID, size_t nBytes, void *dataToCopy) {
             return false;
         } else {
             double nb(nBytes);
-            uint64_t nBytesAlign = ((uint64_t) (std::ceil(nb / 2048))) * 2048;
+            uint64_t nBytesAlign = ((uint64_t) (std::ceil(nb / 256))) * 256;
             AFU::Inputbuffers[BufferID] = AFU::afuManager.fpgaAllocBuffer(nBytesAlign);
             if (AFU::Inputbuffers[BufferID] != nullptr) {
                 memset(AFU::Inputbuffers[BufferID], 0, nBytesAlign);
