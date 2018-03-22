@@ -38,15 +38,10 @@ int main(int argc, char *argv[]){
     high_resolution_clock::time_point s;
     duration<double> diff{};
     s = high_resolution_clock::now();
-    struct timespec pause{};
-    pause.tv_sec = 0;
-    pause.tv_nsec = 500000;
+    
     afu->start();
-    while(true){
-        if(afu->isDoneOutputBuffer(0))break;
-        nanosleep(&pause, nullptr);
-    }    
-
+    afu->waitDone(0);    
+    
     diff = high_resolution_clock::now() - s;
     MSG("Execution Time: " << diff.count() * 1000<< "ms");
 

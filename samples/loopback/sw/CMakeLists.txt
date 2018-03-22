@@ -27,5 +27,5 @@ find_library(LIB_MPF
 
 add_executable(main_ase main.cpp)
 add_executable(main main.cpp)
-target_link_libraries(main_ase ${CMAKE_SOURCE_DIR}/../../../sw/AFUManagerLIB/libafumanager.a ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
-target_link_libraries(main ${CMAKE_SOURCE_DIR}/../../../sw/AFUManagerLIB/libafumanager.a ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
+target_link_libraries(main_ase ${CMAKE_SOURCE_DIR}/../../../sw/AFUManagerLIB/build/libafumanager.a ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
+target_link_libraries(main ${CMAKE_SOURCE_DIR}/../../../sw/AFUManagerLIB/build/libafumanager.a ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
