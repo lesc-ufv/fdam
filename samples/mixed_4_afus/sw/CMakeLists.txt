@@ -27,7 +27,7 @@ find_library(LIB_MPF
     NAMES MPF 
 )
 
-add_executable(main_ase main.cpp  ${CMAKE_SOURCE_DIR}/../../common/dataflow_exec.cpp)
-add_executable(main main.cpp ${CMAKE_SOURCE_DIR}/../../common/dataflow_exec.cpp)
+add_executable(main_ase main.cpp)
+add_executable(main main.cpp)
 target_link_libraries(main_ase  ${LIB_AFU_MGR}  ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
 target_link_libraries(main ${LIB_AFU_MGR} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})

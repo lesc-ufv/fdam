@@ -1,0 +1,3 @@
+/home/lucas/Documentos/afu-manager/sw/AFUManagerLIB/build/CMakeFiles/rebuild_cache.dir
+/home/lucas/Documentos/afu-manager/sw/AFUManagerLIB/build/CMakeFiles/afumanager.dir
+/home/lucas/Documentos/afu-manager/sw/AFUManagerLIB/build/CMakeFiles/edit_cache.dir

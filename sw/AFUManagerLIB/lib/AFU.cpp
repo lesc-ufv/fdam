@@ -20,9 +20,13 @@ AFU::AFU(AFUManager_t &afuManager, afuid_t id, int numInputBuffer, int numOutput
 
     for (int i = 0; i < numInputBuffer; ++i) {
         Inputbuffers[i] = nullptr;
+        AFU::sizeOfInputBuffers[i] = 0;
+        AFU::sendConfIn(i);
     }
     for (int i = 0; i < numOutputBuffer; ++i) {
         Outputbuffers[i] = nullptr;
+        AFU::sizeOfOutputBuffers[i] = 0;
+        AFU::sendConfOut(i);
     }
     AFU::createDSM();
     AFU::sendConfDSM();
