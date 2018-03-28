@@ -1,54 +1,49 @@
-from math import ceil
-
 from veriloggen import *
 
-from make_afu import make_afu
+from make_acc import make_acc
 from make_arbiter_controller import make_arbiter_controller_tree
 from make_conf_receiver import make_conf_receiver
 from make_dsm_controller import make_dsm_controller
 from make_input_queue_controller import make_input_queue_controller
 from make_output_queue_controller import make_output_queue_controller
-from util import numBits, make_const
 
 
-def afu_manager_args_process(afus):
-    afu_count = 0
+def acc_management_args_process(accs):
+    acc_count = 0
     qtd_in_queue = 0
     qtd_out_queue = 0
-    if len(afus) < 1:
-        print('At least one afu should be created!')
+    if len(accs) < 1:
+        print('At least one acc should be created!')
         print('Process aborted.')
         exit()
-    for i in afus:
+    for i in accs:
         if i[0] == 0 or i[1] == 0:
-            print('The quantities of inputs or outputs of afu %d can not be equal to 0!' % afu_count)
+            print('The quantities of inputs or outputs of acc %d can not be equal to 0!' % acc_count)
             print('Process aborted.')
             exit(255)
         qtd_in_queue = qtd_in_queue + i[0]
         qtd_out_queue = qtd_out_queue + i[1]
-        afu_count = afu_count + 1
+        acc_count = acc_count + 1
 
-    return afu_count, qtd_in_queue, qtd_out_queue
+    return acc_count, qtd_in_queue, qtd_out_queue
 
 
-def make_afu_manager(afus):
+def make_acc_management(accs):
     try:
-        afu_count, qtd_in_queue, qtd_out_queue = afu_manager_args_process(afus)
+        acc_count, qtd_in_queue, qtd_out_queue = acc_management_args_process(accs)
         RADIX = 4
         MAX_AFUS = 64
-        m = Module('afu_manager')
+        m = Module('acc_management')
         ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 48)
         QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
         DATA_WIDTH = m.Parameter('DATA_WIDTH', 512)
         CONF_ID_QUEUE_WIDTH = m.Parameter('CONF_ID_QUEUE_WIDTH', 32)
         TAG_WIDTH = m.Parameter('TAG_WIDTH', 16)
-        FIFO_DEPTH_BITS = m.Parameter('FIFO_DEPTH_BITS', 4)
-        FIFO_FULL = m.Parameter('FIFO_FULL', EmbeddedCode('2 ** FIFO_DEPTH_BITS'))
 
         clk = m.Input('clk')
         rst = m.Input('rst')
-        rst_afus = m.Input('rst_afus', MAX_AFUS)
-        start_afus = m.Input('start_afus', MAX_AFUS)
+        rst_accs = m.Input('rst_accs', MAX_AFUS)
+        start_accs = m.Input('start_accs', MAX_AFUS)
 
         conf_valid = m.Input('conf_valid', 2)
         conf = m.Input('conf',128)
@@ -98,25 +93,24 @@ def make_afu_manager(afus):
         input_queue_controller = make_input_queue_controller(conf_receiver)
         output_queue_controller = make_output_queue_controller(conf_receiver, False)
         output_queue_controller_dsm = make_output_queue_controller(conf_receiver, True)
-        dsm_controller_afus = make_dsm_controller()
+        dsm_controller_accs = make_dsm_controller()
 
-        afu_id = 0
+        acc_id = 0
         ini_in_queue_id = 0
         ini_out_queue_id = 0
-        for num_in_queue, num_out_queue in afus:
-            afu = make_afu(afu_id, input_queue_controller, output_queue_controller, output_queue_controller_dsm,
-                           dsm_controller_afus)
+        for num_in_queue, num_out_queue in accs:
+            acc = make_acc(acc_id, input_queue_controller, output_queue_controller, output_queue_controller_dsm,
+                           dsm_controller_accs)
             range1 = '%d*(%d*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:%d*(%d*(ADDR_WIDTH+TAG_WIDTH))' % (
-                num_in_queue, ini_in_queue_id, num_in_queue, ini_in_queue_id)
+                num_in_queue, acc_id, num_in_queue, acc_id)
             range2 = '%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))' % (
-                num_out_queue, ini_out_queue_id, num_out_queue, ini_out_queue_id)
+                num_out_queue, acc_id, num_out_queue, acc_id)
             params = [('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH), ('DATA_WIDTH', DATA_WIDTH),
                       ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('INITIAL_INPUT_QUEUE_ID', ini_in_queue_id),
                       ('INITIAL_OUTPUT_QUEUE_ID', ini_out_queue_id), ('NUM_INPUT_QUEUES', num_in_queue),
                       ('NUM_OUTPUT_QUEUES', num_out_queue), ('TAG_WIDTH', TAG_WIDTH),
-                      ('FIFO_DEPTH_BITS', FIFO_DEPTH_BITS), ('FIFO_FULL', FIFO_FULL),
                       ('DSM_DATA_WIDTH', DSM_DATA_WIDTH)]
-            con = [('clk', clk), ('rst', rst | rst_afus[afu_id]), ('start', start_afus[afu_id]),
+            con = [('clk', clk), ('rst', rst | rst_accs[acc_id]), ('start', start_accs[acc_id]),
                    ('conf_valid', conf_valid), ('conf', conf[0:(ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH)]),
                    ('available_read', req_rd_available_in[ini_in_queue_id:ini_in_queue_id + num_in_queue]),
                    ('request_read', req_rd_en_in[ini_in_queue_id:ini_in_queue_id + num_in_queue]),
@@ -128,14 +122,13 @@ def make_afu_manager(afus):
                    ('write_data', req_wr_data_in[EmbeddedCode(range2)]),
                    ('write_data_valid', resp_wr_valid),
                    ('write_queue_id', resp_wr_mdata)]
-            m.Instance(afu, 'afu_%d_%dx%d' % (afu_id, num_in_queue, num_out_queue), params, con)
-            afu_id = afu_id + 1
+            m.Instance(acc, 'acc_%d_%dx%d' % (acc_id, num_in_queue, num_out_queue), params, con)
+            acc_id = acc_id + 1
             ini_in_queue_id = ini_in_queue_id + num_in_queue
             ini_out_queue_id = ini_out_queue_id + num_out_queue
 
         ac_in = make_arbiter_controller_tree(RADIX, qtd_in_queue)
-        params = [('DATA_WIDTH', ADDR_WIDTH + TAG_WIDTH), ('INPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
-                  ('OUTPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS)]
+        params = [('DATA_WIDTH', ADDR_WIDTH + TAG_WIDTH),('INPUT_FIFO_DEPTH_BITS',6),('OUTPUT_FIFO_DEPTH_BITS',6)]
         con = [('clk', clk), ('rst', rst), ('req_wr_en_in', req_rd_en_in), ('req_wr_data_in', req_rd_data_in),
                ('req_wr_available_in', req_rd_available_in), ('req_wr_available_out', req_rd_available_out),
                ('req_wr_en_out', req_rd_en_out), ('req_wr_data_out', req_rd_data_out)]
@@ -146,8 +139,7 @@ def make_afu_manager(afus):
         else:
             ac_out = make_arbiter_controller_tree(RADIX, qtd_out_queue)
 
-        params = [('DATA_WIDTH', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH), ('INPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
-                  ('OUTPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS)]
+        params = [('DATA_WIDTH', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]
         con = [('clk', clk), ('rst', rst), ('req_wr_en_in', req_wr_en_in), ('req_wr_data_in', req_wr_data_in),
                ('req_wr_available_in', req_wr_available_in), ('req_wr_available_out', req_wr_available_out),
                ('req_wr_en_out', req_wr_en_out), ('req_wr_data_out', req_wr_data_out)]
@@ -159,8 +151,8 @@ def make_afu_manager(afus):
         m.Always(Posedge(clk))(
             If(rst)(
                 req_rd_en(Int(0, 1, 2)),
-                req_rd_addr(make_const(0, ADDR_WIDTH)),
-                req_rd_mdata(make_const(0, TAG_WIDTH))
+                req_rd_addr(0),
+                req_rd_mdata(0)
             ).Else(
                 req_rd_en(req_rd_en_out),
                 req_rd_addr(req_rd_data_out[TAG_WIDTH:TAG_WIDTH + ADDR_WIDTH]),
@@ -171,9 +163,9 @@ def make_afu_manager(afus):
         m.Always(Posedge(clk))(
             If(rst)(
                 req_wr_en(Int(0, 1, 2)),
-                req_wr_addr(make_const(0, ADDR_WIDTH)),
-                req_wr_mdata(make_const(0, TAG_WIDTH)),
-                req_wr_data(make_const(0, DATA_WIDTH))
+                req_wr_addr(0),
+                req_wr_mdata(0),
+                req_wr_data(0)
             ).Else(
                 req_wr_en(req_wr_en_out),
                 req_wr_data(req_wr_data_out[TAG_WIDTH + ADDR_WIDTH:DATA_WIDTH + TAG_WIDTH + ADDR_WIDTH]),
@@ -181,11 +173,9 @@ def make_afu_manager(afus):
                 req_wr_mdata(req_wr_data_out[0:TAG_WIDTH])
             )
         )
-
-        # Informações sobre o controlador de buffers para o software
         j = 0
         code = ''
-        for i in afus:
+        for i in accs:
             code = code + 'info[%d:%d] <= {8\'d%d, 8\'d%d};\n' % (j + 15, j, i[1], i[0])
             j = j + 16
         m.Always(Posedge(clk))(
@@ -195,13 +185,13 @@ def make_afu_manager(afus):
                 EmbeddedCode(code)
             )
         )
-        print('AFU manager successfully created!')
-        print('Amount of AFUs: %d' % len(afus))
+        print('Accelerator management successfully created!')
+        print('Amount of accelerator: %d' % len(accs))
         print('Amount of Input Queue: %d' % qtd_in_queue)
         print('Amount of Output Queue: %d' % (qtd_out_queue))
         return m
     except:
-        print('Failed to create the AFU manager!')
+        print('Failed to create the accelerator management!')
         print("Error:", sys.exc_info())
         exit(255)
         raise

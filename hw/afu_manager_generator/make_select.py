@@ -1,8 +1,5 @@
 from veriloggen import *
 
-from util import make_const
-
-
 def make_select_tree(radix, num_input):
     array = []
     array = make_select_tree_array(radix, num_input, array)
@@ -100,7 +97,7 @@ def make_select(num_input):
     code = code + '     default:data_out <= 0;\nendcase'
     m.Always(Posedge(clk))(
         If(rst)(
-            data_out(make_const(0, DATA_WIDTH))
+            data_out(0)
         ).Else(
             EmbeddedCode(code)
         )

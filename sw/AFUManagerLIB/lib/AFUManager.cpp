@@ -149,6 +149,7 @@ void AFUManager::printStatics() {
     double total_cicles = AFUManager::readCSR(REG_CLOCK_COUNT);
     double total_cl_wr = AFUManager::readCSR(REG_CL_WR_COUNT);
     double total_cl_rd = AFUManager::readCSR(REG_CL_RD_COUNT);
+    
     double totalBytesBuffers = CL(total_cl_wr + total_cl_rd);
     double cicle_time = 1.0 / (AFUManager::csrs->getAFUMHz() * 1000000.0);
     double time_spend = cicle_time * total_cicles;
@@ -159,6 +160,8 @@ void AFUManager::printStatics() {
     }
     // Reads CSRs to get some statistics
     BEGIN_COLOR(GREEN);
+    MSG("Total read bytes: " << CL(total_cl_rd));
+    MSG("Total write bytes: " <<  CL(total_cl_wr));
     MSG("Total Clock cicles: " << std::dec << total_cicles);
     MSG("AFUManager frequency: " << std::dec << AFUManager::csrs->getAFUMHz() << " MHz");
     MSG("AFUManager TARGET:" << (AFUManager::fpga->hwIsSimulated() ? " [simulated]" : "[real device]"));

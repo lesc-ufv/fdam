@@ -46,9 +46,13 @@ module app_afu(
 );
     // Local reset to reduce fan-out
     logic reset = 1'b1;
+    logic [2:0]reset_pipe;
     always @(posedge clk)
     begin
-        reset <= fiu.reset;
+        reset_pipe[0] <= fiu.reset;
+        reset_pipe[1] <= reset_pipe[0];
+        reset_pipe[2] <= reset_pipe[1];
+        reset <= reset_pipe[2];
     end
     //
     // Convert between byte addresses and line addresses.  The conversion
@@ -204,6 +208,20 @@ module app_afu(
     t_cci_mpf_c1_ReqMemHdr wr_hdr;
     t_cci_mpf_ReqMemHdrParams rd_hdr_params,wr_hdr_params;
     
+    logic [2-1:0]sop_count;
+    
+    always_ff @(posedge clk)
+    begin
+        if(reset)
+        begin
+          sop_count <= 0;
+        end else begin
+           if(req_wr_en)begin
+              sop_count <= sop_count + 1;
+           end
+        end 
+    end 
+    
     always_comb
     begin
         // Use virtual addresses
@@ -211,12 +229,13 @@ module app_afu(
         // Let the FIU pick the channel
         rd_hdr_params.vc_sel = eVC_VA;
         // Read 1 line
-        rd_hdr_params.cl_len = eCL_LEN_1;
+        rd_hdr_params.cl_len = eCL_LEN_4;
         // Generate the header
         rd_hdr = cci_mpf_c0_genReqHdr(eREQ_RDLINE_I, req_rd_addr,req_rd_mdata, rd_hdr_params);
         
         fiu.c0Tx = cci_mpf_genC0TxReadReq(rd_hdr,req_rd_en);
     end
+    
     always_comb
     begin
         // Use virtual addresses
@@ -224,7 +243,9 @@ module app_afu(
         // Let the FIU pick the channel
         wr_hdr_params.vc_sel = eVC_VA;
         // Writer 1 line
-        wr_hdr_params.cl_len = eCL_LEN_1; 
+        wr_hdr_params.cl_len = req_wr_mdata[15] ? eCL_LEN_1: eCL_LEN_4;
+        
+        wr_hdr_params.sop = req_wr_mdata[15] ? 1 : sop_count == 0;
         
         wr_hdr = cci_mpf_c1_genReqHdr(eREQ_WRLINE_I, req_wr_addr,req_wr_mdata, wr_hdr_params);
         
@@ -232,13 +253,13 @@ module app_afu(
     end 
     
     
-    afu_manager afu_manager(
+    acc_management acc_management(
     
       .clk(clk),
       .rst(reset),
      
-      .rst_afus(rst_afus),  
-      .start_afus(start_afus),
+      .rst_accs(rst_afus),  
+      .start_accs(start_afus),
       
       .conf_valid(conf_valid),
       .conf(conf),
@@ -277,7 +298,7 @@ module app_afu(
              total_clocks <= total_clocks + 64'd1;
           end
           if(cci_c1Rx_isWriteRsp(fiu.c1Rx)) begin 
-             total_cl_wr <= total_cl_wr + 64'd1;
+             total_cl_wr <= total_cl_wr + 64'd4;
           end
           if(cci_c0Rx_isReadRsp(fiu.c0Rx))
           begin
