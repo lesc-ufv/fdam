@@ -20,7 +20,6 @@ module AsyncOut
   localparam FSM_DONE = 3'd2;
   reg [512-1:0] data;
   reg [6-1:0] counter;
-  reg wr_flag;
 
   always @(posedge clk) begin
     if(rst) begin
@@ -28,7 +27,6 @@ module AsyncOut
       ackl0 <= 1'b0;
       counter <= 6'd0;
       data <= 512'd0;
-      wr_flag <= 1'b0;
       done <= 1'b0;
       fsm_main <= FSM_IDLE;
     end else begin
@@ -40,25 +38,27 @@ module AsyncOut
               fsm_main <= FSM_WAIT;
               ackl0 <= 1'b1;
               case(din0[33:32])
-                2'b1: begin
-                  if(counter == 15) begin
+                2'b10: begin
+                  if(counter == 6'd15) begin
                     counter <= 6'd0;
-                    wr_flag <= 1'b0;
-                    wr_data <= (din0[31:0] << DATA_WIDTH * counter) | data;
+                    wr_data <= { din0[31:0], data[511:32] };
+                    wr_en <= 1'b1;
+                    fsm_main <= FSM_DONE;
+                  end else begin
+                    counter <= counter + 6'd1;
+                    data <= { 32'd0, data[511:32] };
+                  end
+                end
+                2'b1: begin
+                  if(counter == 6'd15) begin
+                    counter <= 6'd0;
+                    wr_data <= { din0[31:0], data[511:32] };
                     data <= 512'd0;
                     wr_en <= 1'b1;
                   end else begin
                     counter <= counter + 6'd1;
-                    data <= (din0[31:0] << DATA_WIDTH * counter) | data;
-                    wr_flag <= 1'b1;
+                    data <= { din0[31:0], data[511:32] };
                   end
-                end
-                2'b10: begin
-                  if(wr_flag) begin
-                    wr_data <= data;
-                    wr_en <= 1'b1;
-                  end 
-                  fsm_main <= FSM_DONE;
                 end
               endcase
             end 

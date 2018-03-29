@@ -37,25 +37,27 @@ module SyncOut
           case(din0[33:32])
             2'b10: begin
               component_ready <= 1'b1;
-              if(wr_flag) begin
-                wr_flag <= 1'b0;
-                wr_data <= data;
+              if(counter == 6'd15) begin
+                counter <= 6'd0;
+                wr_data <= { din0[31:0], data[511:32] };
                 wr_en <= 1'b1;
-              end else begin
+                wr_flag <= 1'b1;
+              end else if(wr_flag) begin
                 done <= 1'b1;
+              end else begin
+                counter <= counter + 6'd1;
+                data <= { 32'd0, data[511:32] };
               end
             end
             2'b1: begin
-              if(counter == 15) begin
+              if(counter == 6'd15) begin
                 counter <= 6'd0;
-                wr_flag <= 1'b0;
-                wr_data <= (din0[31:0] << DATA_WIDTH * counter) | data;
+                wr_data <= { din0[31:0], data[511:32] };
                 data <= 512'd0;
                 wr_en <= 1'b1;
               end else begin
                 counter <= counter + 6'd1;
-                data <= (din0[31:0] << DATA_WIDTH * counter) | data;
-                wr_flag <= 1'b1;
+                data <= { din0[31:0], data[511:32] };
               end
             end
           endcase
