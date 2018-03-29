@@ -17,7 +17,7 @@ module SyncAdd
       if(en) begin
         //Stop = {00,00}, Done = {10,10}, Valid = {01,01}
         case({ din0[17:16], din1[17:16] })
-          4'b0: begin
+          2'b0: begin
             dout0 <= 18'd0;
           end
           { 2'b10, 2'b10 }: begin

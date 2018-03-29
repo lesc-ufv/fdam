@@ -14,13 +14,13 @@ module SyncIn
   output reg [18-1:0] dout0
 );
 
-  localparam FSM_IDLE = 1;
-  localparam FSM_READ = 2;
-  localparam FSM_DATA_OUT = 3;
-  localparam FSM_DONE = 4;
+  reg [3-1:0] fsm_main;
+  localparam FSM_IDLE = 3'd1;
+  localparam FSM_READ = 3'd2;
+  localparam FSM_DATA_OUT = 3'd3;
+  localparam FSM_DONE = 3'd4;
   reg [512-1:0] data;
   reg [6-1:0] counter;
-  reg [3-1:0] fsm_main;
 
   always @(posedge clk) begin
     if(rst) begin
@@ -55,7 +55,7 @@ module SyncIn
               dout0 <= { 2'd1, data[15:0] };
               data <= data >> 6'd16;
               counter <= counter + 6'b1;
-              if(counter == 31) begin
+              if(counter == 6'd31) begin
                 fsm_main <= FSM_IDLE;
               end else begin
                 fsm_main <= FSM_DATA_OUT;

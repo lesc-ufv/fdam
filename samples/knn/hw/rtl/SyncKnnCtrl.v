@@ -22,7 +22,7 @@ module SyncKnnCtrl
       if(en) begin
         //Stop = 00, Done = 10, Valid = 01
         case(din0[17:16])
-          4'b0: begin
+          2'b0: begin
             dout0 <= 18'd0;
             dout1 <= 2'd0;
           end
