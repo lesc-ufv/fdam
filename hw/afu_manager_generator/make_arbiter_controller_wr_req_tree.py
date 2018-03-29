@@ -150,6 +150,8 @@ def make_arbiter_controller_wr_req(num_input):
     fsm_in_fifo_re = m.Reg('fsm_in_fifo_re',2)
     m.EmbeddedCode('')
     in_fifo_re = m.Reg('in_fifo_re', NUM_INPUT)
+    in_fifo_re_next = m.Reg('in_fifo_re_next', NUM_INPUT)
+    in_fifo_flag = m.Reg('in_fifo_flag')
     in_fifo_dout_valid = m.Wire('in_fifo_dout_valid', NUM_INPUT)
     in_fifo_dout = m.Wire('in_fifo_dout', EmbeddedCode('DATA_WIDTH*%d' % NUM_INPUT))
     m.EmbeddedCode('')
@@ -274,16 +276,23 @@ def make_arbiter_controller_wr_req(num_input):
     )
     m.Always(Posedge(clk))(
         If(rst_reg)(
-            in_fifo_re((Int(0, NUM_INPUT, 10))),
+            in_fifo_re(Int(0, NUM_INPUT, 10)),
             in_fifo_re_count(Int(0, 3, 10)),
-            fsm_in_fifo_re(Int(0, fsm_in_fifo_re.width, 10))
+            fsm_in_fifo_re(Int(0, fsm_in_fifo_re.width, 10)),
+            in_fifo_flag(Int(0,1, 2)),
+            in_fifo_re_next(Int(0, NUM_INPUT, 10))
         ).Else(
             Case(fsm_in_fifo_re)(
                 When(Int(0, fsm_in_fifo_re.width, 10))(
-                    If(arbiter_grant_valid)(
+                    If(arbiter_grant_valid & ~in_fifo_flag)(
                         in_fifo_re(arbiter_grant),
                         in_fifo_re_count(in_fifo_re_count + Int(1, 3, 10)),
                         fsm_in_fifo_re(Int(1, 1, 2))
+                    ).Elif(in_fifo_flag)(
+                        in_fifo_flag(Int(0,1,2)),
+                        in_fifo_re(in_fifo_re_next),
+                        in_fifo_re_count(in_fifo_re_count + Int(1, 3, 10)),
+                        fsm_in_fifo_re(Int(1, 1, 2)) 
                     ).Else(
                         in_fifo_re((Int(0, NUM_INPUT, 10))),
                     )
@@ -292,7 +301,9 @@ def make_arbiter_controller_wr_req(num_input):
                     If(in_fifo_re_count[1]&in_fifo_re_count[0])(
                         in_fifo_re_count(Int(0, 3, 10)),
                         If(AndList(arbiter_grant_valid,Not(in_fifo_re&arbiter_grant)))(
-                            fsm_in_fifo_re(Int(0, fsm_in_fifo_re.width, 10))
+                            fsm_in_fifo_re(Int(0, fsm_in_fifo_re.width, 10)),
+                            in_fifo_re_next(arbiter_grant),
+                            in_fifo_flag(Int(1,1,2))
                         ).Else(
                             fsm_in_fifo_re(Int(2, fsm_in_fifo_re.width, 10))
                         )
