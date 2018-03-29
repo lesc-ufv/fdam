@@ -16,13 +16,13 @@ def make_arbiter():
     acknowledge = m.Input('acknowledge', PORTS)
     grant = m.Output('grant', PORTS)
     grant_valid = m.Output('grant_valid')
-    grant_encoded = m.Output('grant_encoded',WIDTH)
+    grant_encoded = m.Output('grant_encoded', WIDTH)
 
     grant_reg = m.Reg('grant_reg', PORTS)
     grant_valid_reg = m.Reg('grant_valid_reg')
-    grant_encoded_reg = m.Reg('grant_encoded_reg',WIDTH)
+    grant_encoded_reg = m.Reg('grant_encoded_reg', WIDTH)
 
-    genIf = m.GenerateIf(PORTS>1,'gen_if_true')
+    genIf = m.GenerateIf(PORTS > 1, 'gen_if_true')
 
     grant_next = genIf.Reg('grant_next', PORTS)
     grant_valid_next = genIf.Reg('grant_valid_next')

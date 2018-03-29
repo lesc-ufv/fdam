@@ -1,5 +1,3 @@
-from veriloggen import *
-
 def numBits(n):
     count = 1
     while n / 2 > 1:

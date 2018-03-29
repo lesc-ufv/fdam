@@ -195,11 +195,11 @@ module app_afu(
         end 
     end
         
-    wire req_rd_en;
+    logic req_rd_en;
     t_byteAddr req_rd_addr;
     t_cci_mdata req_rd_mdata;
     
-    wire req_wr_en;
+    logic req_wr_en;
     t_byteAddr  req_wr_addr;
     t_cci_clData req_wr_data;
     t_cci_mdata req_wr_mdata;
@@ -214,10 +214,10 @@ module app_afu(
     begin
         if(reset)
         begin
-          sop_count <= 0;
+          sop_count <= 2'd0;
         end else begin
            if(req_wr_en)begin
-              sop_count <= sop_count + 1;
+              sop_count <= sop_count + 2'd1;
            end
         end 
     end 
@@ -243,9 +243,9 @@ module app_afu(
         // Let the FIU pick the channel
         wr_hdr_params.vc_sel = eVC_VA;
         // Writer 1 line
-        wr_hdr_params.cl_len = req_wr_mdata[15] ? eCL_LEN_1: eCL_LEN_4;
+        wr_hdr_params.cl_len = eCL_LEN_4;
         
-        wr_hdr_params.sop = req_wr_mdata[15] ? 1 : sop_count == 0;
+        wr_hdr_params.sop = (sop_count == 2'd0);
         
         wr_hdr = cci_mpf_c1_genReqHdr(eREQ_WRLINE_I, req_wr_addr,req_wr_mdata, wr_hdr_params);
         

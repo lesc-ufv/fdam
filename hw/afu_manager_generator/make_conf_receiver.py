@@ -1,5 +1,6 @@
 from veriloggen import *
 
+
 def make_conf_receiver():
     m = Module('conf_receiver')
     CONF_TYPE = m.Parameter('CONF_TYPE', 1)
@@ -16,25 +17,25 @@ def make_conf_receiver():
     fsm_conf_rec = m.Reg('fsm_conf_rec', 2)
     m.Always(Posedge(clk))(
         If(rst)(
-            conf_out_valid(Int(0,1,2)),
+            conf_out_valid(Int(0, 1, 2)),
             conf_out_data(0),
-            conf_reset_out(Int(1,1,2)),
-            fsm_conf_rec(Int(0,fsm_conf_rec.width,10))
+            conf_reset_out(Int(1, 1, 2)),
+            fsm_conf_rec(Int(0, fsm_conf_rec.width, 10))
         ).Else(
             conf_out_valid(Int(0, 1, 2)),
             Case(fsm_conf_rec)(
-                When(Int(0,fsm_conf_rec.width,10))(
+                When(Int(0, fsm_conf_rec.width, 10))(
                     If(AndList(conf_in_valid == CONF_TYPE, conf_in_data[0:CONF_ID_WIDTH] == CONF_ID))(
                         conf_out_data(conf_in_data),
-                        conf_reset_out(Int(1,1,2)),
+                        conf_reset_out(Int(1, 1, 2)),
                         fsm_conf_rec(Int(1, fsm_conf_rec.width, 10))
                     )
                 ),
-                When(Int(1,fsm_conf_rec.width,10))(
-                    conf_reset_out(Int(0,1,2)),
+                When(Int(1, fsm_conf_rec.width, 10))(
+                    conf_reset_out(Int(0, 1, 2)),
                     fsm_conf_rec(Int(2, fsm_conf_rec.width, 10))
                 ),
-                When(Int(2,fsm_conf_rec.width,10))(
+                When(Int(2, fsm_conf_rec.width, 10))(
                     conf_out_valid(Int(1, 1, 2)),
                     fsm_conf_rec(Int(0, fsm_conf_rec.width, 10))
                 )

@@ -1,5 +1,6 @@
 from veriloggen import *
 
+
 def make_select_tree(radix, num_input):
     array = []
     array = make_select_tree_array(radix, num_input, array)
@@ -104,7 +105,7 @@ def make_select(num_input):
     )
     m.Always(Posedge(clk))(
         If(rst)(
-            data_out_valid(Int(0,1,2))
+            data_out_valid(Int(0, 1, 2))
         ).Else(
             data_out_valid(EmbeddedCode('|data_in_valid'))
         )

@@ -1,5 +1,6 @@
 from veriloggen import *
 
+
 def make_fifo():
     m = Module('fifo')
     FIFO_WIDTH = m.Parameter('FIFO_WIDTH', 32)

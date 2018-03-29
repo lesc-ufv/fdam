@@ -1,5 +1,6 @@
 from veriloggen import *
 
+
 def make_acc_user(acc_id):
     m = Module('acc_user_%d' % acc_id)
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 512)

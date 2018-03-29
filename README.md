@@ -1,2 +1,2 @@
-# AFU Manager
+# FAM: Framework for Accelerator Management
 

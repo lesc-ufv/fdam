@@ -14,7 +14,6 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
     NUM_INPUT_QUEUES = m.Parameter('NUM_INPUT_QUEUES', 1)
     NUM_OUTPUT_QUEUES = m.Parameter('NUM_OUTPUT_QUEUES', 1)
     TAG_WIDTH = m.Parameter('TAG_WIDTH', 16)
-    DSM_DATA_WIDTH = m.Parameter('DSM_DATA_WIDTH', DATA_WIDTH)
 
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -27,9 +26,9 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
     read_data_valid = m.Input('read_data_valid')
     read_queue_id = m.Input('read_queue_id', TAG_WIDTH)
     read_data = m.Input('read_data', DATA_WIDTH)
-    available_write = m.Input('available_write', NUM_OUTPUT_QUEUES)
-    request_write = m.Output('request_write', NUM_OUTPUT_QUEUES)
-    write_data = m.Output('write_data', EmbeddedCode('(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)*NUM_OUTPUT_QUEUES'))
+    available_write = m.Input('available_write', (NUM_OUTPUT_QUEUES+1))
+    request_write = m.Output('request_write', (NUM_OUTPUT_QUEUES+1))
+    write_data = m.Output('write_data', EmbeddedCode('(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)*(NUM_OUTPUT_QUEUES+1)'))
     write_data_valid = m.Input('write_data_valid')
     write_queue_id = m.Input('write_queue_id', TAG_WIDTH)
 
@@ -60,11 +59,6 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
 
     input_queue_done = m.Wire('input_queue_done', NUM_INPUT_QUEUES)
     output_queue_done = m.Wire('output_queue_done', NUM_OUTPUT_QUEUES)
-
-    acc_dsm_has_peding_wr = m.Wire('acc_dsm_has_peding_wr')
-    acc_dsm_available_write = m.Wire('acc_dsm_available_write')
-    acc_dsm_request_write = m.Wire('acc_dsm_request_write')
-    acc_dsm_write_data = m.Wire('acc_dsm_write_data', DSM_DATA_WIDTH)
 
     idx_in_queue = m.Genvar('idx_in_queue')
     idx_out_queue = m.Genvar('idx_out_queue')
@@ -101,38 +95,28 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
            ('acc_user_write_data',
             acc_user_write_data[(idx_out_queue) * DATA_WIDTH:(idx_out_queue) * DATA_WIDTH + DATA_WIDTH]),
            ('done', output_queue_done[idx_out_queue])]
-    genOutputQueue = m.GenerateFor(idx_out_queue(1), idx_out_queue < NUM_OUTPUT_QUEUES, idx_out_queue.inc(),
+    genOutputQueue = m.GenerateFor(idx_out_queue(0), idx_out_queue < NUM_OUTPUT_QUEUES, idx_out_queue.inc(),
                                    'gen_out_queue_controller')
     genOutputQueue.Instance(output_queue_controller, 'output_queue_controller', params, con)
 
-    params = [('ACC_ID', acc_id), ('ID_QUEUE', INITIAL_OUTPUT_QUEUE_ID), ('ADDR_WIDTH', ADDR_WIDTH),
-              ('QTD_WIDTH', QTD_WIDTH), ('DATA_WIDTH', DATA_WIDTH), ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH),
-              ('TAG_WIDTH', TAG_WIDTH)]
-    con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('conf_valid', conf_valid_reg), ('conf', conf_reg),
-           ('available_write', available_write[0]), ('has_wr_peding', has_peding_wr[0]),
-           ('request_write', request_write[0]),
-           ('write_data', write_data[0:(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]),
-           ('write_data_valid', write_data_valid), ('write_queue_id', write_queue_id),
-           ('acc_user_available_write', acc_user_available_write[0]),
-           ('acc_user_request_write', acc_user_request_write[0]),
-           ('acc_user_write_data', acc_user_write_data[0:DATA_WIDTH]),
-           ('has_wr_peding_dsm', acc_dsm_has_peding_wr),
-           ('acc_dsm_available_write', acc_dsm_available_write),
-           ('acc_dsm_request_write', acc_dsm_request_write),
-           ('acc_dsm_write_data', acc_dsm_write_data),
-           ('done', output_queue_done[0])]
-
-    m.Instance(output_queue_controller_dsm, 'output_queue_controller_dsm', params, con)
-
-    params = [('QTD_WIDTH', QTD_WIDTH), ('DSM_DATA_WIDTH', DSM_DATA_WIDTH), ('NUM_INPUT_QUEUES', NUM_INPUT_QUEUES),
-              ('NUM_OUTPUT_QUEUES', NUM_OUTPUT_QUEUES)]
+    params = [('ACC_ID', acc_id), ('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH),
+              ('TAG_WIDTH', TAG_WIDTH),
+              ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('DATA_WIDTH', DATA_WIDTH),
+              ('NUM_INPUT_QUEUES', NUM_INPUT_QUEUES), ('NUM_OUTPUT_QUEUES', NUM_OUTPUT_QUEUES)]
 
     con = [('clk', clk), ('rst', rst_reg), ('start', start_reg), ('done_rd', input_queue_done),
            ('done_wr', output_queue_done),
-           ('done_acc', acc_user_done_dsm), ('has_pending_wr', acc_dsm_has_peding_wr),
-           ('acc_req_rd_data_en', acc_user_request_read), ('acc_req_wr_data_en', acc_user_request_write),
-           ('acc_dsm_available_write', acc_dsm_available_write), ('acc_dsm_request_write', acc_dsm_request_write),
-           ('acc_dsm_write_data', acc_dsm_write_data)]
+           ('done_acc', acc_user_done_dsm),
+           ('acc_req_rd_data_en', acc_user_request_read),
+           ('acc_req_wr_data_en', acc_user_request_write),
+           ('conf_valid', conf_valid_reg),
+           ('conf', conf_reg),
+           ('available_write', available_write[NUM_OUTPUT_QUEUES]),
+           ('request_write', request_write[NUM_OUTPUT_QUEUES]),
+           ('write_data',
+            write_data[(NUM_OUTPUT_QUEUES) * (DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH):(NUM_OUTPUT_QUEUES) * (
+                    DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH) + (DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]),
+           ('write_data_valid', write_data_valid_reg), ('write_queue_id', write_queue_id_reg)]
 
     m.Instance(dsm_controller, 'dsm_controller', params, con)
 
@@ -147,7 +131,7 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
            ('acc_user_done', acc_user_done)]
     m.Instance(acc_user, 'acc_user_%d' % acc_id, params, con)
 
-    has_peding.assign(Uor(Cat(has_peding_rd,has_peding_wr)))
+    has_peding.assign(Uor(Cat(has_peding_rd, has_peding_wr)))
     acc_user_done_dsm.assign(AndList(acc_user_done, ~has_peding))
 
     m.Always(Posedge(clk))(
