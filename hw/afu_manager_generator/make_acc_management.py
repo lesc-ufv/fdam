@@ -33,7 +33,7 @@ def acc_management_args_process(accs):
 def make_acc_management(accs):
     try:
         acc_count, qtd_in_queue, qtd_out_queue = acc_management_args_process(accs)
-        RADIX = 4
+        RADIX = 8
         MAX_AFUS = 64
         m = Module('acc_management')
         ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 48)
