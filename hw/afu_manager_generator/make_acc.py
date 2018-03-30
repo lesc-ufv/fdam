@@ -94,6 +94,7 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
            ('acc_user_request_write', acc_user_request_write[idx_out_queue]),
            ('acc_user_write_data',
             acc_user_write_data[(idx_out_queue) * DATA_WIDTH:(idx_out_queue) * DATA_WIDTH + DATA_WIDTH]),
+           ('acc_user_done',acc_user_done),
            ('done', output_queue_done[idx_out_queue])]
     genOutputQueue = m.GenerateFor(idx_out_queue(0), idx_out_queue < NUM_OUTPUT_QUEUES, idx_out_queue.inc(),
                                    'gen_out_queue_controller')

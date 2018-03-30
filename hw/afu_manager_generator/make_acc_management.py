@@ -1,3 +1,5 @@
+import traceback
+
 from veriloggen import *
 
 from make_acc import make_acc
@@ -189,6 +191,6 @@ def make_acc_management(accs):
         return m
     except:
         print('Failed to create the accelerator management!')
-        print("Error:", sys.exc_info())
+        print(traceback.format_exc())
         exit(255)
         raise

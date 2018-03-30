@@ -44,10 +44,10 @@ int main(int argc, char *argv[]) {
     double thpt = nGbytes / timeExec;
     MSG("Execution Time: " << timeExec * 1000 << "ms");
     MSG("Throughput: " << thpt << "GB/s");
-    for (int i = 0; i < num_copies; ++i) {
-        delete (data_in[i]);
-        delete (data_out[i]);
-    }
+    
+    delete[](data_in);
+    delete[](data_out);
+
     return 0;
 }
 
