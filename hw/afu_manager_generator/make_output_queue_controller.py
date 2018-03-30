@@ -83,7 +83,8 @@ def make_output_queue_controller(conf_receiver):
                                   Mux(fifo_almostempty, (~fifo_empty & ~fifo_re), Int(1, 1, 2))))
     acc_user_available_write.assign(~fifo_almostfull)
     write_data_valid_queue.assign(AndList(write_data_valid, (write_queue_id == ID_QUEUE)))
-    align_write_data.assign(AndList(fifo_empty, acc_user_done, ~acc_user_request_write, (count_req_cl[0] | count_req_cl[1])))
+    align_write_data.assign(
+        AndList(fifo_empty, acc_user_done, ~acc_user_request_write, (count_req_cl[0] | count_req_cl[1])))
 
     m.Always(Posedge(clk))(
         If(rst_internal)(
@@ -118,7 +119,7 @@ def make_output_queue_controller(conf_receiver):
             If(conf_ready & flag_addr_init)(
                 addr_write_next(addr_base),
                 flag_addr_init(Int(0, 1, 2))
-            ).Elif(fifo_dout_valid|align_write_data)(
+            ).Elif(fifo_dout_valid | align_write_data)(
                 addr_write_next(addr_write_next + 1),
                 count_req_cl(count_req_cl + 1)
             )
@@ -150,7 +151,7 @@ def make_output_queue_controller(conf_receiver):
         If(rst_internal)(
             write_peding(0)
         ).Else(
-            Case(Cat(write_data_valid_queue, (fifo_dout_valid|align_write_data)))(
+            Case(Cat(write_data_valid_queue, (fifo_dout_valid | align_write_data)))(
                 When(Int(0, 2, 10))(
                     write_peding(write_peding)
                 ),

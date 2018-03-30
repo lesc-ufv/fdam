@@ -3,9 +3,8 @@ import traceback
 from veriloggen import *
 
 from make_acc import make_acc
+from make_arbiter_controller_rd_req_tree import make_arbiter_controller_rd_req_tree
 from make_arbiter_controller_wr_req_tree import make_arbiter_controller_wr_req_tree
-from make_arbiter_controller_rd_req_tree import  make_arbiter_controller_rd_req_tree
-
 from make_conf_receiver import make_conf_receiver
 from make_dsm_controller import make_dsm_controller
 from make_input_queue_controller import make_input_queue_controller
@@ -75,10 +74,11 @@ def make_acc_management(accs):
         info = m.OutputReg('info', bits_info)
 
         m.EmbeddedCode('')
-        req_wr_en_in = m.Wire('req_wr_en_in', (qtd_out_queue+1))
+        req_wr_en_in = m.Wire('req_wr_en_in', (qtd_out_queue + acc_count))
         req_wr_data_in = m.Wire('req_wr_data_in',
-                                EmbeddedCode('(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH) * %d' % (qtd_out_queue+1)))
-        req_wr_available_in = m.Wire('req_wr_available_in', (qtd_out_queue+1))
+                                EmbeddedCode(
+                                    '(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH) * %d' % (qtd_out_queue + acc_count)))
+        req_wr_available_in = m.Wire('req_wr_available_in', (qtd_out_queue + acc_count))
         m.EmbeddedCode('')
         req_wr_available_out = m.Wire('req_wr_available_out')
         req_wr_en_out = m.Wire('req_wr_en_out')
@@ -101,13 +101,14 @@ def make_acc_management(accs):
         acc_id = 0
         ini_in_queue_id = 0
         ini_out_queue_id = 0
+        con_out_wire = 0
         for num_in_queue, num_out_queue in accs:
             acc = make_acc(acc_id, input_queue_controller, output_queue_controller, output_queue_controller_dsm,
                            dsm_controller_accs)
             range1 = '%d*(%d*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:%d*(%d*(ADDR_WIDTH+TAG_WIDTH))' % (
                 num_in_queue, acc_id, num_in_queue, acc_id)
             range2 = '%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))' % (
-                (num_out_queue+1), acc_id, (num_out_queue+1), acc_id)
+                (num_out_queue + 1), acc_id, (num_out_queue + 1), acc_id)
             params = [('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH), ('DATA_WIDTH', DATA_WIDTH),
                       ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('INITIAL_INPUT_QUEUE_ID', ini_in_queue_id),
                       ('INITIAL_OUTPUT_QUEUE_ID', ini_out_queue_id), ('NUM_INPUT_QUEUES', num_in_queue),
@@ -119,15 +120,16 @@ def make_acc_management(accs):
                    ('request_data', req_rd_data_in[EmbeddedCode(range1)]),
 
                    ('read_data_valid', resp_rd_valid), ('read_queue_id', resp_rd_mdata), ('read_data', resp_rd_data),
-                   ('available_write', req_wr_available_in[ini_out_queue_id:ini_out_queue_id + (num_out_queue+1)]),
-                   ('request_write', req_wr_en_in[ini_out_queue_id:ini_out_queue_id + (num_out_queue+1)]),
+                   ('available_write', req_wr_available_in[con_out_wire:con_out_wire + (num_out_queue + 1)]),
+                   ('request_write', req_wr_en_in[con_out_wire:con_out_wire + (num_out_queue + 1)]),
                    ('write_data', req_wr_data_in[EmbeddedCode(range2)]),
                    ('write_data_valid', resp_wr_valid),
                    ('write_queue_id', resp_wr_mdata)]
-            m.Instance(acc, 'acc_%d_%dx%d' % (acc_id, num_in_queue,num_out_queue), params, con)
+            m.Instance(acc, 'acc_%d_%dx%d' % (acc_id, num_in_queue, num_out_queue), params, con)
             acc_id = acc_id + 1
             ini_in_queue_id = ini_in_queue_id + num_in_queue
-            ini_out_queue_id = ini_out_queue_id + (num_out_queue+1)
+            ini_out_queue_id = ini_out_queue_id + num_out_queue
+            con_out_wire = con_out_wire + (num_out_queue + 1)
 
         ac_in = make_arbiter_controller_rd_req_tree(RADIX, qtd_in_queue)
         params = [('DATA_WIDTH', ADDR_WIDTH + TAG_WIDTH), ('INPUT_FIFO_DEPTH_BITS', 6), ('OUTPUT_FIFO_DEPTH_BITS', 6)]
@@ -136,7 +138,7 @@ def make_acc_management(accs):
                ('req_wr_en_out', req_rd_en_out), ('req_wr_data_out', req_rd_data_out)]
         m.Instance(ac_in, 'arbiter_controller_rd_req_tree', params, con)
 
-        ac_out = make_arbiter_controller_wr_req_tree(RADIX, (qtd_out_queue+1))
+        ac_out = make_arbiter_controller_wr_req_tree(RADIX, (qtd_out_queue + acc_count))
 
         params = [('DATA_WIDTH', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]
         con = [('clk', clk), ('rst', rst), ('req_wr_en_in', req_wr_en_in), ('req_wr_data_in', req_wr_data_in),

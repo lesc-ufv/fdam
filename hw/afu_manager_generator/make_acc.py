@@ -26,8 +26,8 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
     read_data_valid = m.Input('read_data_valid')
     read_queue_id = m.Input('read_queue_id', TAG_WIDTH)
     read_data = m.Input('read_data', DATA_WIDTH)
-    available_write = m.Input('available_write', (NUM_OUTPUT_QUEUES+1))
-    request_write = m.Output('request_write', (NUM_OUTPUT_QUEUES+1))
+    available_write = m.Input('available_write', (NUM_OUTPUT_QUEUES + 1))
+    request_write = m.Output('request_write', (NUM_OUTPUT_QUEUES + 1))
     write_data = m.Output('write_data', EmbeddedCode('(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)*(NUM_OUTPUT_QUEUES+1)'))
     write_data_valid = m.Input('write_data_valid')
     write_queue_id = m.Input('write_queue_id', TAG_WIDTH)
@@ -94,7 +94,7 @@ def make_acc(acc_id, input_queue_controller, output_queue_controller, output_que
            ('acc_user_request_write', acc_user_request_write[idx_out_queue]),
            ('acc_user_write_data',
             acc_user_write_data[(idx_out_queue) * DATA_WIDTH:(idx_out_queue) * DATA_WIDTH + DATA_WIDTH]),
-           ('acc_user_done',acc_user_done),
+           ('acc_user_done', acc_user_done),
            ('done', output_queue_done[idx_out_queue])]
     genOutputQueue = m.GenerateFor(idx_out_queue(0), idx_out_queue < NUM_OUTPUT_QUEUES, idx_out_queue.inc(),
                                    'gen_out_queue_controller')

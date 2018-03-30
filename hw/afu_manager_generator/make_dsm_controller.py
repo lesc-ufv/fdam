@@ -1,5 +1,7 @@
 from veriloggen import *
+
 from make_counter import make_counter
+
 
 def make_dsm_controller(conf_receiver):
     m = Module('dsm_controller')
@@ -130,7 +132,8 @@ def make_dsm_controller(conf_receiver):
         ).Else(
             If(dsm_conf_rd_valid)(
                 dsm_qtd_data_cl(dsm_conf_rd[CONF_ID_QUEUE_WIDTH:CONF_ID_QUEUE_WIDTH + QTD_WIDTH]),
-                dsm_addr_base(dsm_conf_rd[CONF_ID_QUEUE_WIDTH + QTD_WIDTH:CONF_ID_QUEUE_WIDTH + QTD_WIDTH + ADDR_WIDTH]),
+                dsm_addr_base(
+                    dsm_conf_rd[CONF_ID_QUEUE_WIDTH + QTD_WIDTH:CONF_ID_QUEUE_WIDTH + QTD_WIDTH + ADDR_WIDTH]),
                 dsm_conf_ready(Int(1, 1, 2))
             )
         )

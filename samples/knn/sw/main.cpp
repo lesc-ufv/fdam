@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
             data_in[k][i] = new uint16_t[num_data_in];
             data_out[k][i] = new uint16_t[num_data_out];
             for (int j = 0; j < num_data_in; ++j) {
-                data_in[k][i][j] = static_cast<uint16_t>(j + 1);
+                data_in[k][i][j] = static_cast<uint16_t>(k+i+1);
             }
             for (int j = 0; j < num_data_out; ++j) {
                 data_out[k][i][j] = 0;
@@ -44,6 +44,17 @@ int main(int argc, char *argv[]) {
     double thpt = nGbytes / timeExec;
     MSG("Execution Time: " << timeExec * 1000 << "ms");
     MSG("Throughput: " << thpt << "GB/s");
+    for (int k = 0; k < num_copies; ++k) {
+        MSG("ACC " << k << ":");
+        for (int i = 0; i < 4; ++i) {
+            cout << "         OUT "<<i<<":";
+            cout << " [ ";
+            for (int j = 0; j < num_data_out; ++j) {
+                cout << data_out[k][i][j] << " ";
+            }
+            cout <<"]"<< endl;
+        }
+    }
     
     delete[](data_in);
     delete[](data_out);

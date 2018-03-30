@@ -89,7 +89,8 @@ def make_arbiter_controller_rd_req_tree(radix, num_input):
                ('req_wr_en_out', req_wr_en_out), ('req_wr_data_out', req_wr_data_out)]
         if not array[len(array) - 1][0] in mods.keys():
             mods[array[len(array) - 1][0]] = make_arbiter_controller_rd_req(array[len(array) - 1][0])
-        m.Instance(mods[array[len(array) - 1][0]], 'arbiter_controller_rd_req_%d_%d' % (len(array) - 1, 0), m.get_params(),
+        m.Instance(mods[array[len(array) - 1][0]], 'arbiter_controller_rd_req_%d_%d' % (len(array) - 1, 0),
+                   m.get_params(),
                    con)
     return m
 

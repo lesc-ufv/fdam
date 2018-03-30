@@ -89,7 +89,8 @@ def make_arbiter_controller_wr_req_tree(radix, num_input):
                ('req_wr_en_out', req_wr_en_out), ('req_wr_data_out', req_wr_data_out)]
         if not array[len(array) - 1][0] in mods.keys():
             mods[array[len(array) - 1][0]] = make_arbiter_controller_wr_req(array[len(array) - 1][0])
-        m.Instance(mods[array[len(array) - 1][0]], 'arbiter_controller_wr_req_%d_%d' % (len(array) - 1, 0), m.get_params(),
+        m.Instance(mods[array[len(array) - 1][0]], 'arbiter_controller_wr_req_%d_%d' % (len(array) - 1, 0),
+                   m.get_params(),
                    con)
     return m
 
@@ -147,7 +148,7 @@ def make_arbiter_controller_wr_req(num_input):
     in_fifo_we = m.Reg('in_fifo_we', NUM_INPUT)
     in_fifo_din = m.Reg('in_fifo_din', DATA_WIDTH * NUM_INPUT)
     in_fifo_re_count = m.Reg('in_fifo_re_count', 3)
-    fsm_in_fifo_re = m.Reg('fsm_in_fifo_re',2)
+    fsm_in_fifo_re = m.Reg('fsm_in_fifo_re', 2)
     m.EmbeddedCode('')
     in_fifo_re = m.Reg('in_fifo_re', NUM_INPUT)
     in_fifo_re_next = m.Reg('in_fifo_re_next', NUM_INPUT)
@@ -279,7 +280,7 @@ def make_arbiter_controller_wr_req(num_input):
             in_fifo_re(Int(0, NUM_INPUT, 10)),
             in_fifo_re_count(Int(0, 3, 10)),
             fsm_in_fifo_re(Int(0, fsm_in_fifo_re.width, 10)),
-            in_fifo_flag(Int(0,1, 2)),
+            in_fifo_flag(Int(0, 1, 2)),
             in_fifo_re_next(Int(0, NUM_INPUT, 10))
         ).Else(
             Case(fsm_in_fifo_re)(
@@ -289,21 +290,21 @@ def make_arbiter_controller_wr_req(num_input):
                         in_fifo_re_count(in_fifo_re_count + Int(1, 3, 10)),
                         fsm_in_fifo_re(Int(1, 1, 2))
                     ).Elif(in_fifo_flag)(
-                        in_fifo_flag(Int(0,1,2)),
+                        in_fifo_flag(Int(0, 1, 2)),
                         in_fifo_re(in_fifo_re_next),
                         in_fifo_re_count(in_fifo_re_count + Int(1, 3, 10)),
-                        fsm_in_fifo_re(Int(1, 1, 2)) 
+                        fsm_in_fifo_re(Int(1, 1, 2))
                     ).Else(
                         in_fifo_re((Int(0, NUM_INPUT, 10))),
                     )
                 ),
                 When(Int(1, fsm_in_fifo_re.width, 10))(
-                    If(in_fifo_re_count[1]&in_fifo_re_count[0])(
+                    If(in_fifo_re_count[1] & in_fifo_re_count[0])(
                         in_fifo_re_count(Int(0, 3, 10)),
-                        If(AndList(arbiter_grant_valid,Not(in_fifo_re&arbiter_grant)))(
+                        If(AndList(arbiter_grant_valid, Not(in_fifo_re & arbiter_grant)))(
                             fsm_in_fifo_re(Int(0, fsm_in_fifo_re.width, 10)),
                             in_fifo_re_next(arbiter_grant),
-                            in_fifo_flag(Int(1,1,2))
+                            in_fifo_flag(Int(1, 1, 2))
                         ).Else(
                             fsm_in_fifo_re(Int(2, fsm_in_fifo_re.width, 10))
                         )
