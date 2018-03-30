@@ -16,14 +16,14 @@ module SyncAbs
       if(en) begin
         //Stop = 00, Done = 10, Valid = 01
         case(din0[17:16])
-          4'b0: begin
+          2'b0: begin
             dout0 <= 18'd0;
           end
           2'b10: begin
             dout0 <= { 2'd2, 16'd0 };
           end
           2'b1: begin
-            dout0 <= { 2'd1, (din0[15])? ~din0[15:0] + 1 : din0[15:0] };
+            dout0 <= { 2'd1, (din0[15])? ~din0[15:0] + 16'd1 : din0[15:0] };
           end
           default: begin
             dout0 <= 18'd0;
