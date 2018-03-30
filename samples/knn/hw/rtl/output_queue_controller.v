@@ -23,6 +23,7 @@ module output_queue_controller #
   output acc_user_available_write,
   input acc_user_request_write,
   input [DATA_WIDTH-1:0] acc_user_write_data,
+  input acc_user_done,
   output reg done
 );
 
@@ -51,6 +52,7 @@ module output_queue_controller #
   wire conf_rd_valid;
   wire [((ADDR_WIDTH+QTD_WIDTH)+CONF_ID_QUEUE_WIDTH)-1:0] conf_rd;
   wire rst_internal;
+  wire align_write_data;
 
   conf_receiver
   #(
@@ -98,6 +100,7 @@ module output_queue_controller #
   assign issue_req_data = start & conf_ready & ~end_req_rd_data & available_write && ((fifo_almostempty)? ~fifo_empty & ~fifo_re : 1'b1);
   assign acc_user_available_write = ~fifo_almostfull;
   assign write_data_valid_queue = write_data_valid && (write_queue_id == ID_QUEUE);
+  assign align_write_data = fifo_empty && acc_user_done && ~acc_user_request_write && count_req_cl[0] | count_req_cl[1];
 
   always @(posedge clk) begin
     if(rst_internal) begin
@@ -134,7 +137,7 @@ module output_queue_controller #
       if(conf_ready & flag_addr_init) begin
         addr_write_next <= addr_base;
         flag_addr_init <= 1'b0;
-      end else if(fifo_dout_valid) begin
+      end else if(fifo_dout_valid | align_write_data) begin
         addr_write_next <= addr_write_next + 1;
         count_req_cl <= count_req_cl + 1;
       end 
@@ -169,7 +172,7 @@ module output_queue_controller #
     if(rst_internal) begin
       write_peding <= 0;
     end else begin
-      case({ write_data_valid_queue, fifo_dout_valid })
+      case({ write_data_valid_queue, fifo_dout_valid | align_write_data })
         2'd0: begin
           write_peding <= write_peding;
         end
@@ -196,6 +199,9 @@ module output_queue_controller #
       if(fifo_dout_valid) begin
         request_write <= 1'b1;
         write_data <= { fifo_dout, addr_write_next, ID_QUEUE[TAG_WIDTH-1:0] };
+      end else if(align_write_data) begin
+        request_write <= 1'b1;
+        write_data <= { 512'd0, addr_write_next, ID_QUEUE[TAG_WIDTH-1:0] };
       end 
     end
   end

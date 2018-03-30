@@ -119,6 +119,7 @@ module acc_0 #
       .acc_user_available_write(acc_user_available_write[idx_out_queue]),
       .acc_user_request_write(acc_user_request_write[idx_out_queue]),
       .acc_user_write_data(acc_user_write_data[idx_out_queue*DATA_WIDTH+DATA_WIDTH-1:idx_out_queue*DATA_WIDTH]),
+      .acc_user_done(acc_user_done),
       .done(output_queue_done[idx_out_queue])
     );
 
