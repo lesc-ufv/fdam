@@ -132,7 +132,7 @@ def make_acc_management(accs):
             con_out_wire = con_out_wire + (num_out_queue + 1)
 
         ac_in = make_arbiter_controller_rd_req_tree(RADIX, qtd_in_queue)
-        params = [('DATA_WIDTH', ADDR_WIDTH + TAG_WIDTH), ('INPUT_FIFO_DEPTH_BITS', 6), ('OUTPUT_FIFO_DEPTH_BITS', 6)]
+        params = [('DATA_WIDTH', ADDR_WIDTH + TAG_WIDTH), ('INPUT_FIFO_DEPTH_BITS', 10), ('OUTPUT_FIFO_DEPTH_BITS', 10)]
         con = [('clk', clk), ('rst', rst), ('req_wr_en_in', req_rd_en_in), ('req_wr_data_in', req_rd_data_in),
                ('req_wr_available_in', req_rd_available_in), ('req_wr_available_out', req_rd_available_out),
                ('req_wr_en_out', req_rd_en_out), ('req_wr_data_out', req_rd_data_out)]
@@ -140,7 +140,8 @@ def make_acc_management(accs):
 
         ac_out = make_arbiter_controller_wr_req_tree(RADIX, (qtd_out_queue + acc_count))
 
-        params = [('DATA_WIDTH', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)]
+        params = [('DATA_WIDTH', DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH), ('INPUT_FIFO_DEPTH_BITS', 10),
+                  ('OUTPUT_FIFO_DEPTH_BITS', 10)]
         con = [('clk', clk), ('rst', rst), ('req_wr_en_in', req_wr_en_in), ('req_wr_data_in', req_wr_data_in),
                ('req_wr_available_in', req_wr_available_in), ('req_wr_available_out', req_wr_available_out),
                ('req_wr_en_out', req_wr_en_out), ('req_wr_data_out', req_wr_data_out)]

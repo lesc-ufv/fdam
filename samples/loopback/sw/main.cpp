@@ -89,7 +89,7 @@ double loopback(uint16_t ***data_in, uint16_t ***data_out, int num_data_in, int 
     s = high_resolution_clock::now();
 
     accMgr->startAccelerators(accMask);
-    accMgr->waitDone(accMask, 2000);
+    accMgr->waitDone(accMask,0);
 
     diff = high_resolution_clock::now() - s;
 

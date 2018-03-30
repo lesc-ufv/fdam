@@ -34,7 +34,7 @@ def make_output_queue_controller(conf_receiver):
 
     done = m.OutputReg('done')
 
-    FIFO_DEPTH_BITS = m.Localparam('FIFO_DEPTH_BITS', 4)
+    FIFO_DEPTH_BITS = m.Localparam('FIFO_DEPTH_BITS', 10)
     FIFO_FULL = m.Localparam('FIFO_FULL', EmbeddedCode('2 ** FIFO_DEPTH_BITS'))
     CONF_TYPE_OUT_DATA = m.Localparam('CONF_TYPE_OUT_DATA', 2)
 

@@ -34,7 +34,7 @@ def make_input_queue_controller(conf_receiver):
     acc_user_read_data_valid = m.OutputReg('acc_user_read_data_valid')
     done = m.OutputReg('done')
 
-    FIFO_DEPTH_BITS = m.Localparam('FIFO_DEPTH_BITS', 8)
+    FIFO_DEPTH_BITS = m.Localparam('FIFO_DEPTH_BITS', 10)
     FIFO_FULL = m.Localparam('FIFO_FULL', EmbeddedCode('2 ** FIFO_DEPTH_BITS'))
     CONF_TYPE_IN = m.Localparam('CONF_TYPE_IN', 1)
 
