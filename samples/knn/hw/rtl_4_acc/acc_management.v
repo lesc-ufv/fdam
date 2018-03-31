@@ -184,8 +184,8 @@ module acc_management #
   arbiter_controller_rd_req_tree_16
   #(
     .DATA_WIDTH(ADDR_WIDTH + TAG_WIDTH),
-    .INPUT_FIFO_DEPTH_BITS(6),
-    .OUTPUT_FIFO_DEPTH_BITS(6)
+    .INPUT_FIFO_DEPTH_BITS(10),
+    .OUTPUT_FIFO_DEPTH_BITS(10)
   )
   arbiter_controller_rd_req_tree
   (
@@ -202,7 +202,9 @@ module acc_management #
 
   arbiter_controller_wr_req_tree_20
   #(
-    .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH)
+    .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH + TAG_WIDTH),
+    .INPUT_FIFO_DEPTH_BITS(10),
+    .OUTPUT_FIFO_DEPTH_BITS(10)
   )
   arbiter_controller_wr_req_tree
   (

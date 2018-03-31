@@ -34,10 +34,16 @@ module dsm_controller #
   localparam NUM_CL_DSM_TOTAL_ALIGN = $rtoi($ceil(NUM_CL_DSM_TOTAL/4.0)*4.0);
   localparam NUM_CL_DSM_TOTAL_BITS = $rtoi($ceil($clog2(NUM_CL_DSM_TOTAL_ALIGN)));
   localparam CONF_TYPE_OUT_DSM = 3;
+  localparam FSM_DSM_UPDATE_IDLE = 0;
+  localparam FSM_DSM_UPDATE_DELAY = 1;
+  localparam FSM_DSM_UPDATE_WR1 = 2;
+  localparam FSM_DSM_UPDATE_WR2 = 3;
+  localparam FSM_DSM_UPDATE_WAIT_RESP = 4;
+  reg [7-1:0] count_dsm_delay;
   reg [DATA_WIDTH-1:0] dsm_data [0:NUM_CL_DSM_TOTAL-1];
   reg [DATA_WIDTH-1:0] done;
   reg [DATA_WIDTH-1:0] done_last;
-  reg [2-1:0] fsm_update_dsm;
+  reg [3-1:0] fsm_update_dsm;
   reg [NUM_CL_DSM_TOTAL_BITS+1-1:0] acc_req_wr_count;
   reg update_dsm;
   reg [NUM_CL_DSM_TOTAL_BITS+1-1:0] dsm_count_cl;
@@ -188,28 +194,37 @@ module dsm_controller #
   always @(posedge clk) begin
     if(dsm_rst_internal) begin
       request_write <= 1'b0;
-      fsm_update_dsm <= 2'd0;
+      fsm_update_dsm <= FSM_DSM_UPDATE_IDLE;
       done_last <= 0;
       acc_req_wr_count <= 0;
       write_data <= 0;
       dsm_addr_write_next <= 0;
       flag_send_done <= 1'b0;
       reset_dsm_count_cl <= 1'b0;
+      count_dsm_delay <= 7'd0;
     end else begin
       if(start) begin
         request_write <= 1'b0;
         reset_dsm_count_cl <= 1'b0;
         case(fsm_update_dsm)
-          2'd0: begin
+          FSM_DSM_UPDATE_IDLE: begin
             if(update_dsm & dsm_conf_ready) begin
-              done_last <= done;
-              fsm_update_dsm <= 2'd1;
               acc_req_wr_count <= 0;
               dsm_addr_write_next <= dsm_addr_base;
               flag_send_done <= 1'b0;
+              fsm_update_dsm <= FSM_DSM_UPDATE_DELAY;
             end 
           end
-          2'd1: begin
+          FSM_DSM_UPDATE_DELAY: begin
+            if(count_dsm_delay[6]) begin
+              done_last <= done;
+              count_dsm_delay[6] <= 1'b0;
+              fsm_update_dsm <= FSM_DSM_UPDATE_WR1;
+            end else begin
+              count_dsm_delay <= count_dsm_delay + 7'd1;
+            end
+          end
+          FSM_DSM_UPDATE_WR1: begin
             if(available_write) begin
               request_write <= 1'b1;
               write_data <= { dsm_data[acc_req_wr_count], dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
@@ -217,10 +232,10 @@ module dsm_controller #
               dsm_addr_write_next <= dsm_addr_write_next + 1;
             end 
             if(acc_req_wr_count == NUM_CL_DSM_TOTAL - 1) begin
-              fsm_update_dsm <= 2'd2;
+              fsm_update_dsm <= FSM_DSM_UPDATE_WR2;
             end 
           end
-          2'd2: begin
+          FSM_DSM_UPDATE_WR2: begin
             if(flag_send_done) begin
               write_data <= { done_last, dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
             end else begin
@@ -232,19 +247,19 @@ module dsm_controller #
               dsm_addr_write_next <= dsm_addr_write_next + 1;
             end 
             if(acc_req_wr_count == NUM_CL_DSM_TOTAL_ALIGN - 1) begin
-              fsm_update_dsm <= 2'd3;
+              fsm_update_dsm <= FSM_DSM_UPDATE_WAIT_RESP;
             end 
           end
-          2'd3: begin
+          FSM_DSM_UPDATE_WAIT_RESP: begin
             if(dsm_count_cl == NUM_CL_DSM_TOTAL_ALIGN) begin
               reset_dsm_count_cl <= 1'b1;
               if(flag_send_done) begin
-                fsm_update_dsm <= 2'd0;
+                fsm_update_dsm <= FSM_DSM_UPDATE_IDLE;
               end else begin
                 dsm_addr_write_next <= dsm_addr_base;
                 acc_req_wr_count <= 0;
-                fsm_update_dsm <= 2'd1;
                 flag_send_done <= 1'b1;
+                fsm_update_dsm <= FSM_DSM_UPDATE_WR1;
               end
             end 
           end
