@@ -302,7 +302,22 @@ accid_t Accelerator::getId() const {
 }
 
 void Accelerator::printInf() {
-
+    auto dsmNumCL = Accelerator::Accelerator::getDsmSize() / 64;
+    auto * dsm = static_cast<uint32_t *>(Accelerator::getDsm());
+    MSG("ACC " << Accelerator::getId() << " DSM:");
+    for (int i = 0; i < dsmNumCL-1; ++i) {
+        cout << "  [APP]  ";
+        for (int j = 15; j >= 0; --j) {
+            cout << dsm[GET_INDEX(i, j, 16)] << " ";
+        }
+        cout << endl;
+    }
+    cout << "  [APP]  ";
+    for (int j = 15; j >= 0; --j) {
+        cout << std::hex << dsm[GET_INDEX(dsmNumCL-1, j, 16)] << " ";
+    }
+    cout << endl;
+    
 }
 
 void Accelerator::clear() {

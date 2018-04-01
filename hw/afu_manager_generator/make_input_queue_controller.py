@@ -82,9 +82,9 @@ def make_input_queue_controller(conf_receiver):
     m.Instance(fifo, 'fifo', params, con)
 
     end_req_rd_data.assign((count_req_cl < qtd_data_cl))
-    end_req_rd_data_next.assign(((count_req_cl + 8) < qtd_data_cl))
+    end_req_rd_data_next.assign(((count_req_cl + 12) < qtd_data_cl))
     acc_user_available_read.assign(Mux(fifo_almostempty, ~fifo_empty & ~acc_user_request_read, Int(1, 1, 2))),
-    fifo_fit.assign(read_peding < FIFO_FULL - 8)
+    fifo_fit.assign(read_peding < FIFO_FULL - 12)
     read_data_valid_queue.assign(AndList(read_data_valid, read_queue_id == ID_QUEUE))
 
     m.Always(Posedge(clk))(

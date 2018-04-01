@@ -6,6 +6,7 @@
 using namespace std;
 using namespace std::chrono;
 
+#define DEBUG FALSE
 
 double loopback(uint16_t ***data_in, uint16_t ***data_out, int num_data_in, int num_data_out);
 
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
     double thpt = nGbytes / timeExec;
     MSG("Execution Time: " << timeExec * 1000 << "ms");
     MSG("Throughput: " << thpt << "GB/s");
+#if DEBUG
     for (int k = 0; k < num_copies; ++k) {
         cout << "ACC " << k << ":" << endl;
         for (int i = 0; i < num_queues; ++i) {
@@ -64,6 +66,7 @@ int main(int argc, char *argv[]) {
             cout << endl;
         }
     }
+#endif
     
     delete[](data_in);
     delete[](data_out);
