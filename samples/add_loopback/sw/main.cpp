@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         }
     }
     double timeExec = loopback(data_in, data_out, num_data_in, num_data_out);
-    double nBytes = (num_data_in + num_data_out) * sizeof(uint16_t);
+    double nBytes = (num_data_in + num_data_out) * num_queues * sizeof(uint16_t);
     double nGbytes = nBytes / (1 << 30);
     double thpt = nGbytes / timeExec;
     MSG("Execution Time: " << timeExec * 1000 << "ms");
