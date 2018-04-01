@@ -50,13 +50,13 @@ int main(int argc, char *argv[]) {
     MSG("Execution Time: " << timeExec * 1000 << "ms");
     MSG("Throughput: " << thpt << "GB/s");
     for (int k = 0; k < num_copies; ++k) {
-        cout << "ACC " << k << ":" << endl;
         for (int i = 0; i < num_queues; ++i) {
-            cout << endl << "     ";
             for (int j = 0; j < num_data_out; ++j) {
-                cout << data_out[k][i][j] << " ";
+                if(data_out[k][i][j] != data_in[k][i][j]){
+                  MSG("Error: ACC " << k << " Queue " << i << ": " << data_out[k][i][j] << " != "<< data_in[k][i][j]);
+                  break;
+                }
             }
-            cout << endl;
         }
     }
     

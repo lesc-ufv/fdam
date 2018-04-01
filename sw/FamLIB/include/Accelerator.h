@@ -30,8 +30,6 @@ private:
 
     size_t *sizeOfOutputQueues;
 
-private:
-
     void createDsm();
 
     void *getDsm() const;

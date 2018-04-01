@@ -10,7 +10,6 @@
 #include <csr_mgr.h>
 #include <AccManagementDEFS.h>
 #include <Accelerator.h>
-#include <vector>
 
 using namespace std;
 
@@ -31,8 +30,6 @@ private:
     int numAccelerators;
 
     std::map<accid_t ,Accelerator *> accelerators;
-
-private:
 
     void createAccelerators();
 
