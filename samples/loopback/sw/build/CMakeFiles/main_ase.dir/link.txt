@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/main_ase.dir/main.cpp.o  -o main_ase  -L/home/lucas/Documentos/afu-manager/samples/loopback/sw/../../../sw/FamLIB/build -Wl,-rpath,/home/lucas/Documentos/afu-manager/samples/loopback/sw/../../../sw/FamLIB/build:/usr/local/lib -lfam /usr/local/lib/libopae-c-ase.so /usr/lib64/libuuid.so /usr/local/lib/libMPF.so 

@@ -1,0 +1,4 @@
+/home/lucas/Documentos/afu-manager/samples/loopback/sw/build/CMakeFiles/rebuild_cache.dir
+/home/lucas/Documentos/afu-manager/samples/loopback/sw/build/CMakeFiles/main_ase.dir
+/home/lucas/Documentos/afu-manager/samples/loopback/sw/build/CMakeFiles/edit_cache.dir
+/home/lucas/Documentos/afu-manager/samples/loopback/sw/build/CMakeFiles/main.dir

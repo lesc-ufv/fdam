@@ -14,6 +14,12 @@ int main(int argc, char *argv[]) {
     int num_data_out = 0;
     int num_copies = 0;
     int num_queues = 0;
+    double timeExec = 0;
+    double nBytes = 0;
+    double nGbytes = 0;
+    double thpt =0;
+    int cont = 1;
+    
     if (argc > 3) {
         num_copies = atoi(argv[1]);
         num_queues = atoi(argv[2]);
@@ -25,30 +31,30 @@ int main(int argc, char *argv[]) {
         exit(255);
     }
 
-    auto ***data_in = new uint16_t **[num_copies];
-    auto ***data_out = new uint16_t **[num_copies];
-    int cont = 1;
+    auto ***data_in = (uint16_t ***) malloc(sizeof(uint16_t**)*num_copies);
+    auto ***data_out = (uint16_t ***) malloc(sizeof(uint16_t**)*num_copies);
+   
     for (int k = 0; k < num_copies; ++k) {
-        data_in[k] = new uint16_t *[num_copies];
-        data_out[k] = new uint16_t *[num_copies];
+        data_in[k] = (uint16_t **) malloc(sizeof(uint16_t*)*num_queues);
+        data_out[k] = (uint16_t **) malloc(sizeof(uint16_t*)*num_queues);
         for (int i = 0; i < num_queues; ++i) {
-            data_in[k][i] = new uint16_t[num_data_in];
-            data_out[k][i] = new uint16_t[num_data_out];
+            data_in[k][i] = (uint16_t *) malloc(sizeof(uint16_t)*num_data_in);
+            data_out[k][i] = (uint16_t *) malloc(sizeof(uint16_t)*num_data_out);   
             for (int j = 0; j < num_data_in; ++j) {
-                data_in[k][i][j] = static_cast<uint16_t>(cont);
-            }
-            for (int j = 0; j < num_data_out; ++j) {
-                data_out[k][i][j] = 0;
+               data_in[k][i][j] = cont;
             }
             cont++;
-        }
+        }  
     }
-    double timeExec = loopback(data_in, data_out, num_data_in, num_data_out);
-    double nBytes = (num_data_in + num_data_out) * sizeof(uint16_t);
-    double nGbytes = nBytes / (1 << 30);
-    double thpt = nGbytes / timeExec;
+
+    timeExec = loopback(data_in, data_out, num_data_in, num_data_out);
+    nBytes = (num_data_in + num_data_out) * num_copies * num_queues * sizeof(uint16_t);
+    nGbytes = nBytes / (1 << 30);
+    thpt = nGbytes / timeExec;
+    
     MSG("Execution Time: " << timeExec * 1000 << "ms");
     MSG("Throughput: " << thpt << "GB/s");
+    
     for (int k = 0; k < num_copies; ++k) {
         for (int i = 0; i < num_queues; ++i) {
             for (int j = 0; j < num_data_out; ++j) {
@@ -60,8 +66,18 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    delete[](data_in);
-    delete[](data_out);
+    for (int k = 0; k < num_copies; ++k) {
+        for (int i = 0; i < num_queues; ++i) {   
+            free(data_in[k][i]);
+            free(data_out[k][i]);
+        }  
+    }
+    for (int k = 0; k < num_copies; ++k) {
+        free(data_in[k]);
+        free(data_out[k]);
+    }
+    free(data_in);
+    free(data_out);
 
     return 0;
 }
@@ -76,7 +92,7 @@ double loopback(uint16_t ***data_in, uint16_t ***data_out, int num_data_in, int 
         auto nIn = acc->getNumInputQueue();
         auto nOut = acc->getNumOutputQueue();
         for (short j = 0; j < nIn; ++j) {
-            acc->createInputQueue(static_cast<uint8_t>(j), numBytesIn, data_in[acc->getId()][j]);
+            acc->createInputQueue(static_cast<uint8_t>(j), numBytesIn, data_in[acc->getId()][j]); 
         }
         for (short j = 0; j < nOut; ++j) {
             acc->createOutputQueue(static_cast<uint8_t>(j), numBytesOut);

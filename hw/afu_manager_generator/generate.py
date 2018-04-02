@@ -1,6 +1,6 @@
 from make_acc_management import make_acc_management
 
-acc_array = [(1,1)]
+acc_array = [(8,8)]
 
 acc_management = make_acc_management(acc_array)
 
