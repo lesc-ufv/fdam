@@ -17,7 +17,8 @@ module AsyncOut
   reg [3-1:0] fsm_main;
   localparam FSM_IDLE = 3'd0;
   localparam FSM_WAIT = 3'd1;
-  localparam FSM_DONE = 3'd2;
+  localparam FSM_FINALIZE = 3'd2;
+  localparam FSM_DONE = 3'd3;
   reg [512-1:0] data;
   reg [6-1:0] counter;
 
@@ -38,15 +39,12 @@ module AsyncOut
               ackl0 <= 1'b1;
               case(din0[33:32])
                 2'b10: begin
-                  if(counter == 6'd15) begin
-                    counter <= 6'd0;
-                    wr_data <= { din0[31:0], data[511:32] };
-                    wr_en <= 1'b1;
+                  ackl0 <= 1'b0;
+                  if(counter == 0) begin
+                    ackl0 <= 1'b1;
                     fsm_main <= FSM_DONE;
                   end else begin
-                    counter <= counter + 6'd1;
-                    data <= { 32'd0, data[511:32] };
-                    ackl0 <= 1'b0;
+                    fsm_main <= FSM_FINALIZE;
                   end
                 end
                 2'b1: begin
@@ -69,6 +67,18 @@ module AsyncOut
               ackl0 <= 1'b0;
               fsm_main <= FSM_IDLE;
             end 
+          end
+          FSM_FINALIZE: begin
+            if(counter == 6'd15) begin
+              ackl0 <= 1'b1;
+              wr_data <= { din0[31:0], data[511:32] };
+              wr_en <= 1'b1;
+              fsm_main <= FSM_DONE;
+            end else begin
+              counter <= counter + 6'd1;
+              data <= { 32'd0, data[511:32] };
+              ackl0 <= 1'b0;
+            end
           end
           FSM_DONE: begin
             if(!reql0) begin

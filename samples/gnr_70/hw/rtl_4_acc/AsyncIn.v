@@ -37,7 +37,7 @@ module AsyncIn
             if(rd_available) begin
               rd_en <= 1'b1;
               fsm_main <= FSM_READ;
-            end else if(rd_done) begin
+            end else if(rd_done && !ackr0) begin
               dout0 <= { 2'b10, 32'd0 };
               reqr0 <= 1'b1;
               fsm_main <= FSM_DONE;
@@ -62,7 +62,7 @@ module AsyncIn
           FSM_WAIT_ACK: begin
             if(ackr0) begin
               reqr0 <= 1'b0;
-              if(counter >= 16) begin
+              if(counter >= 6'd16) begin
                 fsm_main <= FSM_IDLE;
               end else begin
                 fsm_main <= FSM_DATA_OUT;

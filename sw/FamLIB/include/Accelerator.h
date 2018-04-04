@@ -104,7 +104,7 @@ public:
 
     accid_t getId() const;
 
-    void printInf();
+    void printInfo();
 
     void clear();
 

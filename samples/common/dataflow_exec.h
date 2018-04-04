@@ -5,12 +5,12 @@
 #define DATAFLOW_EXEC_H
 
 #include <chrono>
-#include <AFUManager.h>
+#include <AccManagement.h>
 
 using namespace std;
 using namespace std::chrono;
 
-double dataflow_exec(int ** constants, int num_constants ,unsigned short **data_in, int num_data_in,unsigned short **data_out, int num_data_out, int num_copies, bool printAFUStatus);
+double dataflow_exec(int ** constants, int num_constants ,uint16_t **data_in, int num_data_in,uint16_t **data_out, int num_data_out, int num_copies, bool printAccStatus);
 
 
 

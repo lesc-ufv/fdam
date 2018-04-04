@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstring>
-#include<dataflow_exec.h>
+#include <dataflow_exec.h>
 
 using namespace std;
 
@@ -50,22 +50,24 @@ int main(int argc, char *argv[]){
         for (int j = 0; j < num_constants; j++){
             fir_const[i][j] = constants[j];
         }
-    }
+   }
 
-   double time_exec =  dataflow_exec(fir_const,num_constants,data_in,num_data_in,data_out,num_data_out,num_copies,true);
-
+   double timeExec =  dataflow_exec(fir_const,num_constants,data_in,num_data_in,data_out,num_data_out,num_copies,true);
+   double nBytes = (num_data_in + num_data_out) * num_copies * sizeof(uint16_t);
+   double nGbytes = nBytes / (1 << 30);
+   double thpt = nGbytes / timeExec;
+   MSG("Execution Time: " << timeExec * 1000 << "ms");
+   MSG("Throughput: " << thpt << "GB/s");
     
-    MSG("Execution Time: " << time_exec << "ms");
-
-    for (int i = 0; i < num_copies; i++){
+   for (int i = 0; i < num_copies; i++){
         for (int j = 0; j < num_data_out; j++){
             if(data_out[i][j] != 272){
-                MSG("AFU " << i << " Fir16 error: "<< data_out[i][j] << " != 272");
+                MSG("Acc " << i << " Fir16 error: "<< data_out[i][j] << " != 272");
                 flag_error = true;
             }
         }
         if(!flag_error){
-            MSG("AFU "<< i << ": Fir16 success!");
+            MSG("Acc "<< i << ": Fir16 success!");
         }
 
     }

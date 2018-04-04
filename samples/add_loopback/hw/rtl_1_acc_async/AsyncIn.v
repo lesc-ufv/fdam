@@ -37,7 +37,7 @@ module AsyncIn
             if(rd_available) begin
               rd_en <= 1'b1;
               fsm_main <= FSM_READ;
-            end else if(rd_done) begin
+            end else if(rd_done && !ackr0) begin
               dout0 <= { 2'b10, 32'd0 };
               reqr0 <= 1'b1;
               fsm_main <= FSM_DONE;

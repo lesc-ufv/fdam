@@ -45,22 +45,24 @@ int main(int argc, char *argv[]){
         }
     }
 
-    double time_exec = dataflow_exec(gourand_const,num_constants,data_in,num_data_in,data_out,num_data_out,num_copies,true);
-
-    MSG("Execution Time: " << time_exec<< "ms");
+    double timeExec = dataflow_exec(gourand_const,num_constants,data_in,num_data_in,data_out,num_data_out,num_copies,true);
+    double nBytes = (num_data_in + num_data_out) * num_copies * sizeof(uint16_t);
+    double nGbytes = nBytes / (1 << 30);
+    double thpt = nGbytes / timeExec;
+    MSG("Execution Time: " << timeExec * 1000 << "ms");
+    MSG("Throughput: " << thpt << "GB/s");
 
     for (int i = 0; i < num_copies; i++){
         flag_error = false;
         for (int j = 0; j < num_data_out-1; j+=2){
             if(data_out[i][j] != 4228 || data_out[i][j+1] != 4096){
-                cout << data_out[i][j] << " "<< data_out[i][j+1] << " ";
-                MSG("AFU "<< i << ": Gourand error: "<< data_out[i][j] << " != 4228 || " << data_out[i][j+1] << " != 4096" );
+                MSG("Acc "<< i << ": Gourand error: "<< data_out[i][j] << " != 4228 || " << data_out[i][j+1] << " != 4096" );
                 flag_error = true;
                 break;
             }
         }
         if(!flag_error){
-            MSG("AFU " << i << ": Gourand success!");
+            MSG("Acc " << i << ": Gourand success!");
         }
     }
     return 0;

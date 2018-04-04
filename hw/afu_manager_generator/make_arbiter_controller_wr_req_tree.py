@@ -134,7 +134,7 @@ def make_arbiter_controller_wr_req(num_input):
     IN_FIFO_ALMOSTEMPTY_THRESHOLD = m.Localparam('IN_FIFO_ALMOSTEMPTY_THRESHOLD', 4)
     m.EmbeddedCode('')
     OUT_FIFO_ALMOSTFULL_THRESHOLD = m.Localparam('OUT_FIFO_ALMOSTFULL_THRESHOLD',
-                                                 EmbeddedCode('2 ** OUTPUT_FIFO_DEPTH_BITS - 8'))
+                                                 EmbeddedCode('2 ** OUTPUT_FIFO_DEPTH_BITS - 12'))
     OUT_FIFO_ALMOSTEMPTY_THRESHOLD = m.Localparam('OUT_FIFO_ALMOSTEMPTY_THRESHOLD', 2)
     m.EmbeddedCode('')
     in_fifo_empty = m.Wire('in_fifo_empty', NUM_INPUT)

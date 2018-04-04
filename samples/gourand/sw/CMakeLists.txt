@@ -7,11 +7,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 #Descomentar a linha abaixo para compilar no harp2
 #set(CMAKE_PREFIX_PATH "/upb/departments/pc2/users/h/h2lucas/usr/local")
-set(LIB_AFU_MGR "${CMAKE_SOURCE_DIR}/../../../sw/AFUManagerLIB/build/libafumanager.a")
+set(FAM_LIB_DIR "${CMAKE_SOURCE_DIR}/../../../sw/FamLIB")
+set(FAM_LIB "${FAM_LIB_DIR}/build/libfam.so")
 
 include_directories(
 	"${CMAKE_PREFIX_PATH}/include"
-	"${CMAKE_SOURCE_DIR}/../../../sw/AFUManagerLIB/include"
+	"${FAM_LIB_DIR}/include"
 	"${CMAKE_SOURCE_DIR}/../../common"
 )
 find_library(LIB_OPAE
@@ -29,5 +30,5 @@ find_library(LIB_MPF
 
 add_executable(main_ase main.cpp  ${CMAKE_SOURCE_DIR}/../../common/dataflow_exec.cpp)
 add_executable(main main.cpp ${CMAKE_SOURCE_DIR}/../../common/dataflow_exec.cpp)
-target_link_libraries(main_ase  ${LIB_AFU_MGR}  ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
-target_link_libraries(main ${LIB_AFU_MGR} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
+target_link_libraries(main_ase  ${FAM_LIB}  ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
+target_link_libraries(main ${FAM_LIB} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})

@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC   -shared -Wl,-soname,libfam.so -o libfam.so CMakeFiles/fam.dir/lib/AccManagement.cpp.o CMakeFiles/fam.dir/lib/Accelerator.cpp.o CMakeFiles/fam.dir/lib/opae_svc_wrapper.cpp.o 

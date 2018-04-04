@@ -301,23 +301,40 @@ accid_t Accelerator::getId() const {
     return Accelerator::id;
 }
 
-void Accelerator::printInf() {
+void Accelerator::printInfo() {
     auto dsmNumCL = Accelerator::Accelerator::getDsmSize() / 64;
-    auto * dsm = static_cast<uint32_t *>(Accelerator::getDsm());
-    MSG("ACC " << Accelerator::getId() << " DSM:");
-    for (int i = 0; i < dsmNumCL-1; ++i) {
-        cout << "  [APP]  ";
-        for (int j = 15; j >= 0; --j) {
-            cout << dsm[GET_INDEX(i, j, 16)] << " ";
+    auto *dsm = static_cast<uint32_t *>(Accelerator::getDsm());
+    int numIn = Accelerator::getNumInputQueue();
+    int numOut = Accelerator::getNumOutputQueue();
+    int id = Accelerator::getId();
+    int offset = static_cast<int>(std::ceil(numIn / 16.0))*16;
+    MSG("INFO Accelerator:");
+    MSG("ID: " << id);
+    MSG("Amount of input queues: " << numIn);
+    MSG("Amount of output queues: " << numOut);
+    if (Accelerator::isDone()) {
+        MSG("Status: Done");
+    } else {
+        MSG("Status: Not done");
+    }
+    MSG("INFO Input Queues:");
+    for (uint8_t i = 0; i < numIn; i++) {
+        if (Accelerator::isDoneInputQueue(i)) {
+            MSG("Queue ID: " << static_cast<int >(i) << ", State: Done, Bytes read: "<< dsm[i] * 64);
+        } else {
+            MSG("Queue ID: " << static_cast<int >(i) << ", State: Not done, Bytes read: "<< dsm[i] * 64);
         }
-        cout << endl;
+
     }
-    cout << "  [APP]  ";
-    for (int j = 15; j >= 0; --j) {
-        cout << std::hex << dsm[GET_INDEX(dsmNumCL-1, j, 16)] << " ";
+    MSG("INFO Output Queues:");
+    for (uint8_t i = 0; i < numOut; i++) {
+        if(Accelerator::isDoneOutputQueue(i)){
+            MSG("Queue ID: " << static_cast<int >(i) << " State: Done, Written bytes: " << dsm[i + offset] * 64);
+        }else{
+            MSG("Queue ID: " << static_cast<int >(i) << " State: Not done, Written bytes: " << dsm[i + offset] * 64);
+        }
+
     }
-    cout << endl;
-    
 }
 
 void Accelerator::clear() {

@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
     
     int num_data_in = 5;
     int num_data_out = 1024;
-    int num_copies = 1;
+    int num_copies = 4;
     int num_queues = 1;
     
     uint32_t vet_data_in[] = {0x0,0x0,0xff80,0x0,0x0};
@@ -96,7 +96,7 @@ double gnr(uint32_t ***data_in, uint32_t ***data_out, int num_data_in, int num_d
         } else {
             MSG("ACC " << acc->getId() << " NOT DONE!");
         }
-        acc->printInf();
+        acc->printInfo();
     }
 
     accMgr->printHwInfo();

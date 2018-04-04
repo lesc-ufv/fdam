@@ -111,7 +111,7 @@ double loopback(uint16_t ***data_in, uint16_t ***data_out, int num_data_in, int 
         } else {
             MSG("ACC " << acc->getId() << " NOT DONE!");
         }
-        acc->printInf();
+        acc->printInfo();
     }
 
     accMgr->printHwInfo();

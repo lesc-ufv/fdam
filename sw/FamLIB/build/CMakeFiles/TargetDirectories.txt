@@ -1,3 +1,0 @@
-/home/lucas/Documentos/afu-manager/sw/FamLIB/build/CMakeFiles/rebuild_cache.dir
-/home/lucas/Documentos/afu-manager/sw/FamLIB/build/CMakeFiles/fam.dir
-/home/lucas/Documentos/afu-manager/sw/FamLIB/build/CMakeFiles/edit_cache.dir

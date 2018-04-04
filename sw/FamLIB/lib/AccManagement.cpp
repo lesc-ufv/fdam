@@ -138,8 +138,8 @@ void AccManagement::printHwInfo() {
     MSG("INFO: Total number of input queues: " << AccManagement::getNumInputQueue());
     MSG("INFO: Total number of output queues: " << AccManagement::getNumOutputQueue());
     MSG("INFO: Total clock: " << totalClocks);
-    MSG("INFO: Total read bytes: " << totalClRead*64);
-    MSG("INFO: Total write bytes: " << totalClWrite*64);
+    MSG("INFO: Total bytes read: " << totalClRead*64);
+    MSG("INFO: Total written bytes: " << totalClWrite*64);
     MSG("INFO: Approximate throughput: " << throughput << "MB/s");
     if (mpfVtpIsAvailable(AccManagement::fpga->mpf_handle)) {
         mpf_vtp_stats vtp_stats{};
