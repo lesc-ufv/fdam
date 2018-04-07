@@ -105,14 +105,15 @@ def make_acc_management(accs):
         for num_in_queue, num_out_queue in accs:
             acc = make_acc(acc_id, input_queue_controller, output_queue_controller, output_queue_controller_dsm,
                            dsm_controller_accs)
-            range1 = '%d*(%d*(ADDR_WIDTH+TAG_WIDTH)+(ADDR_WIDTH+TAG_WIDTH))-1:%d*(%d*(ADDR_WIDTH+TAG_WIDTH))' % (
-                num_in_queue, acc_id, num_in_queue, acc_id)
-            range2 = '%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH)+(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))-1:%d*(%d*(DATA_WIDTH+ADDR_WIDTH + TAG_WIDTH))' % (
-                (num_out_queue + 1), acc_id, (num_out_queue + 1), acc_id)
+            range1 = '%d*(ADDR_WIDTH+TAG_WIDTH)-1:%d*(ADDR_WIDTH+TAG_WIDTH)' % (
+            ini_in_queue_id + num_in_queue, ini_in_queue_id)
+            range2 = '%d*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:%d*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)' % (
+            con_out_wire + num_out_queue + 1, con_out_wire)
             params = [('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH), ('DATA_WIDTH', DATA_WIDTH),
                       ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('INITIAL_INPUT_QUEUE_ID', ini_in_queue_id),
                       ('INITIAL_OUTPUT_QUEUE_ID', ini_out_queue_id), ('NUM_INPUT_QUEUES', num_in_queue),
                       ('NUM_OUTPUT_QUEUES', num_out_queue), ('TAG_WIDTH', TAG_WIDTH)]
+
             con = [('clk', clk), ('rst', rst | rst_accs[acc_id]), ('start', start_accs[acc_id]),
                    ('conf_valid', conf_valid), ('conf', conf[0:(ADDR_WIDTH + QTD_WIDTH + CONF_ID_QUEUE_WIDTH)]),
                    ('available_read', req_rd_available_in[ini_in_queue_id:ini_in_queue_id + num_in_queue]),

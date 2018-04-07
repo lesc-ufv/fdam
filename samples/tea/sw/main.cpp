@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     int num_copies = 0;
     if (argc > 2) {
         num_copies = atoi(argv[1]);
-        num_data_in = (CL(1) / sizeof(uint16_t)) * atoi(argv[2]);
+        num_data_in = (CL(1) / sizeof(uint32_t)) * atoi(argv[2]);
     } else {
         cout << "invalid args!!!" << endl;
         cout << "usage: <num copies> <num cache lines>" << endl;
@@ -106,7 +106,7 @@ double tea(uint32_t ***data_in, uint32_t ***data_out, int num_data_in, int num_d
         } else {
             MSG("ACC " << acc->getId() << " NOT DONE!");
         }
-        acc->printInf();
+        acc->printInfo();
     }
 
     accMgr->printHwInfo();

@@ -1,6 +1,6 @@
 from make_acc_management import make_acc_management
 
-acc_array = [(1,1)]
+acc_array = [(2,2),(2,2),(1,1),(1,1)]
 
 acc_management = make_acc_management(acc_array)
 

@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/main_ase.dir/main.cpp.o  -o main_ase -Wl,-rpath,/home/lucas/Documentos/afu-manager/samples/gnr_70/sw/../../../sw/FamLIB/build:/usr/local/lib ../../../../sw/FamLIB/build/libfam.so /usr/local/lib/libopae-c-ase.so /usr/lib64/libuuid.so /usr/local/lib/libMPF.so 
