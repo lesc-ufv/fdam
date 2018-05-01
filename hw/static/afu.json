@@ -9,7 +9,7 @@
       "accelerator-clusters":
          [
             {
-               "name": "07_loopback_1x1",
+               "name": "acc_management",
                "total-contexts": 1,
                "accelerator-type-uuid": "9f81ba12-1d38-4cc7-953a-dafeef45065b"
             }

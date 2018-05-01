@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -Wall -fPIC  -shared -Wl,-soname,libfam.so -o libfam.so CMakeFiles/fam.dir/src/AccManagement.cpp.o CMakeFiles/fam.dir/src/Accelerator.cpp.o CMakeFiles/fam.dir/src/opae_svc_wrapper.cpp.o -Wl,-rpath,/opt/intelFPGA/opae-sdk/install/lib64:/usr/local/lib: /opt/intelFPGA/opae-sdk/install/lib64/libopae-c.so /usr/lib64/libuuid.so /usr/local/lib/libMPF.so 
