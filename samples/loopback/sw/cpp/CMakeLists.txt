@@ -16,8 +16,10 @@ find_library(LIB_OPAE_ASE NAMES opae-c-ase)
 find_library(LIB_UUID NAMES uuid)
 find_library(LIB_MPF NAMES MPF)
 
-add_executable(main_ase main.cpp)
-add_executable(main main.cpp)
+set(CPP_SRCS ${CMAKE_SOURCE_DIR}/src/Loopback.cpp)
+
+add_executable(main_ase ${CPP_SRCS})
+add_executable(main ${CPP_SRCS})
 
 target_link_libraries(main_ase ${FAM_LIB_ASE} ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
 target_link_libraries(main ${FAM_LIB} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})

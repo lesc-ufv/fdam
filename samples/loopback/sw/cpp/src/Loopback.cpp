@@ -47,13 +47,14 @@ int main(int argc, char *argv[]) {
    acc.printInfo();
 
    acc.copyFromOutputQueue(0,out,sizeof(uint32_t)*n);
-   /*
-   cout << endl;
-   for(int i = 0;i < n/2;i++){
-        cout << out[i] << " ";
+ 
+   for(int i = 0;i < n;i++){
+       if(in[i] != out[i]){
+          MSG("Loopback error at " << i << " position, expect "<< in[i] << " found "<<out[i]);
+          break;   
+       }
    }
-   cout << endl;
-   */
+    
    accMgr->printHwInfo();
    
    diff = high_resolution_clock::now() - s;
@@ -70,5 +71,4 @@ int main(int argc, char *argv[]) {
    delete accMgr;
 
 }
-
 
