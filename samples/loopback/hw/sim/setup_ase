@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm -rf ase_sim
+$FAM_BASEDIR/hw/fam-generator/scripts/update_sources.py
+afu_sim_setup --sources=sources.txt afu_sim

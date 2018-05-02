@@ -1,0 +1,5 @@
+#!/bin/sh
+
+rm -rf fam_synth
+$FAM_BASEDIR/hw/fam-generator/scripts/update_sources.py
+afu_synth_setup  -s sources.txt --lib $AALSDK_BASEDIR/hw/lib afu_synth

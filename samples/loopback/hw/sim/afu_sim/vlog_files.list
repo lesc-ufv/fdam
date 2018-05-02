@@ -1,0 +1,22 @@
++define+MPF_PLATFORM_BDX
++incdir+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl
+-F /home/lucas/Documentos/acc-management-repo/hw/static/base_addenda.txt
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/arbiter_controller_wr_req_tree_2.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/fifo.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/select_top_1.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/arbiter.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/select_top_2.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/acc_management.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/select_1.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/select_2.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/acc_0.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/output_queue_controller.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/dsm_controller.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/arbiter_controller_rd_req_1.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/conf_receiver.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/acc_counter.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/priority_encoder.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/arbiter_controller_wr_req_2.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/input_queue_controller.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/fam_gen/arbiter_controller_rd_req_tree_1.v
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/rtl/acc0/acc_user_0.v

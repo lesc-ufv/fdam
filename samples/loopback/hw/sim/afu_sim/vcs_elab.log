@@ -1,0 +1,221 @@
+Note: Bumping stack limit from 8192 to 65536 Kbytes.
+Command: vcs -nc -V +vcs+lic+wait -full64 -debug_pp -Mupdate -lca -j 4 -l vcs_elab.log \
++vhdllib+work -Mlib=work +lint=TFIPC-L -override_timescale=1ps/1ps -o work/ase_simv \
+ase_top work/ase_libs.so -lrt -lpthread
+/opt/synopsys/vcs/linux64/bin/comelab -nc -unielab -nc -verbose -lca -output vcs_elab.log -override_timescale 1ps/1ps -exe work/ase_simv -picarchive -debug 1 -uum   -ldlibs work/ase_libs.so -lrt -lpthread  -mxuumtop ase_top  -verilogcomp  -nc -V +vcs+lic+wait -full64 -debug_pp -Mupdate -lca -j 4 -l vcs_elab.log +vhdllib+work -Mlib=work +lint=TFIPC-L -override_timescale=1ps/1ps -o work/ase_simv work/ase_libs.so -lrt -lpthread -uum   -elaboration_options /tmp/vcs_20180501232126_5801/elaboptfile_5801
+Doing common elaboration 
+/opt/synopsys/vcs/linux64/bin/vcs1 -Mcc=gcc -Mcplusplus=g++ -Masflags= -Mcfl= -pipe \
+-fPIC -O -I/opt/synopsys/vcs/include  -Mxcflags= -pipe -fPIC -I/opt/synopsys/vcs/include \
+-Mldflags= -rdynamic  -Mout=work/ase_simv -Mamsrun="" -Mvcsaceobjs="" -Mobjects=" \
+/opt/synopsys/vcs/linux64/lib/liberrorinf.so /opt/synopsys/vcs/linux64/lib/libsnpsmalloc.so \
+/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/sim/afu_sim/work/ase_libs.so \
+-lrt -lpthread " -Mexternalobj= -Msaverestoreobj=/opt/synopsys/vcs/linux64/lib/vcs_save_restore_new.o \
+-Mcrt0= -Mcrtn="" -Mcsrc="" -Mupdate -Mlib=work -Msyslibs=-ldl  -l vcs_elab.log -uum \
+ase_top -mxunielab -uni_make -nc -V +vcs+lic+wait -full64 -Xcbug=0x1 -Xpiyushb1=0x80 \
+-lca -j4 +vhdllib+work +lint=TFIPC-L -override_timescale=1ps/1ps -o work/ase_simv \
+-uum -elaboration_options=/tmp/vcs_20180501232126_5801/elaboptfile_5801 -full64 -picarchive \
++vcsd +itf+/opt/synopsys/vcs/linux64/lib/vcsdp.tab +cli+1 -debug=1 +memcbk +vpi -VHDLelab=-mxunielab \
+-uni_make -nc -nc -verbose -lca -override_timescale 1ps/1ps -exe work/ase_simv -uum \
+-elaboration_options /tmp/vcs_20180501232126_5801/elaboptfile_5801 -picarchive -debug \
+1  -gen_obj -f work/ase_simv.daidir/mxopt.db  
+Top Level Modules:
+       ase_top
+TimeScale is 1 ps / 1 ps
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci_mpf.sv, 394
+"cci_mpf_if_pkg::cci_mpf_c0Rx_isEOP"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci_mpf.sv, 397
+"cci_mpf_if_pkg::cci_c1Rx_isWriteRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_edge/cci_mpf_shim_edge_fiu.sv, 316
+"cci_mpf_if_pkg::cci_c0Rx_isReadRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 456
+"cci_mpf_if_pkg::cci_c0Rx_isValid"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 457
+"cci_mpf_if_pkg::cci_c0Rx_isReadRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 479
+"cci_mpf_if_pkg::cci_c0Rx_isReadRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 489
+"cci_mpf_if_pkg::cci_c0Rx_isReadRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 527
+"cci_mpf_if_pkg::cci_c1Rx_isWriteRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 528
+"cci_mpf_if_pkg::cci_c1Rx_isWriteFenceRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+
+Warning-[USVS-ACWCFC] Unsupported System Verilog construct
+/opt/intelFPGA/intel-fpga-bbb/BBB_cci_mpf/hw/sim/../rtl/cci-mpf-shims/cci_mpf_shim_rsp_order.sv, 248
+"cci_mpf_if_pkg::cci_c0Rx_isReadRsp"
+  The always_comb block has nested hierarchical or interface function calls. 
+  The sensitivity list is based on function argument rather than the function 
+  bodies.
+  Please avoid always_comb with nested hierarchical function calls.
+
+Starting vcs inline pass...
+
+Note-[VCS_PARAL] Parallel code-gen enabled
+  VCS is running with parallel code generation(-j)...
+
+60 unique modules to generate
+recompiling module ccip_emulator
+recompiling module ALTERA_MF_MEMORY_INITIALIZATION
+recompiling module altsyncram
+recompiling module altsyncram
+recompiling module altsyncram
+recompiling module cci_mpf_prim_heap_ctrl
+recompiling module cci_mpf_prim_rob
+recompiling module cci_mpf_shim_vtp_chan
+recompiling module cci_mpf_shim_csr_events
+recompiling module cci_mpf_prim_fifo_lutram
+recompiling module cci_mpf_prim_fifo_lutram_ctrl
+recompiling module fifo
+recompiling package _vcs_DPI_package
+recompiling module ase_svfifo
+recompiling module cci_mpf_prim_ram_simple_init
+recompiling module cci_mpf_prim_fifo_lutram
+recompiling package cci_csr_if_pkg
+recompiling module cci_mpf_shim_null
+recompiling package ccip_if_pkg
+recompiling package cci_mpf_csrs_pkg
+recompiling module cci_mpf_shim_pwrite_if
+recompiling module outoforder_wrf_channel
+recompiling module cci_mpf_shim_edge_afu
+recompiling module cci_mpf_shim_csr
+recompiling module altsyncram
+recompiling module altsyncram
+recompiling package cci_mpf_if_pkg
+recompiling module cci_mpf_shim_vtp
+recompiling module csr_mgr
+recompiling module cci_mpf_svc_vtp_pipe
+recompiling module cci_mpf_shim_vtp_chan_l1_caches
+recompiling module ALTERA_DEVICE_FAMILIES
+recompiling module ccip_wires_to_mpf
+recompiling module cci_mpf_shim_detect_eop
+recompiling module ase_svfifo
+recompiling module platform_shim_ccip
+recompiling package ccip_if_funcs_pkg
+recompiling module cci_mpf_prim_lutram
+recompiling package ccip_feature_list_pkg
+recompiling module app_csrs
+recompiling module cci_mpf_shim_vtp_pt_walk_if
+recompiling module app_afu
+recompiling module ccip_checker
+recompiling module cci_mpf_pipe_std
+recompiling module altsyncram
+recompiling module altsyncram
+recompiling module platform_shim_ccip_std_afu
+recompiling module cci_mpf_svc_vtp_tlb
+recompiling module cci_mpf_shim_vtp_chan
+recompiling package ase_pkg
+recompiling module fifo
+recompiling module cci_mpf_prim_repl_random
+recompiling module ase_svfifo
+recompiling module cci_mpf_prim_ram_simple_init
+recompiling module cci_mpf_prim_fifo_lutram
+recompiling module conf_receiver
+recompiling module cci_mpf_prim_ram_dualport_byteena
+recompiling module ase_top
+recompiling package ccis_if_funcs_pkg
+recompiling module cci_mpf_shim_edge_if
+recompiling module cci_mpf_shim_vtp_tlb_if
+recompiling module outoforder_wrf_channel
+recompiling module cci_mpf_svc_vtp
+recompiling module altsyncram
+recompiling module altsyncram
+recompiling module altsyncram
+recompiling module cci_mpf_svc_vtp_tlb
+recompiling module cci_mpf_shim_detect_eop_track_flits
+recompiling module ccip_logger
+recompiling module cci_mpf_prim_fifo_lutram
+recompiling module cci_mpf_if
+recompiling module fifo
+recompiling module cci_mpf_prim_lutram_init_banked
+recompiling module ase_svfifo
+recompiling module ase_svfifo
+recompiling module cci_mpf_prim_arb_rr
+recompiling module cci_mpf_shim_buffer_fiu
+recompiling package cci_mpf_shim_pkg
+recompiling package ccip_cfg_pkg
+recompiling package ccis_if_pkg
+recompiling module cci_mpf_csrs
+recompiling module cci_mpf_shim_vtp_svc_if
+( cd csrc ; make -f Makefile SNPS_VCS_TMPDIR=/tmp/vcs_20180501232126_5801 product \
+)
+make[2]: Entering directory '/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/sim/afu_sim/csrc' \
+
+rm -f _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../work/ase_simv ]; then chmod -x ../work/ase_simv; fi
+g++  -o ../work/ase_simv   -Wl,-rpath-link=./ -Wl,-rpath='$ORIGIN'/ase_simv.daidir/ \
+-Wl,-rpath=./ase_simv.daidir/ -Wl,-rpath='$ORIGIN'/ase_simv.daidir//scsim.db.dir \
+-rdynamic  amcQwB.o objs/amcQw_d.o   _6811_archive_1.so _6818_archive_1.so _6819_archive_1.so \
+_6820_archive_1.so  SIM_l.o       rmapats_mop.o rmapats.o rmar.o  rmar_llvm_0_1.o \
+rmar_llvm_0_0.o          /opt/synopsys/vcs/linux64/lib/libzerosoft_rt_stubs.so /opt/synopsys/vcs/linux64/lib/liberrorinf.so \
+/opt/synopsys/vcs/linux64/lib/libsnpsmalloc.so /home/lucas/Documentos/acc-management-repo/samples/loopback/hw/sim/afu_sim/work/ase_libs.so \
+-lrt -lpthread    /opt/synopsys/vcs/linux64/lib/libvcsnew.so /opt/synopsys/vcs/linux64/lib/libsimprofile.so \
+/opt/synopsys/vcs/linux64/lib/libvirsim.so /opt/synopsys/vcs/linux64/lib/libuclinative.so \
+-Wl,-whole-archive /opt/synopsys/vcs/linux64/lib/libvcsucli.so -Wl,-no-whole-archive \
+./../work/ase_simv.daidir/vc_hdrs.o    /opt/synopsys/vcs/linux64/lib/vcs_save_restore_new.o \
+-ldl  -lc -lm -lpthread -ldl 
+../work/ase_simv up to date
+make[2]: Leaving directory '/home/lucas/Documentos/acc-management-repo/samples/loopback/hw/sim/afu_sim/csrc' \
+

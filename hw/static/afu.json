@@ -1,18 +1,19 @@
-{
-   "version": 1,
-   "afu-image": {
-      "power": 0,
-      "afu-top-interface":
-         {
-            "name": "ccip_std_afu"
-         },
-      "accelerator-clusters":
-         [
-            {
-               "name": "acc_management",
-               "total-contexts": 1,
-               "accelerator-type-uuid": "9f81ba12-1d38-4cc7-953a-dafeef45065b"
-            }
-         ]
-   }
-}
+ {
+    "version": 1,
+    "platform-name" : "HARP",
+    "afu-image": {
+       "magic-no": 488605312,
+       "interface-uuid": "00000000-0000-0000-0000-000000000000",
+       "clock-frequency-low": 0,
+       "clock-frequency-high": 0,
+       "power": 0,
+       "accelerator-clusters":
+          [
+             {
+                "name": "acc_management",
+                "total-contexts": 1,
+                "accelerator-type-uuid": "9f81ba12-1d38-4cc7-953a-dafeef45065b"
+             }
+          ]
+    }
+ }
