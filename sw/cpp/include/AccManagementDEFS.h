@@ -18,7 +18,6 @@
 
 #define UUID_ACC_MANAGEMENT "9f81ba12-1d38-4cc7-953a-dafeef45065b"
 
-typedef unsigned short accid_t;
 typedef class AccManagement AccManagement_t;
 
 typedef enum CSR_WR {

@@ -30,7 +30,7 @@ private:
 
     int numAccelerators;
 
-    std::map<accid_t ,Accelerator *> accelerators;
+    std::map<unsigned short ,Accelerator *> accelerators;
 
     void createAccelerators();
 
@@ -47,12 +47,12 @@ public:
     explicit AccManagement();
 
     ~AccManagement();
-
+        
     void clear();
 
-    void writeCSR(uint32_t regID, uint64_t val);
+    void writeCSR(unsigned int  regID, unsigned long val);
 
-    uint64_t readCSR(uint32_t regID);
+    unsigned long readCSR(unsigned int  regID);
 
     int getNumInputQueue() const;
 
@@ -64,21 +64,21 @@ public:
 
     void fpgaFreeQueue(void *ptr);
 
-    void startAccelerators(uint64_t accelerators);
+    void startAccelerators(unsigned long accelerators);
 
-    void stopAccelerators(uint64_t accelerators);
+    void stopAccelerators(unsigned long accelerators);
 
-    void resetAccelerators(uint64_t accelerators);
+    void resetAccelerators(unsigned long accelerators);
 
-    void waitDone(uint64_t accelerators, int64_t timeWaitMax);
+    void waitDone(unsigned long accelerators,long timeWaitMax);
 
     bool isSimulated();
 
-    Accelerator &getAccelerator(accid_t id);
+    Accelerator &getAccelerator(unsigned short id);
 
-    const std::map<accid_t ,Accelerator *> &getAccelerators() const;
+    const std::map<unsigned short ,Accelerator *> &getAccelerators() const;
 
-    bool isAccDone(uint64_t accelerators);
+    bool isAccDone(unsigned long accelerators);
 
     void printHwInfo();
 };

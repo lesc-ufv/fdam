@@ -12,7 +12,7 @@ class Accelerator {
 private:
     AccManagement_t &accManagement;
 
-    accid_t id;
+    unsigned short id;
 
     void *ptrDsm;
 
@@ -42,13 +42,13 @@ private:
 
     void setDsmSize(size_t size);
 
-    void sendConfIn(uint8_t idQueue);
+    void sendConfIn(unsigned char idQueue);
 
-    void sendConfOut(uint8_t idQueue);
+    void sendConfOut(unsigned char idQueue);
 
 
 public:
-    Accelerator(AccManagement_t &accManagement, accid_t id, int numInputQueue, int numOutputQueue);
+    Accelerator(AccManagement_t &accManagement, unsigned short id, int numInputQueue, int numOutputQueue);
 
     ~Accelerator();
 
@@ -58,59 +58,59 @@ public:
 
     void reset();
 
-    bool createInputQueue(uint8_t idQueue, size_t nBytes, void *dataToCopy);
+    bool createInputQueue(unsigned char idQueue, size_t nBytes, void *dataToCopy);
 
-    bool createOutputQueue(uint8_t idQueue, size_t nBytes);
+    bool createOutputQueue(unsigned char idQueue, size_t nBytes);
 
-    void *getInputQueue(uint8_t idQueue);
+    void *getInputQueue(unsigned char idQueue);
 
-    void *getOutputQueue(uint8_t idQueue);
+    void *getOutputQueue(unsigned char idQueue);
 
-    void setInputQueue(uint8_t idQueue, void *ptrQueue, size_t numBytes);
+    void setInputQueue(unsigned char idQueue, void *ptrQueue, size_t numBytes);
 
-    void setOutputQueue(uint8_t idQueue, void *ptrQueue, size_t numBytes);
+    void setOutputQueue(unsigned char idQueue, void *ptrQueue, size_t numBytes);
 
-    bool copyFromInputQueue(uint8_t idQueue, void *data, size_t nBytes);
+    bool copyFromInputQueue(unsigned char idQueue, void *data, size_t nBytes);
 
-    bool copyFromOutputQueue(uint8_t idQueue, void *data, size_t nBytes);
+    bool copyFromOutputQueue(unsigned char idQueue, void *data, size_t nBytes);
 
-    bool copyToInputQueue(uint8_t idQueue, void *data, size_t nBytes);
+    bool copyToInputQueue(unsigned char idQueue, void *data, size_t nBytes);
 
-    bool copyToOutputQueue(uint8_t idQueue, void *data, size_t nBytes);
+    bool copyToOutputQueue(unsigned char idQueue, void *data, size_t nBytes);
 
-    bool setNumBytesRead(uint8_t idQueue, size_t nBytes);
+    bool setNumBytesRead(unsigned char idQueue, size_t nBytes);
 
-    bool setNumBytesWrite(uint8_t idQueue, size_t nBytes);
+    bool setNumBytesWrite(unsigned char idQueue, size_t nBytes);
 
-    size_t getSizeOfInputQueue(uint8_t idQueue) const;
+    size_t getSizeOfInputQueue(unsigned char idQueue) const;
 
-    size_t getSizeOfOutputQueue(uint8_t idQueue) const;
+    size_t getSizeOfOutputQueue(unsigned char idQueue) const;
 
     int getNumInputQueue() const;
 
     int getNumOutputQueue() const;
 
-    size_t getNumBytesRead(uint8_t idQueue) const;
+    size_t getNumBytesRead(unsigned char idQueue) const;
 
-    size_t getNumBytesWrite(uint8_t idQueue) const;
+    size_t getNumBytesWrite(unsigned char idQueue) const;
 
-    bool isDoneInputQueue(uint8_t idQueue) const;
+    bool isDoneInputQueue(unsigned char idQueue) const;
 
-    bool isDoneOutputQueue(uint8_t idQueue) const;
+    bool isDoneOutputQueue(unsigned char idQueue) const;
 
-    void waitDone(int64_t timeWaitMax);
+    void waitDone(long timeWaitMax);
 
     bool isDone() const;
 
-    accid_t getId() const;
+    unsigned short getId() const;
 
     void printInfo();
 
     void clear();
 
-    int getInputQueueGlobalID(uint8_t idQueue);
+    int getInputQueueGlobalID(unsigned char idQueue);
 
-    int getOutputQueueGlobalID(uint8_t idQueue);
+    int getOutputQueueGlobalID(unsigned char idQueue);
 
     Accelerator &operator=(const Accelerator &Accelerator);
 };

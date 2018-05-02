@@ -22,7 +22,7 @@ void AccManagement::createAccelerators() {
         for (int i = 0; i < n; ++i) {
             int numInputQueue = AccManagement::accInfo[i * 2];
             int numOutputQueue = AccManagement::accInfo[i * 2 + 1];
-            auto id = (accid_t) i;
+            auto id = (unsigned short) i;
             auto *acc = new Accelerator(*this,id, numInputQueue, numOutputQueue);
             AccManagement::accelerators[id] = acc;
         }
@@ -33,11 +33,11 @@ void AccManagement::createAccelerators() {
     }
 }
 
-void AccManagement::writeCSR(uint32_t regID, uint64_t val) {
+void AccManagement::writeCSR(unsigned int regID, unsigned long val) {
     AccManagement::csrs->writeCSR(regID, val);
 }
 
-uint64_t AccManagement::readCSR(uint32_t regID) {
+unsigned long AccManagement::readCSR(unsigned int regID) {
     return AccManagement::csrs->readCSR(regID);
 }
 
@@ -81,19 +81,19 @@ void AccManagement::fpgaFreeQueue(void *ptr) {
     AccManagement::fpga->freeBuffer(ptr);
 }
 
-void AccManagement::startAccelerators(const uint64_t accelerators) {
+void AccManagement::startAccelerators(unsigned long accelerators) {
     AccManagement::writeCSR(REG_START_AFUs, accelerators);
 }
 
-void AccManagement::stopAccelerators(const uint64_t accelerators) {
+void AccManagement::stopAccelerators(unsigned long accelerators) {
     AccManagement::writeCSR(REG_STOP_AFUs, accelerators);
 }
 
-void AccManagement::resetAccelerators(const uint64_t accelerators) {
+void AccManagement::resetAccelerators(unsigned long accelerators) {
     AccManagement::writeCSR(REG_RESET_AFUs, accelerators);
 }
 
-void AccManagement::waitDone(const uint64_t accelerators, int64_t timeWaitMax) {
+void AccManagement::waitDone(unsigned long accelerators, long timeWaitMax) {
     for (auto &acc : AccManagement::accelerators) {
         if((accelerators & (1 << acc.second->getId())) != 0){
             acc.second->waitDone(timeWaitMax);
@@ -105,12 +105,12 @@ bool AccManagement::isSimulated() {
     return AccManagement::fpga->hwIsSimulated();
 }
 
-Accelerator &AccManagement::getAccelerator(accid_t id) {
+Accelerator &AccManagement::getAccelerator(unsigned short id) {
     auto acc = (AccManagement::accelerators.at(id));
     return *acc;
 }
 
-bool AccManagement::isAccDone(const uint64_t accelerators) {
+bool AccManagement::isAccDone(const unsigned long accelerators) {
 
     for (auto &acc : AccManagement::accelerators) {
         if((accelerators & (1 << acc.second->getId())) != 0){
@@ -145,7 +145,7 @@ void AccManagement::printHwInfo() {
         mpf_vtp_stats vtp_stats{};
         mpfVtpGetStats(AccManagement::fpga->mpf_handle, &vtp_stats);
         if (vtp_stats.numFailedTranslations) {
-            MSG("INFO: VTP failed translating VA: 0x" << hex << uint64_t(vtp_stats.ptWalkLastVAddr) << dec);
+            MSG("INFO: VTP failed translating VA: 0x" << hex << vtp_stats.ptWalkLastVAddr << dec);
         }
         MSG("INFO: VTP PT walk cycles: " << vtp_stats.numPTWalkBusyCycles);
         MSG("INFO: VTP L2 4KB hit / miss: " << vtp_stats.numTLBHits4KB << " / " << vtp_stats.numTLBMisses4KB);
@@ -154,7 +154,7 @@ void AccManagement::printHwInfo() {
 }
 
 void AccManagement::getInfoHw() {
-    uint64_t inf[8];
+    unsigned long inf[8];
     inf[0] = AccManagement::readCSR(REG_INF_1);
     inf[1] = AccManagement::readCSR(REG_INF_2);
     inf[2] = AccManagement::readCSR(REG_INF_3);
@@ -182,6 +182,6 @@ void AccManagement::getInfoHw() {
     }
 }
 
-const std::map<accid_t ,Accelerator *> &AccManagement::getAccelerators() const {
+const std::map<unsigned short ,Accelerator *> &AccManagement::getAccelerators() const {
     return AccManagement::accelerators;
 }

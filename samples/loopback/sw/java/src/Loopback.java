@@ -1,10 +1,10 @@
 public class Loopback{
 
-   public static void main(String args[]){
+   public static void main(String argv[]){
+   
        AccManagement accMgr = new AccManagement();
-       SWIGTYPE_p_accid_t id = new SWIGTYPE_p_accid_t(0,false);
-       Accelerator acc = accMgr.getAccelerator(id);
-       
+       Accelerator acc = accMgr.getAccelerator(0);
+/*       
        int n = 10000;
        
        int in[] = new int[n];
@@ -14,11 +14,11 @@ public class Loopback{
           in[i] = i;
           out[i] = 0;
        }
-//        acc.createInputQueue(0,sizeof(int)*n,in);
-//        acc.createOutputQueue(0,sizeof(int)*n);
-//        
-//        acc.start();
-//        acc.waitDone(0);
+       acc.createInputQueue(0,sizeof(int)*n,in);
+       acc.createOutputQueue(0,sizeof(int)*n);
+       
+       acc.start();
+       acc.waitDone(0);*/
        
        acc.printInfo();
 //        acc.copyFromOutputQueue(0,out,sizeof(int)*n);
@@ -29,9 +29,9 @@ public class Loopback{
 //              break;
 //          }
 //        }
-    
+//     
        accMgr.printHwInfo();
-          
+       accMgr.delete();          
    }
 
 }
