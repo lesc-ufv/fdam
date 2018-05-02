@@ -1,3 +1,0 @@
-DPI_STUB_OBJS += ./../work/ase_simv.daidir/vc_hdrs.o
-./../work/ase_simv.daidir/vc_hdrs.o: ./../work/ase_simv.daidir/vc_hdrs.c
-	@$(CC) -I/opt/synopsys/vcs/include  -pipe -fPIC    -I/opt/synopsys/vcs/include  -fPIC -c -o ./../work/ase_simv.daidir/vc_hdrs.o ./../work/ase_simv.daidir/vc_hdrs.c

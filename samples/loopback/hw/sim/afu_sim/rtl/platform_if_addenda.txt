@@ -1,9 +1,0 @@
-//
-// This file has been generated automatically by afu_platform_config.
-// Do not edit it by hand.
-//
-// Platform: intg_xeon
-// AFU top-level interface: ccip_std_afu
-//
-
--F /opt/intelFPGA/opae-sdk/install/share/opae/platform/platform_if/sim/platform_if_addenda.txt
