@@ -1,9 +1,11 @@
-%module AccManagementJava
+%module fam
 %{
     #include "AccManagement.h"
+    #include "Accelerator.h"
 %}
 
 %include "AccManagement.h"
+%include "Accelerator.h"
 
 %pragma(java) jniclassimports=%{
 
@@ -22,7 +24,7 @@ import java.util.logging.Logger;
   static {
       try{
             String libName = "libjava_fam.so";
-            URL url = AccManagementJavaJNI.class.getResource("/" + libName);
+            URL url = famJNI.class.getResource("/" + libName);
             File tmpDir = Files.createTempDirectory("lib").toFile();
             tmpDir.deleteOnExit();
             File nativeLibTmpFile = new File(tmpDir, libName);
@@ -32,7 +34,7 @@ import java.util.logging.Logger;
             }
             System.load(nativeLibTmpFile.getAbsolutePath());
       } catch (IOException ex) {
-          Logger.getLogger(AccManagementJavaJNI.class.getName()).log(Level.SEVERE, null, ex);
+          Logger.getLogger(famJNI.class.getName()).log(Level.SEVERE, null, ex);
       }
   }
     

@@ -6,19 +6,29 @@ include(UseJava)
 
 find_package(Java REQUIRED)
 
-set(FAM_LIB_JAR "$ENV{FAM_BASEDIR}/sw/build/java/AccManagementJNI.jar")
-set(FAM_LIB_ASE_JAR "$ENV{FAM_BASEDIR}/sw/build/java/AccManagementAseJNI.jar")
+set(FAM_LIB_JAR "$ENV{FAM_BASEDIR}/sw/build/java/libfam.jar")
+set(FAM_LIB_ASE_JAR "$ENV{FAM_BASEDIR}/sw/build/java/libfam_ase.jar")
 set(JAVA_SRCS ${CMAKE_SOURCE_DIR}/src/Loopback.java)
 
-add_custom_target(
-    EXTRACT_FILES_ASE ALL
-    COMMAND ${Java_JAR_EXECUTABLE} -xvf ${FAM_LIB_ASE_JAR}
+file(GENERATE OUTPUT fixed_jar_ase.sh 
+     CONTENT
+"
+#!/bin/sh
+${Java_JAR_EXECUTABLE} -xvf ${FAM_LIB_ASE_JAR}
+ls -1 *.class *.so > ase_classes.txt
+${Java_JAR_EXECUTABLE} uf ${CMAKE_CURRENT_BINARY_DIR}/LoopbackAse.jar @ase_classes.txt
+rm -rf *.class *.so ase_classes.txt fixed_jar_ase.sh META-INF
+"
 )
-
-add_custom_command(
-     TARGET EXTRACT_FILES_ASE
-     POST_BUILD
-     COMMAND ls -1 *.class *.so > classes.txt
+file(GENERATE OUTPUT fixed_jar_harp.sh 
+     CONTENT
+"
+#!/bin/sh
+${Java_JAR_EXECUTABLE} -xvf ${FAM_LIB_JAR}
+ls -1 *.class *.so > harp_classes.txt
+${Java_JAR_EXECUTABLE} uf ${CMAKE_CURRENT_BINARY_DIR}/Loopback.jar @harp_classes.txt
+rm -rf *.class *.so harp_classes.txt fixed_jar_harp.sh META-INF
+"
 )
 
 add_jar(
@@ -26,30 +36,6 @@ add_jar(
     SOURCES ${JAVA_SRCS}
     INCLUDE_JARS ${FAM_LIB_ASE_JAR}
     ENTRY_POINT Loopback
-)
-
-add_custom_command(
-     TARGET LoopbackAse
-     POST_BUILD
-     COMMAND ${Java_JAR_EXECUTABLE} uf "${CMAKE_CURRENT_BINARY_DIR}/LoopbackAse.jar" @classes.txt
-)
-
-add_custom_command(
-    TARGET LoopbackAse
-    POST_BUILD
-    COMMAND rm -rf classes.txt *.class *.so META-INF
-)
-
-
-add_custom_target(
-    EXTRACT_FILES ALL
-    COMMAND ${Java_JAR_EXECUTABLE} -xvf ${FAM_LIB_JAR}
-)
-
-add_custom_command(
-     TARGET EXTRACT_FILES
-     POST_BUILD
-     COMMAND ls -1 *.class *.so > classes.txt
 )
 
 add_jar(
@@ -60,14 +46,14 @@ add_jar(
 )
 
 add_custom_command(
-     TARGET Loopback
-     POST_BUILD
-     COMMAND ${Java_JAR_EXECUTABLE} uf "${CMAKE_CURRENT_BINARY_DIR}/Loopback.jar" @classes.txt
+    TARGET LoopbackAse
+    POST_BUILD
+    COMMAND sh fixed_jar_ase.sh
 )
 
 add_custom_command(
     TARGET Loopback
     POST_BUILD
-    COMMAND rm -rf classes.txt *.class *.so META-INF
+    COMMAND sh fixed_jar_harp.sh
 )
 

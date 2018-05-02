@@ -26,16 +26,16 @@ add_custom_command(
 )
 
 add_jar(
-    AccManagementAseJNI
+    libfam_ase
     SOURCES 
     @${CMAKE_SWIG_OUTDIR}/files.txt
 )
-add_dependencies(AccManagementAseJNI java_fam_ase)
+add_dependencies(libfam_ase java_fam_ase)
 
 add_custom_command(
-    TARGET AccManagementAseJNI 
+    TARGET libfam_ase 
     POST_BUILD
-    COMMAND ${Java_JAR_EXECUTABLE} -uf "${CMAKE_CURRENT_BINARY_DIR}/AccManagementAseJNI.jar" "./libjava_fam_ase.so"
+    COMMAND ${Java_JAR_EXECUTABLE} -uf "${CMAKE_CURRENT_BINARY_DIR}/libfam_ase.jar" "./libjava_fam_ase.so"
 )
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/harp)
 set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/harp)
@@ -57,21 +57,21 @@ add_custom_command(
      COMMAND find ${CMAKE_SWIG_OUTDIR} -iname '*.java' > ${CMAKE_SWIG_OUTDIR}/files.txt
 )
 add_jar(
-    AccManagementJNI
+    libfam
     SOURCES
     @${CMAKE_SWIG_OUTDIR}/files.txt
 )
 
-add_dependencies( AccManagementJNI java_fam)
+add_dependencies(libfam java_fam)
 
 add_custom_command(
-    TARGET AccManagementJNI 
+    TARGET libfam 
     POST_BUILD
-    COMMAND ${Java_JAR_EXECUTABLE} -uf "${CMAKE_CURRENT_BINARY_DIR}/AccManagementJNI.jar" "./libjava_fam.so"
+    COMMAND ${Java_JAR_EXECUTABLE} -uf "${CMAKE_CURRENT_BINARY_DIR}/libfam.jar" "./libjava_fam.so"
 )
 
-add_custom_command(
-    TARGET AccManagementJNI
-    POST_BUILD
-    COMMAND rm -rf *.so ase harp
-)
+# add_custom_command(
+#     TARGET libfam
+#     POST_BUILD
+#     COMMAND rm -rf *.so ase harp
+# )
