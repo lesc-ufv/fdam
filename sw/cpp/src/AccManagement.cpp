@@ -17,13 +17,13 @@ AccManagement::~AccManagement() {
 
 void AccManagement::createAccelerators() {
     AccManagement::getInfoHw();
-    auto n  = AccManagement::getNumAccelerators();
-    if(n > 0){
+    auto n = AccManagement::getNumAccelerators();
+    if (n > 0) {
         for (int i = 0; i < n; ++i) {
             int numInputQueue = AccManagement::accInfo[i * 2];
             int numOutputQueue = AccManagement::accInfo[i * 2 + 1];
             auto id = (unsigned short) i;
-            auto *acc = new Accelerator(*this,id, numInputQueue, numOutputQueue);
+            auto *acc = new Accelerator(*this, id, numInputQueue, numOutputQueue);
             AccManagement::accelerators[id] = acc;
         }
     } else {
@@ -42,8 +42,8 @@ unsigned long AccManagement::readCSR(unsigned int regID) {
 }
 
 void AccManagement::clear() {
-    for(auto &acc: AccManagement::accelerators){
-        delete(acc.second);
+    for (auto &acc: AccManagement::accelerators) {
+        delete (acc.second);
     }
     delete AccManagement::csrs;
     delete AccManagement::fpga;
@@ -73,11 +73,11 @@ int AccManagement::getNumAccelerators() const {
     return AccManagement::numAccelerators;
 }
 
-void *AccManagement::fpgaAllocQueue(size_t numBytes) {
-    return AccManagement::fpga->allocBuffer(numBytes);
+void *AccManagement::accAllocQueue(long long numBytes) {
+    return AccManagement::fpga->allocBuffer(static_cast<size_t>(numBytes));
 }
 
-void AccManagement::fpgaFreeQueue(void *ptr) {
+void AccManagement::accFreeQueue(void *ptr) {
     AccManagement::fpga->freeBuffer(ptr);
 }
 
@@ -95,7 +95,7 @@ void AccManagement::resetAccelerators(unsigned long accelerators) {
 
 void AccManagement::waitDone(unsigned long accelerators, long timeWaitMax) {
     for (auto &acc : AccManagement::accelerators) {
-        if((accelerators & (1 << acc.second->getId())) != 0){
+        if ((accelerators & (1L << acc.second->getId())) != 0L) {
             acc.second->waitDone(timeWaitMax);
         }
     }
@@ -113,8 +113,8 @@ Accelerator &AccManagement::getAccelerator(unsigned short id) {
 bool AccManagement::isAccDone(const unsigned long accelerators) {
 
     for (auto &acc : AccManagement::accelerators) {
-        if((accelerators & (1 << acc.second->getId())) != 0){
-            if(!acc.second->isDone())return false;
+        if ((accelerators & (1 << acc.second->getId())) != 0) {
+            if (!acc.second->isDone())return false;
         }
     }
 
@@ -127,9 +127,9 @@ void AccManagement::printHwInfo() {
     double totalClWrite = AccManagement::readCSR(REG_CL_WR_COUNT);
     double totalClRead = AccManagement::readCSR(REG_CL_RD_COUNT);
     double cicleTime = 1.0 / (AccManagement::csrs->getAFUMHz() * 1000000.0);
-    double totalTime = cicleTime*totalClocks;
-    double Mb = ((totalClRead+totalClWrite)*64.0)/(1024*1024);
-    auto throughput = Mb/totalTime;
+    double totalTime = cicleTime * totalClocks;
+    double Mb = ((totalClRead + totalClWrite) * 64.0) / (1024 * 1024);
+    auto throughput = Mb / totalTime;
 
     MSG("INFO: Accelerator Management");
     MSG("INFO: TARGET:" << (AccManagement::fpga->hwIsSimulated() ? " [simulated]" : "[real device]"));
@@ -138,8 +138,8 @@ void AccManagement::printHwInfo() {
     MSG("INFO: Total number of input queues: " << AccManagement::getNumInputQueue());
     MSG("INFO: Total number of output queues: " << AccManagement::getNumOutputQueue());
     MSG("INFO: Total clock: " << totalClocks);
-    MSG("INFO: Total bytes read: " << totalClRead*64);
-    MSG("INFO: Total written bytes: " << totalClWrite*64);
+    MSG("INFO: Total bytes read: " << totalClRead * 64);
+    MSG("INFO: Total written bytes: " << totalClWrite * 64);
     MSG("INFO: Approximate throughput: " << throughput << "MB/s");
     if (mpfVtpIsAvailable(AccManagement::fpga->mpf_handle)) {
         mpf_vtp_stats vtp_stats{};
@@ -182,6 +182,6 @@ void AccManagement::getInfoHw() {
     }
 }
 
-const std::map<unsigned short ,Accelerator *> &AccManagement::getAccelerators() const {
+const std::map<unsigned short, Accelerator *> &AccManagement::getAccelerators() const {
     return AccManagement::accelerators;
 }

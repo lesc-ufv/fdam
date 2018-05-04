@@ -18,7 +18,7 @@ Accelerator::Accelerator(AccManagement_t &accManagement, unsigned short id, int 
     Accelerator::sizeOfInputQueues = new size_t[numInputQueue];
     Accelerator::sizeOfOutputQueues = new size_t[numOutputQueue];
 
-    for (int i = 0; i < Accelerator::getNumInputQueue() ; ++i) {
+    for (int i = 0; i < Accelerator::getNumInputQueue(); ++i) {
         Accelerator::inputQueue[i] = nullptr;
         Accelerator::sizeOfInputQueues[i] = 0;
         Accelerator::sendConfIn(static_cast<unsigned char>(i));
@@ -31,7 +31,7 @@ Accelerator::Accelerator(AccManagement_t &accManagement, unsigned short id, int 
     Accelerator::createDsm();
 }
 
-Accelerator::~Accelerator(){
+Accelerator::~Accelerator() {
     Accelerator::clear();
 };
 
@@ -40,7 +40,7 @@ void Accelerator::createDsm() {
             1.0 + ceil(Accelerator::getNumInputQueue() / 16.0) + ceil(Accelerator::getNumOutputQueue() / 16.0));
     auto nBytesAlign = static_cast<size_t>((std::ceil(size / 256.0)) * 256.0);
     Accelerator::setDsmSize(static_cast<size_t>(nBytesAlign));
-    Accelerator::ptrDsm = Accelerator::accManagement.fpgaAllocQueue(Accelerator::getDsmSize());
+    Accelerator::ptrDsm = Accelerator::accManagement.accAllocQueue(Accelerator::getDsmSize());
     Accelerator::clearDsm();
     Accelerator::sendConfDsm();
 }
@@ -73,7 +73,7 @@ void Accelerator::clearDsm() {
 void Accelerator::sendConfIn(unsigned char idQueue) {
     int idQueueGlobal = Accelerator::getInputQueueGlobalID(idQueue);
     auto numCl = static_cast<unsigned long>(Accelerator::getSizeOfInputQueue(idQueue) / 64);
-    auto val_low = static_cast<unsigned long>(numCl << 32 | idQueueGlobal);
+    auto val_low = numCl << 32L | idQueueGlobal;
     auto val_high = static_cast<unsigned long>(intptr_t(Accelerator::getInputQueue(idQueue)) / 64);
     Accelerator::accManagement.writeCSR(REG_CONF_IN_LOW, val_low);
     Accelerator::accManagement.writeCSR(REG_CONF_IN_HIGH, val_high);
@@ -82,7 +82,7 @@ void Accelerator::sendConfIn(unsigned char idQueue) {
 void Accelerator::sendConfOut(unsigned char idQueue) {
     int idQueueGlobal = Accelerator::getOutputQueueGlobalID(idQueue);
     auto numCl = static_cast<unsigned long>(Accelerator::getSizeOfOutputQueue(idQueue) / 64);
-    auto val_low = static_cast<unsigned long>(numCl << 32 | idQueueGlobal);
+    auto val_low = numCl << 32L | idQueueGlobal;
     auto val_high = static_cast<unsigned long>(intptr_t(Accelerator::getOutputQueue(idQueue)) / 64);
     Accelerator::accManagement.writeCSR(REG_CONF_OUT_LOW, val_low);
     Accelerator::accManagement.writeCSR(REG_CONF_OUT_HIGH, val_high);
@@ -102,14 +102,14 @@ void *Accelerator::getOutputQueue(unsigned char idQueue) {
     return nullptr;
 }
 
-void Accelerator::setInputQueue(unsigned char idQueue, void *ptrQueue, size_t numBytes) {
+void Accelerator::setInputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
         Accelerator::inputQueue[idQueue] = ptrQueue;
         Accelerator::sizeOfInputQueues[idQueue] = numBytes;
     }
 }
 
-void Accelerator::setOutputQueue(unsigned char idQueue, void *ptrQueue, size_t numBytes) {
+void Accelerator::setOutputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
         Accelerator::outputQueue[idQueue] = ptrQueue;
         Accelerator::sizeOfOutputQueues[idQueue] = numBytes;
@@ -131,33 +131,30 @@ void Accelerator::reset() {
     Accelerator::accManagement.resetAccelerators(0L);
 }
 
-bool Accelerator::createInputQueue(unsigned char idQueue, size_t nBytes, void *dataToCopy) {
+bool Accelerator::createInputQueue(unsigned char idQueue, long long nBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
         double nb = nBytes;
-        auto nBytesAlign = static_cast<size_t>((std::ceil(nb / 256.0)) * 256.0);
-        void *ptrQueue = Accelerator::accManagement.fpgaAllocQueue(nBytesAlign);
-        std::memset(ptrQueue, 0x00, nBytesAlign);
+        auto nBytesAlign = static_cast<long long>((std::ceil(nb / 256.0)) * 256.0);
+        void *ptrQueue = Accelerator::accManagement.accAllocQueue(nBytesAlign);
+        std::memset(ptrQueue, 0x00, static_cast<size_t>(nBytesAlign));
         if (Accelerator::getInputQueue(idQueue) != nullptr) {
-            Accelerator::accManagement.fpgaFreeQueue(Accelerator::getInputQueue(idQueue));
+            Accelerator::accManagement.accFreeQueue(Accelerator::getInputQueue(idQueue));
         }
         Accelerator::setInputQueue(idQueue, ptrQueue, nBytesAlign);
-        if (dataToCopy != nullptr) {
-            std::memcpy(ptrQueue, dataToCopy, nBytes);
-        }
         Accelerator::sendConfIn(idQueue);
         return true;
     }
     return false;
 }
 
-bool Accelerator::createOutputQueue(unsigned char idQueue, size_t nBytes) {
+bool Accelerator::createOutputQueue(unsigned char idQueue, long long nBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
         double nb = nBytes;
-        auto nBytesAlign = static_cast<size_t>((std::ceil(nb / 256.0)) * 256.0);
-        void *ptrQueue = Accelerator::accManagement.fpgaAllocQueue(nBytesAlign);
-        std::memset(ptrQueue, 0x00, nBytesAlign);
+        auto nBytesAlign = static_cast<long long>((std::ceil(nb / 256.0)) * 256.0);
+        void *ptrQueue = Accelerator::accManagement.accAllocQueue(nBytesAlign);
+        std::memset(ptrQueue, 0x00, static_cast<size_t>(nBytesAlign));
         if (Accelerator::getOutputQueue(idQueue) != nullptr) {
-            Accelerator::accManagement.fpgaFreeQueue(Accelerator::getOutputQueue(idQueue));
+            Accelerator::accManagement.accFreeQueue(Accelerator::getOutputQueue(idQueue));
         }
         Accelerator::setOutputQueue(idQueue, ptrQueue, nBytesAlign);
         Accelerator::sendConfOut(idQueue);
@@ -166,39 +163,183 @@ bool Accelerator::createOutputQueue(unsigned char idQueue, size_t nBytes) {
     return false;
 }
 
-bool Accelerator::copyFromInputQueue(unsigned char idQueue, void *data, size_t nBytes) {
+bool Accelerator::copyToInputQueue(unsigned char idQueue, const signed char *data, long long ndata) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
-        std::memcpy(data, Accelerator::getInputQueue(idQueue), nBytes);
+        auto *accData = static_cast<signed char *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
         return true;
     }
     return false;
 }
 
-bool Accelerator::copyFromOutputQueue(unsigned char idQueue, void *data, size_t nBytes) {
-    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
-        std::memcpy(data, Accelerator::getOutputQueue(idQueue), nBytes);
-        return true;
-    }
-    return false;
-}
-
-bool Accelerator::copyToInputQueue(unsigned char idQueue, void *data, size_t nBytes) {
+bool Accelerator::copyToInputQueue(unsigned char idQueue, const short *data, long long ndata) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
-        std::memcpy(Accelerator::getInputQueue(idQueue), data, nBytes);
+        auto *accData = static_cast<short *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
         return true;
     }
     return false;
 }
 
-bool Accelerator::copyToOutputQueue(unsigned char idQueue, void *data, size_t nBytes) {
+bool Accelerator::copyToInputQueue(unsigned char idQueue, const int *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
+        auto *accData = static_cast<int *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyToInputQueue(unsigned char idQueue, const long long *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
+        auto *accData = static_cast<long *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromInputQueue(unsigned char idQueue, signed char *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
+        auto *accData = static_cast<signed char *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromInputQueue(unsigned char idQueue, short *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
+        auto *accData = static_cast<short *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromInputQueue(unsigned char idQueue, int *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
+        auto *accData = static_cast<int *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromInputQueue(unsigned char idQueue,long long *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
+        auto *accData = static_cast<long *>(Accelerator::getInputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyToOutputQueue(unsigned char idQueue, const signed char *data, long long ndata) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
-        std::memcpy(Accelerator::getOutputQueue(idQueue), data, nBytes);
+        auto *accData = static_cast<signed char *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
         return true;
     }
     return false;
 }
 
-bool Accelerator::setNumBytesRead(unsigned char idQueue, size_t nBytes) {
+bool Accelerator::copyToOutputQueue(unsigned char idQueue, const short *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<short *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyToOutputQueue(unsigned char idQueue, const int *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<int *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyToOutputQueue(unsigned char idQueue, const long long *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<long *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            accData[i] = data[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromOutputQueue(unsigned char idQueue, signed char *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<signed char *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromOutputQueue(unsigned char idQueue, short *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<short *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromOutputQueue(unsigned char idQueue, int *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<int *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::copyFromOutputQueue(unsigned char idQueue, long long *data, long long ndata) {
+    if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
+        auto *accData = static_cast<long *>(Accelerator::getOutputQueue(idQueue));
+        for (int i = 0; i < ndata; ++i) {
+            data[i] = accData[i];
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Accelerator::setNumBytesRead(unsigned char idQueue, long long nBytes) {
     void *ptrQueue = Accelerator::getInputQueue(idQueue);
     if (idQueue >= 0 &&
         idQueue < Accelerator::getNumInputQueue() &&
@@ -211,7 +352,7 @@ bool Accelerator::setNumBytesRead(unsigned char idQueue, size_t nBytes) {
     return false;
 }
 
-bool Accelerator::setNumBytesWrite(unsigned char idQueue, size_t nBytes) {
+bool Accelerator::setNumBytesWrite(unsigned char idQueue, long long nBytes) {
     void *ptrQueue = Accelerator::getOutputQueue(idQueue);
     if (idQueue >= 0 &&
         idQueue < Accelerator::getNumOutputQueue() &&
@@ -224,11 +365,11 @@ bool Accelerator::setNumBytesWrite(unsigned char idQueue, size_t nBytes) {
     return false;
 }
 
-size_t Accelerator::getSizeOfInputQueue(unsigned char idQueue) const {
+long long Accelerator::getSizeOfInputQueue(unsigned char idQueue) const {
     return Accelerator::sizeOfInputQueues[idQueue];
 }
 
-size_t Accelerator::getSizeOfOutputQueue(unsigned char idQueue) const {
+long long Accelerator::getSizeOfOutputQueue(unsigned char idQueue) const {
     return Accelerator::sizeOfOutputQueues[idQueue];
 }
 
@@ -259,7 +400,7 @@ bool Accelerator::isDoneInputQueue(unsigned char idQueue) const {
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
-    return (doneDword & (2 << bit)) == (2 << bit);
+    return (doneDword & (2UL << bit)) == (2UL << bit);
 }
 
 bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
@@ -270,11 +411,10 @@ bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
-    return (doneDword & (2 << bit)) == (2 << bit);
+    return (doneDword & (2UL << bit)) == (2UL << bit);
 }
 
-
-void Accelerator::waitDone(long timeWaitMax) {
+void Accelerator::waitDone(long long timeWaitMax) {
     bool flagNoMaxTime = false;
     struct timespec pause{};
     pause.tv_sec = 0;
@@ -301,13 +441,12 @@ unsigned short Accelerator::getId() const {
     return Accelerator::id;
 }
 
-void Accelerator::printInfo() {
-    auto dsmNumCL = Accelerator::Accelerator::getDsmSize() / 64;
+void Accelerator::printHwInfo() {
     auto *dsm = static_cast<unsigned int *>(Accelerator::getDsm());
     int numIn = Accelerator::getNumInputQueue();
     int numOut = Accelerator::getNumOutputQueue();
     int id = Accelerator::getId();
-    int offset = static_cast<int>(std::ceil(numIn / 16.0))*16;
+    int offset = static_cast<int>(std::ceil(numIn / 16.0)) * 16;
     MSG("INFO Accelerator:");
     MSG("ID: " << id);
     MSG("Amount of input queues: " << numIn);
@@ -320,17 +459,17 @@ void Accelerator::printInfo() {
     MSG("INFO Input Queues:");
     for (unsigned char i = 0; i < numIn; i++) {
         if (Accelerator::isDoneInputQueue(i)) {
-            MSG("Queue ID: " << static_cast<int >(i) << ", State: Done, Bytes read: "<< dsm[i] * 64);
+            MSG("Queue ID: " << static_cast<int >(i) << ", State: Done, Bytes read: " << dsm[i] * 64);
         } else {
-            MSG("Queue ID: " << static_cast<int >(i) << ", State: Not done, Bytes read: "<< dsm[i] * 64);
+            MSG("Queue ID: " << static_cast<int >(i) << ", State: Not done, Bytes read: " << dsm[i] * 64);
         }
 
     }
     MSG("INFO Output Queues:");
     for (unsigned char i = 0; i < numOut; i++) {
-        if(Accelerator::isDoneOutputQueue(i)){
+        if (Accelerator::isDoneOutputQueue(i)) {
             MSG("Queue ID: " << static_cast<int >(i) << " State: Done, Written bytes: " << dsm[i + offset] * 64);
-        }else{
+        } else {
             MSG("Queue ID: " << static_cast<int >(i) << " State: Not done, Written bytes: " << dsm[i + offset] * 64);
         }
 
@@ -344,13 +483,13 @@ void Accelerator::clear() {
     Accelerator::sizeOfOutputQueues = nullptr;
     for (int i = 0; i < Accelerator::numInputQueue; ++i) {
         if (nullptr != Accelerator::inputQueue[i]) {
-            Accelerator::accManagement.fpgaFreeQueue(Accelerator::inputQueue[i]);
+            Accelerator::accManagement.accFreeQueue(Accelerator::inputQueue[i]);
             Accelerator::inputQueue[i] = nullptr;
         }
     }
     for (int i = 0; i < Accelerator::numOutputQueue; ++i) {
         if (nullptr != Accelerator::outputQueue[i]) {
-            Accelerator::accManagement.fpgaFreeQueue(Accelerator::outputQueue[i]);
+            Accelerator::accManagement.accFreeQueue(Accelerator::outputQueue[i]);
             Accelerator::outputQueue[i] = nullptr;
         }
     }
@@ -360,21 +499,22 @@ int Accelerator::getInputQueueGlobalID(unsigned char idQueue) {
     int globalID = 0;
     auto accs = Accelerator::accManagement.getAccelerators();
     unsigned short id = Accelerator::getId();
-    for (auto &acc : accs){
-        if(id == acc.second->getId()) break;
+    for (auto &acc : accs) {
+        if (id == acc.second->getId()) break;
         globalID += acc.second->getNumInputQueue();
     }
-    return globalID+idQueue;
+    return globalID + idQueue;
 }
+
 int Accelerator::getOutputQueueGlobalID(unsigned char idQueue) {
     int globalID = 0;
     auto &accs = Accelerator::accManagement.getAccelerators();
     unsigned short id = Accelerator::getId();
-    for (auto &acc : accs){
-        if(id == acc.second->getId()) break;
+    for (auto &acc : accs) {
+        if (id == acc.second->getId()) break;
         globalID += acc.second->getNumOutputQueue();
     }
-    return globalID+idQueue;
+    return globalID + idQueue;
 }
 
 Accelerator &Accelerator::operator=(const Accelerator &Accelerator) {

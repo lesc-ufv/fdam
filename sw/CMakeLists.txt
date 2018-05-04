@@ -19,8 +19,8 @@ find_library(LIB_UUID NAMES uuid)
 find_library(LIB_MPF NAMES MPF)
 
 include_directories(
-    "${CPPLIB_INCLUDE_DIR}"
-    "${CMAKE_PREFIX_PATH}/include"
+        "${CPPLIB_INCLUDE_DIR}"
+        "${CMAKE_PREFIX_PATH}/include"
 )
 
 add_subdirectory(cpp)

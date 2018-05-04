@@ -38,11 +38,9 @@
 // to the base cci_csrs RTL module.
 //
 
-class CSR_MGR
-{
-  protected:
-    enum
-    {
+class CSR_MGR {
+protected:
+    enum {
         //
         // Offset of user CSRs in the CSR index space.  Offsets below this
         // are in the "common" (application-independent) CSR space,
@@ -50,13 +48,12 @@ class CSR_MGR
         //
         // This constant must match the RTL implementation in csr_mgr.sv!
         //
-        USER_CSR_BASE = 32
+                USER_CSR_BASE = 32
     };
 
-  public:
-    CSR_MGR(SVC_WRAPPER& svc) :
-        svc(svc)
-    {};
+public:
+    CSR_MGR(SVC_WRAPPER &svc) :
+            svc(svc) {};
 
     ~CSR_MGR() {};
 
@@ -65,13 +62,11 @@ class CSR_MGR
     // Write/read application-specific CSRs.  The maximum CSR index
     // is application-dependent.
     //
-    void writeCSR(uint32_t idx, uint64_t v)
-    {
+    void writeCSR(uint32_t idx, uint64_t v) {
         svc.mmioWrite64(8 * (USER_CSR_BASE + idx), v);
     }
 
-    uint64_t readCSR(uint32_t idx)
-    {
+    uint64_t readCSR(uint32_t idx) {
         return svc.mmioRead64(8 * (USER_CSR_BASE + idx));
     }
 
@@ -80,35 +75,33 @@ class CSR_MGR
     // Common CSRs available on in all programs using CSR_MGR.  These offsets
     // must match the implementation in csr_mgr.sv.
     //
-    typedef enum 
-    {
+    typedef enum {
         CSR_COMMON_DFH = 0,
         CSR_COMMON_ID_L = 1,
         CSR_COMMON_ID_H = 2,
         // AFU frequency
-        CSR_COMMON_FREQ = 8,
+                CSR_COMMON_FREQ = 8,
         // Number of read/write hits in the FIU system memory cache
-        CSR_COMMON_CACHE_RD_HITS = 9,
+                CSR_COMMON_CACHE_RD_HITS = 9,
         CSR_COMMON_CACHE_WR_HITS = 10,
         // Lines read/written on the cached physical channel
-        CSR_COMMON_VL0_RD_LINES = 11,
+                CSR_COMMON_VL0_RD_LINES = 11,
         CSR_COMMON_VL0_WR_LINES = 12,
         // Lines read or written on the non-cached physical channels
-        CSR_COMMON_VH0_LINES = 13,
+                CSR_COMMON_VH0_LINES = 13,
         CSR_COMMON_VH1_LINES = 14,
         // A collection of status signals from the FIU.  See "FIU state"
         // defined in csr_mgr.sv.
-        CSR_COMMON_FIU_STATE = 15,
+                CSR_COMMON_FIU_STATE = 15,
         CSR_COMMON_RD_ALMOST_FULL_CYCLES = 16,
         CSR_COMMON_WR_ALMOST_FULL_CYCLES = 17,
 
         CSR_COMMON__LAST = 18
     }
-    t_csr_common;
+            t_csr_common;
 
     // Read one of the common CSRs
-    uint64_t readCommonCSR(t_csr_common idx)
-    {
+    uint64_t readCommonCSR(t_csr_common idx) {
         if (idx >= CSR_COMMON__LAST) return ~uint64_t(0);
 
         return svc.mmioRead64(8 * uint32_t(idx));
@@ -120,18 +113,14 @@ class CSR_MGR
     // AFU is attached.  When the attached clock is the "user clock" the
     // frequency isn't known at compile time.
     //
-    uint64_t getAFUMHz(uint64_t uClk_usr_mhz = 0)
-    {
+    uint64_t getAFUMHz(uint64_t uClk_usr_mhz = 0) {
         // What's the AFU frequency (MHz)?
         uint64_t afu_mhz = readCommonCSR(CSR_COMMON_FREQ);
 
-        if (afu_mhz == 2)
-        {
+        if (afu_mhz == 2) {
             // 2 indicates uClk_usr
             afu_mhz = uClk_usr_mhz;
-        }
-        else if (afu_mhz == 1)
-        {
+        } else if (afu_mhz == 1) {
             // 1 indicates uClk_usrDiv2
             afu_mhz = uClk_usr_mhz >> 1;
         }
@@ -139,8 +128,8 @@ class CSR_MGR
         return afu_mhz;
     }
 
-  protected:
-    SVC_WRAPPER& svc;
+protected:
+    SVC_WRAPPER &svc;
 };
 
 #endif // __CSR_MGR_H__

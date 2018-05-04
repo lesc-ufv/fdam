@@ -3,6 +3,17 @@
     #include "AccManagement.h"
     #include "Accelerator.h"
 %}
+%include "typemaps.i"
+%apply signed char *INOUT{signed char * data};
+%apply short *INOUT{short * data};
+%apply int *INOUT{int * data};
+%apply long *INOUT{long * data};
+
+%apply signed char *INOUT{const signed char * data};
+%apply short *INOUT{const short * data};
+%apply int *INOUT{const int * data};
+%apply long *INOUT{const long * data};
+%apply long long *INOUT{long long * data};
 
 %include "AccManagement.h"
 %include "Accelerator.h"

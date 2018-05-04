@@ -30,6 +30,8 @@ private:
 
     size_t *sizeOfOutputQueues;
 
+private:
+
     void createDsm();
 
     void *getDsm() const;
@@ -46,6 +48,19 @@ private:
 
     void sendConfOut(unsigned char idQueue);
 
+    void *getInputQueue(unsigned char idQueue);
+
+    void *getOutputQueue(unsigned char idQueue);
+
+    void setInputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
+
+    void setOutputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
+
+    int getInputQueueGlobalID(unsigned char idQueue);
+
+    int getOutputQueueGlobalID(unsigned char idQueue);
+
+    Accelerator &operator=(const Accelerator &Accelerator);
 
 public:
     Accelerator(AccManagement_t &accManagement, unsigned short id, int numInputQueue, int numOutputQueue);
@@ -58,33 +73,49 @@ public:
 
     void reset();
 
-    bool createInputQueue(unsigned char idQueue, size_t nBytes, void *dataToCopy);
+    bool createInputQueue(unsigned char idQueue, long long nBytes);
 
-    bool createOutputQueue(unsigned char idQueue, size_t nBytes);
+    bool createOutputQueue(unsigned char idQueue, long long nBytes);
 
-    void *getInputQueue(unsigned char idQueue);
+    bool copyToInputQueue(unsigned char idQueue, const signed char *data, long long ndata);
 
-    void *getOutputQueue(unsigned char idQueue);
+    bool copyToInputQueue(unsigned char idQueue, const short *data, long long ndata);
 
-    void setInputQueue(unsigned char idQueue, void *ptrQueue, size_t numBytes);
+    bool copyToInputQueue(unsigned char idQueue, const int *data, long long ndata);
 
-    void setOutputQueue(unsigned char idQueue, void *ptrQueue, size_t numBytes);
+    bool copyToInputQueue(unsigned char idQueue, const long long *data, long long ndata);
 
-    bool copyFromInputQueue(unsigned char idQueue, void *data, size_t nBytes);
+    bool copyFromInputQueue(unsigned char idQueue, signed char *data, long long ndata);
 
-    bool copyFromOutputQueue(unsigned char idQueue, void *data, size_t nBytes);
+    bool copyFromInputQueue(unsigned char idQueue, short *data, long long ndata);
 
-    bool copyToInputQueue(unsigned char idQueue, void *data, size_t nBytes);
+    bool copyFromInputQueue(unsigned char idQueue, int *data, long long ndata);
 
-    bool copyToOutputQueue(unsigned char idQueue, void *data, size_t nBytes);
+    bool copyFromInputQueue(unsigned char idQueue, long long *data, long long ndata);
 
-    bool setNumBytesRead(unsigned char idQueue, size_t nBytes);
+    bool copyToOutputQueue(unsigned char idQueue, const signed char *data, long long ndata);
 
-    bool setNumBytesWrite(unsigned char idQueue, size_t nBytes);
+    bool copyToOutputQueue(unsigned char idQueue, const short *data, long long ndata);
 
-    size_t getSizeOfInputQueue(unsigned char idQueue) const;
+    bool copyToOutputQueue(unsigned char idQueue, const int *data, long long ndata);
 
-    size_t getSizeOfOutputQueue(unsigned char idQueue) const;
+    bool copyToOutputQueue(unsigned char idQueue, const long long *data, long long ndata);
+
+    bool copyFromOutputQueue(unsigned char idQueue, signed char *data, long long ndata);
+
+    bool copyFromOutputQueue(unsigned char idQueue, short *data, long long ndata);
+
+    bool copyFromOutputQueue(unsigned char idQueue, int *data, long long ndata);
+
+    bool copyFromOutputQueue(unsigned char idQueue, long long *data, long long ndata);
+
+    bool setNumBytesRead(unsigned char idQueue, long long  nBytes);
+
+    bool setNumBytesWrite(unsigned char idQueue, long long  nBytes);
+
+    long long getSizeOfInputQueue(unsigned char idQueue) const;
+
+    long long getSizeOfOutputQueue(unsigned char idQueue) const;
 
     int getNumInputQueue() const;
 
@@ -98,21 +129,15 @@ public:
 
     bool isDoneOutputQueue(unsigned char idQueue) const;
 
-    void waitDone(long timeWaitMax);
+    void waitDone(long long timeWaitMax);
 
     bool isDone() const;
 
     unsigned short getId() const;
 
-    void printInfo();
+    void printHwInfo();
 
     void clear();
-
-    int getInputQueueGlobalID(unsigned char idQueue);
-
-    int getOutputQueueGlobalID(unsigned char idQueue);
-
-    Accelerator &operator=(const Accelerator &Accelerator);
 };
 
 
