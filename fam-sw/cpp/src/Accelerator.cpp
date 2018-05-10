@@ -1,5 +1,5 @@
-#include <Accelerator.h>
-#include <AccManagement.h>
+#include <fam/Accelerator.h>
+#include <fam/AccManagement.h>
 
 Accelerator::Accelerator(AccManagement_t &accManagement, unsigned short id, int numInputQueue, int numOutputQueue) :
         accManagement(accManagement),

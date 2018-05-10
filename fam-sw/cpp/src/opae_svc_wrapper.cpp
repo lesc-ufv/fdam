@@ -35,7 +35,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "opae_svc_wrapper.h"
+#include <fam/opae_svc_wrapper.h>
 
 using namespace std;
 

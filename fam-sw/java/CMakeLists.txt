@@ -16,7 +16,7 @@ swig_add_library(
         java
         SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/swig/AccManagementAse.i
-        ${CMAKE_SOURCE_DIR}/cpp/include/AccManagement.h
+        ${CMAKE_SOURCE_DIR}/cpp/include/fam/AccManagement.h
 )
 swig_link_libraries(java_fam_ase fam-ase)
 add_custom_command(
@@ -47,7 +47,7 @@ swig_add_library(
         java
         SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/swig/AccManagement.i
-        ${CMAKE_SOURCE_DIR}/cpp/src/AccManagement.cpp
+        ${CMAKE_SOURCE_DIR}/cpp/include/fam/AccManagement.h
 )
 swig_link_libraries(java_fam fam)
 

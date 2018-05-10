@@ -1,7 +1,7 @@
 %module fam
 %{
-    #include "AccManagement.h"
-    #include "Accelerator.h"
+    #include "fam/AccManagement.h"
+    #include "fam/Accelerator.h"
 %}
 %include "typemaps.i"
 %apply signed char *INOUT{signed char * data};
@@ -15,8 +15,8 @@
 %apply long *INOUT{const long * data};
 %apply long long *INOUT{long long * data};
 
-%include "AccManagement.h"
-%include "Accelerator.h"
+%include "fam/AccManagement.h"
+%include "fam/Accelerator.h"
 
 %pragma(java) jniclassimports=%{
 

@@ -27,10 +27,10 @@ install(TARGETS fam-ase
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include/fam
         )
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/Accelerator.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/AccManagementDEFS.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/AccManagement.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/csr_mgr.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/opae_svc_wrapper.h
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/fam/Accelerator.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/fam/AccManagementDEFS.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/fam/AccManagement.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/fam/csr_mgr.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/fam/opae_svc_wrapper.h
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include/fam
         )
