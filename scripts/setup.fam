@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
-FULLPATH="`pwd`/${BASH_SOURCE[@]}"
-MYPATH=${FULLPATH%/*}
+CALLPATH=`pwd`
+FULLPATH="${BASH_SOURCE[@]}"
+FULLPATH=${FULLPATH%/*}
+if [[ -d $FULLPATH ]] 
+then
+    cd $FULLPATH
+fi
+MYPATH=`pwd`
+cd $CALLPATH
 
 # TODO 
 export SR_503_RELEASE_DIR="/home/lucas/Documentos/fam/SR-5.0.3-Release"

@@ -4,7 +4,7 @@
 $ cd <sample>
 $ mkdir build
 $ cd build
-$ cmake ..
+$ cmake .. -DCMAKE_PREFIX_PATH=<install dir>
 $ make
 
 ```

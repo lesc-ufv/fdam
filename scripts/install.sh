@@ -1,61 +1,66 @@
 #!/usr/bin/env bash
 
-FULLPATH="`pwd`/${BASH_SOURCE[@]}"
-MYPATH=${FULLPATH%/*}
+CALLPATH=`pwd`
+FULLPATH="${BASH_SOURCE[@]}"
+FULLPATH=${FULLPATH%/*}
+if [[ -d $FULLPATH ]] 
+then
+    cd $FULLPATH
+fi
+MYPATH=`pwd`
+MYPATH=$MYPATH/..
 
 echo "cleaning up..."
 echo ""
-cd $MYPATH/..
-rm -rf installation
-cd $MYPATH/..
-cd opae-sdk
-rm -rf mybuild
-cd $MYPATH/..
-cd intel-fpga-bbb
-rm -rf mybuild
-cd $MYPATH/..
-cd fam-sw
-rm -rf mybuild
+rm -rf $MYPATH/installation
+rm -rf $MYPATH/opae-sdk/mybuild
+rm -rf $MYPATH/intel-fpga-bbb/mybuild
+rm -rf $MYPATH/fam-sw/fam-cpp/mybuild
+rm -rf $MYPATH/fam-sw/fam-java/mybuild
 echo "end of cleaning up!"
 echo ""
 
-cd $MYPATH/..
-mkdir installation
-cd installation
-INSTALL_DIR=`pwd`
+INSTALL_DIR=$MYPATH/installation
+mkdir $INSTALL_DIR
 
 echo "installing opae-sdk ..."
 echo ""
-cd $MYPATH/..
-cd opae-sdk
-mkdir mybuild
-cd mybuild
+mkdir $MYPATH/opae-sdk/mybuild
+cd  $MYPATH/opae-sdk/mybuild
 cmake .. -DBUILD_ASE=1 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make
+make -j7
 make install
 echo "end of installing opae-sdk"
 echo ""
 
 echo "installing intel-fpga-bbb..."
 echo ""
-cd $MYPATH/..
-cd intel-fpga-bbb
-mkdir mybuild
-cd mybuild
+mkdir $MYPATH/intel-fpga-bbb/mybuild
+cd $MYPATH/intel-fpga-bbb/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make
+make -j7
 make install 
 echo "end of installing intel-fpga-bbb"
 echo ""
 
-echo "installing fam..."
+echo "installing fam-cpp..."
 echo ""
-cd $MYPATH/..
-cd fam-sw
-mkdir mybuild
-cd mybuild
+mkdir $MYPATH/fam-sw/fam-cpp/mybuild
+cd $MYPATH/fam-sw/fam-cpp/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make
+make -j7
 make install 
-echo "end of installing fam"
+echo "end of installing fam-cpp"
 echo ""
+
+echo "installing fam-java..."
+echo ""
+mkdir $MYPATH/fam-sw/fam-java/mybuild
+cd $MYPATH/fam-sw/fam-java/mybuild
+cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+make -j7
+make install 
+echo "end of installing fam-java"
+echo ""
+
+cd $CALLPATH
