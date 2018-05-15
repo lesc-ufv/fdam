@@ -14,7 +14,7 @@ find_library(LIB_FDAM NAMES fdam REQUIRED)
 
 include(UseJava)
 include(UseSWIG)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_PREFIX_PATH  ${CMAKE_INSTALL_PREFIX})
 include_directories(${JNI_INCLUDE_DIRS})
 include_directories("${CMAKE_PREFIX_PATH}/include")
