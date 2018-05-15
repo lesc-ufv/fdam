@@ -1,2 +1,3 @@
-# FAM: Framework for Accelerator Management
+# FDAM: Framework for Dataflow Accelerators Management  
+
 

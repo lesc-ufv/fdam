@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+echo '----------------------------------------------------------------------------'
+echo 'Welcome to FDAM Setup Wizard.'
+echo ''
+echo '----------------------------------------------------------------------------'
+
 CALLPATH=`pwd`
 FULLPATH="${BASH_SOURCE[@]}"
 FULLPATH=${FULLPATH%/*}
@@ -10,26 +15,87 @@ fi
 MYPATH=`pwd`
 MYPATH=$MYPATH/..
 
+# read command line args
+SUDO=''
+INSTALL_DIR='/usr/local/'
+JOBS=''
+
+for i in "$@"
+do
+case $i in
+  -h|--help)
+  echo ''
+  echo 'Usage: sh install.sh [OPTION]'
+  echo ''
+  echo '-h  , --help         show arguments'
+  echo '      --prefix=PATH  override default install location'
+  echo '      --install-as-root  root user is necessary to install the applications'
+  echo '-j=N, --jobs=N       specifies the number of jobs to run simultaneously'
+  exit 0
+  shift # past argument=value
+  ;;
+  --prefix=*)
+  INSTALL_DIR="${i#*=}"
+  shift # past argument=value
+  ;;
+  --install-as-root)
+  SUDO='sudo '
+  shift # past argument with no value
+  ;;
+  -j=*|--jobs=*)
+  JOBS="-j${i#*=}"
+  shift # past argument=value
+  ;;
+  *)
+  # unknown option
+  echo ''
+  echo 'install.sh: invalid option!'
+  echo ''
+  echo "Try: 'bash install.sh --help' for more information."
+  exit 1
+  ;;
+esac
+done
+
+cd $INSTALL_DIR
+INSTALL_DIR=`pwd`
+cd $CALLPATH
+
+echo ''
+echo 'checking libraries ...'
+echo ''
+
+check_lib() {
+  LIB_FILE=$1.'so'
+  CHECK=$(ldconfig -p | grep ${LIB_FILE})
+
+  if [[ ${CHECK} != *${LIB_FILE}* ]]
+  then
+    tput setaf 1; echo 'Error: '${LIB_FILE}' is not installed!'
+    exit 1
+  fi
+}
+
+check_lib libuuid
+check_lib libjson-c
+check_lib libboost_program_options
+
 echo "cleaning up..."
 echo ""
-rm -rf $MYPATH/installation
 rm -rf $MYPATH/opae-sdk/mybuild
 rm -rf $MYPATH/intel-fpga-bbb/mybuild
-rm -rf $MYPATH/fam-sw/fam-cpp/mybuild
-rm -rf $MYPATH/fam-sw/fam-java/mybuild
+rm -rf $MYPATH/fdam-sw/fdam-cpp/mybuild
+rm -rf $MYPATH/fdam-sw/fdam-java/mybuild
 echo "end of cleaning up!"
 echo ""
-
-INSTALL_DIR=$MYPATH/installation
-mkdir $INSTALL_DIR
 
 echo "installing opae-sdk ..."
 echo ""
 mkdir $MYPATH/opae-sdk/mybuild
 cd  $MYPATH/opae-sdk/mybuild
 cmake .. -DBUILD_ASE=1 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make -j7
-make install
+make $JOBS
+$SUDO make install
 echo "end of installing opae-sdk"
 echo ""
 
@@ -38,29 +104,29 @@ echo ""
 mkdir $MYPATH/intel-fpga-bbb/mybuild
 cd $MYPATH/intel-fpga-bbb/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make -j7
-make install 
+make $JOBS
+$SUDO make install
 echo "end of installing intel-fpga-bbb"
 echo ""
 
-echo "installing fam-cpp..."
+echo "installing fdam-cpp..."
 echo ""
-mkdir $MYPATH/fam-sw/fam-cpp/mybuild
-cd $MYPATH/fam-sw/fam-cpp/mybuild
+mkdir $MYPATH/fdam-sw/fdam-cpp/mybuild
+cd $MYPATH/fdam-sw/fdam-cpp/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make -j7
-make install 
-echo "end of installing fam-cpp"
+make $JOBS
+$SUDO make install
+echo "end of installing fdam-cpp"
 echo ""
 
-echo "installing fam-java..."
+echo "installing fdam-java..."
 echo ""
-mkdir $MYPATH/fam-sw/fam-java/mybuild
-cd $MYPATH/fam-sw/fam-java/mybuild
+mkdir $MYPATH/fdam-sw/fdam-java/mybuild
+cd $MYPATH/fdam-sw/fdam-java/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make -j7
-make install 
-echo "end of installing fam-java"
+make $JOBS
+$SUDO make install 
+echo "end of installing fdam-java"
 echo ""
 
 cd $CALLPATH
