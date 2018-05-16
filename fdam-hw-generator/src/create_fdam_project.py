@@ -40,8 +40,12 @@ def create_fdam_project():
                 print('This project already exists!')
                 end_red_fontcolor()
                 exit(0)
-        elif not os.path.exists(prj_path + '/' + prj_name):
-            break
+        else:
+            prj_path = os.path.abspath(prj_path)
+            if not os.path.exists(prj_path + '/' + prj_name):
+                break
+            else:
+                print('This project already exists!')
 
     isDebug = False
     # while True:
@@ -83,6 +87,11 @@ def create_dir_project(path_project, numAcc):
     if len(result) != 0:
         print('Failed to create directory for project!')
 
+    cmd = 'mkdir -p ' + path_project + '/hw/rtl/fdam_gen'
+    result = commands_getoutput(cmd)
+    if len(result) != 0:
+        print('Failed to create directory for project!')
+
     for i in range(numAcc):
         cmd = 'mkdir -p ' + path_project + '/hw/rtl/acc%d' % i
         result = commands_getoutput(cmd)
@@ -100,7 +109,8 @@ def main():
         path_for_rtl = path_for_project + '/hw/rtl/fdam_gen'
         create_dir_project(path_for_project, len(acc_array))
         acc_management = make_acc_management(acc_array)
-        acc_management.to_verilog(path_for_rtl)
+        code = acc_management.to_verilog()
+        split_modules(code,path_for_rtl)
         for i in range(len(acc_array)):
             path_from = path_for_project + '/hw/rtl/fdam_gen/acc_user_%d.v'%i
             path_to = path_for_project + '/hw/rtl/acc%d'%i

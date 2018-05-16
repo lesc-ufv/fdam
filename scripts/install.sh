@@ -78,7 +78,6 @@ check_lib() {
 
 check_lib libuuid
 check_lib libjson-c
-check_lib libboost_program_options
 
 echo "cleaning up..."
 echo ""

@@ -65,3 +65,25 @@ def find_files(dir, typeFile, extensions):
                         filename = filename + "/" + aux[i]
                     str_sim = str_sim + filename + "\n"
     return str_sim
+
+def split_modules(str_modules,dir):
+    modules = str_modules.split('endmodule')
+    for m in modules:
+        m = m.strip(' \n')
+        if m.strip('\n') != '':
+            name = m.split(' ')[1]
+            with open(dir+'/%s.v'%(name),'w') as fm:
+                m = m + '\n\nendmodule'
+                fm.write(m)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
