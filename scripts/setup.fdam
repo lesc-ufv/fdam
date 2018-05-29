@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CALLPATH=`pwd`
-FULLPATH="${BASH_SOURCE[@]}"
+FULLPATH="${BASH_SOURCE[0]}"
 FULLPATH=${FULLPATH%/*}
 if [[ -d $FULLPATH ]] 
 then

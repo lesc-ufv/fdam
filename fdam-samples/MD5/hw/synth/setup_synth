@@ -6,10 +6,10 @@ afu_synth_setup  -s sources.txt --lib $SR_503_RELEASE_DIR/hw/lib afu_synth
 
 echo "#!/bin/sh" > afu_synth/clean.sh
 echo "" >> afu_synth/clean.sh
-echo  "$SR_503_RELEASE_DIR/bin/clean.sh" >> afu_synth/clean.sh
+echo  "bash $SR_503_RELEASE_DIR/bin/clean.sh" >> afu_synth/clean.sh
 chmod +x afu_synth/clean.sh
 echo "#!/bin/sh" > afu_synth/run.sh
 echo "" >> afu_synth/run.sh
-echo  "$SR_503_RELEASE_DIR/bin/run.sh" >> afu_synth/run.sh
+echo  "bash $SR_503_RELEASE_DIR/bin/run.sh" >> afu_synth/run.sh
 chmod +x afu_synth/run.sh
 
