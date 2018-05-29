@@ -31,9 +31,17 @@ module acc_user_0 #
   reg  [512-1:0] data_in;
   reg valid_in;
   
+  reg [5-1:0]rst_pipe;
+  integer i;
+  always @(posedge clk)begin
+      rst_pipe[0] <= rst;
+      for(i=1;i < 5;i=i+1)begin
+        rst_pipe[i] <= rst_pipe[i-1]; 
+      end 
+  end 
   
   always @(posedge clk) begin
-    if(rst) begin
+    if(rst_pipe[4]) begin
       acc_user_request_read <= 0;
       acc_user_request_write <= 0;
       acc_user_write_data <= 0;
@@ -53,7 +61,7 @@ module acc_user_0 #
   end
   
     always @(posedge clk) begin
-    if(rst) begin
+    if(rst_pipe[4]) begin
        shift_reg_data_out <= 512'd0;
        bit_shift <= 0;
        valid_shift_reg_data_out <=0;
@@ -94,7 +102,7 @@ module acc_user_0 #
   Md5Core uu_md5_core
   (
     .clk       (clk),
-    .reset     (rst),
+    .reset     (rst_pipe[4]),
     .wb        (data_in),
     .valid_in  (valid_in),
     .a0        ('h67452301), 

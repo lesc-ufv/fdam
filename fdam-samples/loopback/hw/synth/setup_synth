@@ -1,7 +1,7 @@
 #!/bin/sh
 
-rm -rf fam_synth
-python3 $FAM_BASEDIR/fam-hw-generator/src/update_sources.py
+rm -rf afu_synth
+python3 $FDAM_BASEDIR/fdam-hw-generator/src/update_sources.py
 afu_synth_setup  -s sources.txt --lib $SR_503_RELEASE_DIR/hw/lib afu_synth
 
 echo "#!/bin/sh" > afu_synth/clean.sh
@@ -10,6 +10,13 @@ echo  "bash $SR_503_RELEASE_DIR/bin/clean.sh" >> afu_synth/clean.sh
 chmod +x afu_synth/clean.sh
 echo "#!/bin/sh" > afu_synth/run.sh
 echo "" >> afu_synth/run.sh
+echo "datainicial=\`date +%s\`" >> afu_synth/run.sh
 echo  "bash $SR_503_RELEASE_DIR/bin/run.sh" >> afu_synth/run.sh
+echo "datafinal=\`date +%s\`" >> afu_synth/run.sh
+echo "diff=\`expr \$datafinal - \$datainicial\`" >> afu_synth/run.sh
+echo "resultado=\`expr 10800 + \$diff\`" >> afu_synth/run.sh
+echo "time=\`date -d @\$resultado +%H:%M:%S\`" >> afu_synth/run.sh
+echo "echo \"Total Time spend: \$tempo \" >> time_spend.txt" >> afu_synth/run.sh
+echo "echo \"Total Time spend: \$tempo \"" >> afu_synth/run.sh
 chmod +x afu_synth/run.sh
 

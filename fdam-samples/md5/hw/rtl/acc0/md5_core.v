@@ -214,7 +214,7 @@ module Md5Core (
   reg [31:0] w62 [0:15];
   reg [31:0] w63 [0:15];
 
-  always@(posedge clk or posedge reset) begin
+  always@(posedge clk) begin
     if (reset) begin
       a64 <= '0;
       b64 <= '0;
