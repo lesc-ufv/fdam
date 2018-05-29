@@ -4,7 +4,7 @@ project(main)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories("${CMAKE_PREFIX_PATH}/include")
+include_directories("${CMAKE_PREFIX_PATH}/include" "${CMAKE_SOURCE_DIR}/include")
 
 find_library(LIB_OPAE NAMES opae-c REQUIRED)
 find_library(LIB_OPAE_ASE NAMES opae-c-ase REQUIRED)
