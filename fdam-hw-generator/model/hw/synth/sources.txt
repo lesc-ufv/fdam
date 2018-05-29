@@ -1,0 +1,18 @@
+../rtl/base/afu.json
+
+# For now we force MPF to a particular platform.  This will be fixed later.
++define+MPF_PLATFORM_BDX
+
+QI:../rtl/base/static_base_PAR_files.qsf
+
+SI:$FPGA_BBB_CCI_SRC/BBB_cci_mpf/hw/sim/cci_mpf_sim_addenda.txt
+SI:$FPGA_BBB_CCI_SRC/BBB_ccip_async/hw/sim/ccip_async_sim_addenda.txt
+
++incdir+../rtl/base
+
+../rtl/base/csr_mgr.vh
+../rtl/base/cci_mpf_app_conf.vh
+../rtl/base/cci_mpf_app_conf_default.vh
+../rtl/base/app_afu.sv
+../rtl/base/cci_afu_with_mpf.sv
+../rtl/base/csr_mgr.sv
