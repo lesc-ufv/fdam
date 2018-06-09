@@ -233,7 +233,6 @@ def make_arbiter_controller_wr_req(num_input):
     m.Always(Posedge(clk))(
         If(rst_reg)(
             in_fifo_we(Int(0, NUM_INPUT, 10)),
-            in_fifo_din(0)
         ).Else(
             in_fifo_we(req_wr_en_in),
             in_fifo_din(req_wr_data_in)
@@ -243,7 +242,6 @@ def make_arbiter_controller_wr_req(num_input):
     m.Always(Posedge(clk))(
         If(rst_reg)(
             out_fifo_we(Int(0, 1, 2)),
-            out_fifo_din(0),
             out_fifo_re(Int(0, 1, 2))
         ).Else(
             out_fifo_we(select_dout_valid),
@@ -259,7 +257,6 @@ def make_arbiter_controller_wr_req(num_input):
     m.Always(Posedge(clk))(
         If(rst_reg)(
             req_wr_en_out(Int(0, 1, 2)),
-            req_wr_data_out(0)
         ).Else(
             req_wr_en_out(out_fifo_dout_valid),
             req_wr_data_out(out_fifo_dout)

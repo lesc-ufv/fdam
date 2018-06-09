@@ -46,13 +46,15 @@ module app_afu(
 );
     // Local reset to reduce fan-out
     logic reset = 1'b1;
-    logic [2:0]reset_pipe;
+    integer i;
+    logic [8-1:0]reset_pipe;
     always @(posedge clk)
     begin
         reset_pipe[0] <= fiu.reset;
-        reset_pipe[1] <= reset_pipe[0];
-        reset_pipe[2] <= reset_pipe[1];
-        reset <= reset_pipe[2];
+        for(i = 1; i < 8;i= i+1)begin 
+            reset_pipe[i] <= reset_pipe[i-1];
+        end 
+        reset <= reset_pipe[7];
     end
     //
     // Convert between byte addresses and line addresses.  The conversion

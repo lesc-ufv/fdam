@@ -153,9 +153,7 @@ def make_acc_management(accs):
 
         m.Always(Posedge(clk))(
             If(rst)(
-                req_rd_en(Int(0, 1, 2)),
-                req_rd_addr(0),
-                req_rd_mdata(0)
+                req_rd_en(Int(0, 1, 2))
             ).Else(
                 req_rd_en(req_rd_en_out),
                 req_rd_addr(req_rd_data_out[TAG_WIDTH:TAG_WIDTH + ADDR_WIDTH]),
@@ -165,10 +163,7 @@ def make_acc_management(accs):
 
         m.Always(Posedge(clk))(
             If(rst)(
-                req_wr_en(Int(0, 1, 2)),
-                req_wr_addr(0),
-                req_wr_mdata(0),
-                req_wr_data(0)
+                req_wr_en(Int(0, 1, 2))
             ).Else(
                 req_wr_en(req_wr_en_out),
                 req_wr_data(req_wr_data_out[TAG_WIDTH + ADDR_WIDTH:DATA_WIDTH + TAG_WIDTH + ADDR_WIDTH]),

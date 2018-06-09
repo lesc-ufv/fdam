@@ -44,10 +44,10 @@ int main(int argc, char *argv[]) {
    acc.copyFromOutputQueue(0,out,n);
    acc.printHwInfo();  
    accMgr->printHwInfo();
-   
+   long idx_error = -1;
    for(int i = 0;i < n;i++){
        if(in[i] != out[i]){
-          MSG("Loopback error at " << i << " position, expect "<< in[i] << " found "<<out[i]);
+         idx_error = i;
           break;   
        }
    }
@@ -61,6 +61,13 @@ int main(int argc, char *argv[]) {
    MSG("Total Time: " << timeExec * 1000 << "ms");
    MSG("Accelerator Time: " << timeExec1 * 1000 << "ms");
    MSG("Throughput: " << thpt << "GB/s");
+   if(idx_error >= 0){
+      MSG("Loopback error at " << idx_error<< " position, expect "<< in[idx_error] << " found "<<out[idx_error]);
+   }else{
+      MSG("Loopback pass!");       
+   }
    
+   free(in);
+   free(out);
    delete accMgr;
 }

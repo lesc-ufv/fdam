@@ -250,13 +250,10 @@ def make_arbiter_controller_rd_req(num_input):
     m.Always(Posedge(clk))(
         If(rst_reg)(
             in_fifo_we(Int(0, NUM_INPUT, 10)),
-            in_fifo_din(Repeat(Int(0, 1, 2), EmbeddedCode('DATA_WIDTH*%d' % NUM_INPUT))),
             in_fifo_re((Int(0, NUM_INPUT, 10))),
             out_fifo_we(Int(0, 1, 2)),
-            out_fifo_din(Repeat(Int(0, 1, 2), DATA_WIDTH)),
             out_fifo_re(Int(0, 1, 2)),
             req_wr_en_out(Int(0, 1, 2)),
-            req_wr_data_out(Repeat(Int(0, 1, 2), DATA_WIDTH)),
             in_fifo_re_flag(Int(0, 2, 10))
         ).Else(
             in_fifo_we(req_wr_en_in),

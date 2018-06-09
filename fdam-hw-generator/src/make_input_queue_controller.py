@@ -93,7 +93,7 @@ def make_input_queue_controller(conf_receiver):
             acc_user_read_data(0),
             acc_user_read_data_valid(Int(0, 1, 2)),
         ).Else(
-            done(AndList(count_cl >= qtd_data_cl, start)),
+            done(AndList(count_cl >= qtd_data_cl, start, conf_ready)),
             acc_user_read_data(acc_user_read_data_out),
             acc_user_read_data_valid(acc_user_read_data_valid_out)
         )
@@ -135,7 +135,6 @@ def make_input_queue_controller(conf_receiver):
     m.Always(Posedge(clk))(
         If(rst_internal)(
             request_read(Int(0, 1, 2)),
-            request_data(0),
             count_req_cl(0),
             issue_req_data(Int(0, 1, 2)),
             issue_req_data_next(Int(0, 1, 2))
@@ -189,7 +188,6 @@ def make_input_queue_controller(conf_receiver):
     m.Always(Posedge(clk))(
         If(rst_internal)(
             fifo_we(Int(0, 1, 2)),
-            din(0),
             count_cl(0)
         ).Else(
             fifo_we(Int(0, 1, 2)),

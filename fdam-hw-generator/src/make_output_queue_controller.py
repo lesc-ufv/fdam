@@ -91,7 +91,7 @@ def make_output_queue_controller(conf_receiver):
             done(Int(0, 1, 2)),
             has_wr_peding(Int(0, 1, 2))
         ).Else(
-            done(AndList((count_cl >= qtd_data_cl), start)),
+            done(AndList((count_cl >= qtd_data_cl), start, conf_ready)),
             has_wr_peding(Mux(write_peding > 0, Int(1, 1, 2), Int(0, 1, 2)))
         )
     )
@@ -173,7 +173,6 @@ def make_output_queue_controller(conf_receiver):
     m.Always(Posedge(clk))(
         If(rst_internal)(
             request_write(Int(0, 1, 2)),
-            write_data(0)
         ).Else(
             request_write(Int(0, 1, 2)),
             If(fifo_dout_valid)(

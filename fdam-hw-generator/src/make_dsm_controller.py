@@ -162,7 +162,6 @@ def make_dsm_controller(conf_receiver):
 
     m.Always(Posedge(clk))(
         If(dsm_rst_internal)(
-            done(Int(0, DATA_WIDTH.value, 10)),
             update_dsm(Int(0, 1, 2))
         ).Else(
             done(
@@ -183,7 +182,6 @@ def make_dsm_controller(conf_receiver):
             fsm_update_dsm(FSM_DSM_UPDATE_IDLE),
             done_last(Int(0)),
             acc_req_wr_count(0),
-            write_data(0),
             dsm_addr_write_next(0),
             flag_send_done(Int(0, 1, 2)),
             reset_dsm_count_cl(Int(0, 1, 2)),
@@ -204,6 +202,7 @@ def make_dsm_controller(conf_receiver):
                     If(count_dsm_delay[count_dsm_delay.width-1])(
                         done_last(done),
                         count_dsm_delay[count_dsm_delay.width-1](Int(0,1,2)),
+                        reset_dsm_count_cl(Int(1, 1, 2)),
                         fsm_update_dsm(FSM_DSM_UPDATE_WR1)
                     ).Else(
                         count_dsm_delay(count_dsm_delay + Int(1,count_dsm_delay.width,10))
@@ -240,13 +239,13 @@ def make_dsm_controller(conf_receiver):
                 ),
                 When(FSM_DSM_UPDATE_WAIT_RESP)(
                     If(dsm_count_cl == NUM_CL_DSM_TOTAL_ALIGN)(
-                        reset_dsm_count_cl(Int(1, 1, 2)),
                         If(flag_send_done)(
                             fsm_update_dsm(FSM_DSM_UPDATE_IDLE),
                         ).Else(
                             dsm_addr_write_next(dsm_addr_base),
                             acc_req_wr_count(Int(0)),
                             flag_send_done(Int(1, 1, 2)),
+                            reset_dsm_count_cl(Int(1, 1, 2)),
                             fsm_update_dsm(FSM_DSM_UPDATE_WR1)
                         )
                     )

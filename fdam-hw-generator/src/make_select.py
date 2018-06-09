@@ -90,18 +90,20 @@ def make_select(num_input):
 
     data_out = m.OutputReg('data_out', DATA_WIDTH)
     data_out_valid = m.OutputReg('data_out_valid')
-    id = 1
-    code = 'case(data_in_valid)\n'
-    for i in range(num_input):
-        code = code + '     %d: data_out <= data_in_%d;\n' % (id, i)
-        id = id * 2
-    code = code + '     default:data_out <= 0;\nendcase'
+    code = ''
+    if num_input > 1:
+        id = 1
+        code = 'case(data_in_valid)\n'
+        for i in range(num_input):
+            code = code + '     %d: data_out <= data_in_%d;\n' % (id, i)
+            id = id * 2
+        code = code + '     default:data_out <= 0;\nendcase'
+    else :
+        code = 'data_out <= data_in_0;'
+        
+    
     m.Always(Posedge(clk))(
-        If(rst)(
-            data_out(0)
-        ).Else(
-            EmbeddedCode(code)
-        )
+        EmbeddedCode(code)
     )
     m.Always(Posedge(clk))(
         If(rst)(

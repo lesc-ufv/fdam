@@ -218,6 +218,7 @@ module dsm_controller #
             if(count_dsm_delay[6]) begin
               done_last <= done;
               count_dsm_delay[6] <= 1'b0;
+              reset_dsm_count_cl <= 1'b1;
               fsm_update_dsm <= FSM_DSM_UPDATE_WR1;
             end else begin
               count_dsm_delay <= count_dsm_delay + 7'd1;
@@ -251,13 +252,13 @@ module dsm_controller #
           end
           FSM_DSM_UPDATE_WAIT_RESP: begin
             if(dsm_count_cl == NUM_CL_DSM_TOTAL_ALIGN) begin
-              reset_dsm_count_cl <= 1'b1;
               if(flag_send_done) begin
                 fsm_update_dsm <= FSM_DSM_UPDATE_IDLE;
               end else begin
                 dsm_addr_write_next <= dsm_addr_base;
                 acc_req_wr_count <= 0;
                 flag_send_done <= 1'b1;
+                reset_dsm_count_cl <= 1'b1;
                 fsm_update_dsm <= FSM_DSM_UPDATE_WR1;
               end
             end 

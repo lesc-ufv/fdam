@@ -48,14 +48,6 @@ private:
 
     void sendConfOut(unsigned char idQueue);
 
-    void *getInputQueue(unsigned char idQueue);
-
-    void *getOutputQueue(unsigned char idQueue);
-
-    void setInputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
-
-    void setOutputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
-
     int getInputQueueGlobalID(unsigned char idQueue);
 
     int getOutputQueueGlobalID(unsigned char idQueue);
@@ -72,6 +64,14 @@ public:
     void stop();
 
     void reset();
+    
+    void *getInputQueue(unsigned char idQueue);
+
+    void *getOutputQueue(unsigned char idQueue);
+
+    void setInputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
+
+    void setOutputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
 
     bool createInputQueue(unsigned char idQueue, long long nBytes);
 

@@ -113,7 +113,7 @@ module input_queue_controller #
       acc_user_read_data <= 0;
       acc_user_read_data_valid <= 1'b0;
     end else begin
-      done <= (count_cl >= qtd_data_cl) && start;
+      done <= (count_cl >= qtd_data_cl) && start && conf_ready;
       acc_user_read_data <= acc_user_read_data_out;
       acc_user_read_data_valid <= acc_user_read_data_valid_out;
     end

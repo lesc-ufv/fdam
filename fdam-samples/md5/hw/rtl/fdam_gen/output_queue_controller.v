@@ -106,7 +106,7 @@ module output_queue_controller #
       done <= 1'b0;
       has_wr_peding <= 1'b0;
     end else begin
-      done <= (count_cl >= qtd_data_cl) && start;
+      done <= (count_cl >= qtd_data_cl) && start && conf_ready;
       has_wr_peding <= (write_peding > 0)? 1'b1 : 1'b0;
     end
   end

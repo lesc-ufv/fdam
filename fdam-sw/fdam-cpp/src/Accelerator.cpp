@@ -129,6 +129,7 @@ void Accelerator::reset() {
     Accelerator::clearDsm();
     Accelerator::accManagement.resetAccelerators(static_cast<const unsigned long>(1L << Accelerator::getId()));
     Accelerator::accManagement.resetAccelerators(0L);
+    Accelerator::sendConfDsm();
 }
 
 bool Accelerator::createInputQueue(unsigned char idQueue, long long nBytes) {

@@ -18,7 +18,6 @@ def make_conf_receiver():
     m.Always(Posedge(clk))(
         If(rst)(
             conf_out_valid(Int(0, 1, 2)),
-            conf_out_data(0),
             conf_reset_out(Int(1, 1, 2)),
             fsm_conf_rec(Int(0, fsm_conf_rec.width, 10))
         ).Else(

@@ -83,7 +83,6 @@ def make_fifo():
     )
     m.Always(Posedge(clk))(
         If(rst)(
-            dout(0),
             valid(Int(0, 1, 2))
         ).Else(
             valid(Int(0, 1, 2)),
