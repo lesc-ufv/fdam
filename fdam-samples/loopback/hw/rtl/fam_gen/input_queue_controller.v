@@ -1,4 +1,3 @@
-
 module input_queue_controller #
 (
   parameter ID_QUEUE = 0,
@@ -162,7 +161,6 @@ module input_queue_controller #
   always @(posedge clk) begin
     if(rst_internal) begin
       request_read <= 1'b0;
-      request_data <= 0;
       count_req_cl <= 0;
       issue_req_data <= 1'b0;
       issue_req_data_next <= 1'b0;
@@ -220,7 +218,6 @@ module input_queue_controller #
   always @(posedge clk) begin
     if(rst_internal) begin
       fifo_we <= 1'b0;
-      din <= 0;
       count_cl <= 0;
     end else begin
       fifo_we <= 1'b0;
@@ -231,6 +228,5 @@ module input_queue_controller #
       end 
     end
   end
-
 
 endmodule

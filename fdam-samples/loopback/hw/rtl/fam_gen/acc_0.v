@@ -1,4 +1,3 @@
-
 module acc_0 #
 (
   parameter ADDR_WIDTH = 64,
@@ -195,6 +194,5 @@ module acc_0 #
     write_data_valid_reg <= write_data_valid;
     write_queue_id_reg <= write_queue_id;
   end
-
 
 endmodule

@@ -1,4 +1,3 @@
-
 module select_top_1 #
 (
   parameter DATA_WIDTH = 32
@@ -26,6 +25,5 @@ module select_top_1 #
     .data_out_valid(data_out_valid),
     .data_out(data_out)
   );
-
 
 endmodule

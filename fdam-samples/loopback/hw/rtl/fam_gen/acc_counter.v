@@ -1,4 +1,3 @@
-
 module acc_counter #
 (
   parameter DEPTH_BITS = 32
@@ -20,6 +19,5 @@ module acc_counter #
       end 
     end
   end
-
 
 endmodule

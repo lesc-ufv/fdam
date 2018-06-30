@@ -417,18 +417,22 @@ bool Accelerator::isDoneInputQueue(unsigned char idQueue) const {
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
-    return (doneDword & (2UL << bit)) == (2UL << bit);
+    
+    return (doneDword & (1UL << bit));
 }
 
 bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
+    
     auto dsmNumCL = Accelerator::getDsmSize() / 64;
     auto *doneVet = (unsigned long *) (Accelerator::getDsm());
+    
     idQueue += Accelerator::getNumInputQueue();
     int col = idQueue >> 6;
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
-    return (doneDword & (2UL << bit)) == (2UL << bit);
+    
+    return (doneDword & (1UL << bit));
 }
 
 void Accelerator::waitDone(long long timeWaitMax) {
@@ -451,7 +455,14 @@ void Accelerator::waitDone(long long timeWaitMax) {
 bool Accelerator::isDone() const {
     auto dsmNumCL = Accelerator::getDsmSize() / 64;
     auto *done = (int *) Accelerator::getDsm();
-    return (done[GET_INDEX(dsmNumCL - 1, 0, 16)] & 1) == 1L;
+    
+    for(int i = 0; i < dsmNumCL; i++){
+        if(!(done[GET_INDEX(i,16-1, 16)] & 0x80000000UL)){
+            return false;
+        }
+    }    
+    
+    return true;
 }
 
 unsigned short Accelerator::getId() const {

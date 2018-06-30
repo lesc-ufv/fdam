@@ -1,4 +1,3 @@
-
 module arbiter #
 (
   parameter PORTS = 4,

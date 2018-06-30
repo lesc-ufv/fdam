@@ -1,4 +1,3 @@
-
 module arbiter_controller_rd_req_tree_1 #
 (
   parameter DATA_WIDTH = 32,
@@ -34,6 +33,5 @@ module arbiter_controller_rd_req_tree_1 #
     .req_wr_en_out(req_wr_en_out),
     .req_wr_data_out(req_wr_data_out)
   );
-
 
 endmodule

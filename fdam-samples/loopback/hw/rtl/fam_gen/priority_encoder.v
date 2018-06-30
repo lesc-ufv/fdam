@@ -1,4 +1,3 @@
-
 module priority_encoder #
 (
   parameter WIDTH = 4,

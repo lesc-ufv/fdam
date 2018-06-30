@@ -1,4 +1,3 @@
-
 module dsm_controller #
 (
   parameter ACC_ID = 1,
@@ -39,7 +38,7 @@ module dsm_controller #
   localparam FSM_DSM_UPDATE_WR1 = 2;
   localparam FSM_DSM_UPDATE_WR2 = 3;
   localparam FSM_DSM_UPDATE_WAIT_RESP = 4;
-  reg [7-1:0] count_dsm_delay;
+  reg [10-1:0] count_dsm_delay;
   reg [DATA_WIDTH-1:0] dsm_data [0:NUM_CL_DSM_TOTAL-1];
   reg [DATA_WIDTH-1:0] done;
   reg [DATA_WIDTH-1:0] done_last;
@@ -51,7 +50,6 @@ module dsm_controller #
   reg [QTD_WIDTH-1:0] dsm_qtd_data_cl;
   reg dsm_conf_ready;
   reg [ADDR_WIDTH-1:0] dsm_addr_write_next;
-  reg flag_send_done;
   reg reset_dsm_count_cl;
   wire dsm_write_data_valid_queue;
   wire dsm_conf_rd_valid;
@@ -175,10 +173,9 @@ module dsm_controller #
 
   always @(posedge clk) begin
     if(dsm_rst_internal) begin
-      done <= 512'd0;
       update_dsm <= 1'b0;
     end else begin
-      done <= { { DATA_WIDTH - (NUM_INPUT_QUEUES + NUM_OUTPUT_QUEUES + 1){ 1'b0 } }, done_wr, done_rd, done_acc };
+      done <= { done_acc, { DATA_WIDTH - (NUM_INPUT_QUEUES + NUM_OUTPUT_QUEUES + 1){ 1'b0 } }, done_wr, done_rd };
       update_dsm <= |(done ^ done_last & done);
     end
   end
@@ -197,11 +194,9 @@ module dsm_controller #
       fsm_update_dsm <= FSM_DSM_UPDATE_IDLE;
       done_last <= 0;
       acc_req_wr_count <= 0;
-      write_data <= 0;
       dsm_addr_write_next <= 0;
-      flag_send_done <= 1'b0;
       reset_dsm_count_cl <= 1'b0;
-      count_dsm_delay <= 7'd0;
+      count_dsm_delay <= 10'd0;
     end else begin
       if(start) begin
         request_write <= 1'b0;
@@ -211,24 +206,23 @@ module dsm_controller #
             if(update_dsm & dsm_conf_ready) begin
               acc_req_wr_count <= 0;
               dsm_addr_write_next <= dsm_addr_base;
-              flag_send_done <= 1'b0;
               fsm_update_dsm <= FSM_DSM_UPDATE_DELAY;
             end 
           end
           FSM_DSM_UPDATE_DELAY: begin
-            if(count_dsm_delay[6]) begin
+            if(count_dsm_delay[9]) begin
               done_last <= done;
-              count_dsm_delay[6] <= 1'b0;
+              count_dsm_delay[9] <= 1'b0;
               reset_dsm_count_cl <= 1'b1;
               fsm_update_dsm <= FSM_DSM_UPDATE_WR1;
             end else begin
-              count_dsm_delay <= count_dsm_delay + 7'd1;
+              count_dsm_delay <= count_dsm_delay + 10'd1;
             end
           end
           FSM_DSM_UPDATE_WR1: begin
             if(available_write) begin
               request_write <= 1'b1;
-              write_data <= { dsm_data[acc_req_wr_count], dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
+              write_data <= { done_acc, dsm_data[acc_req_wr_count][DATA_WIDTH-2:0], dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
               acc_req_wr_count <= acc_req_wr_count + 1;
               dsm_addr_write_next <= dsm_addr_write_next + 1;
             end 
@@ -237,11 +231,7 @@ module dsm_controller #
             end 
           end
           FSM_DSM_UPDATE_WR2: begin
-            if(flag_send_done) begin
-              write_data <= { done_last, dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
-            end else begin
-              write_data <= { 512'd0, dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
-            end
+            write_data <= { done_last, dsm_addr_write_next, { 1'b1, ACC_ID[TAG_WIDTH-1-1:0] } };
             if(available_write) begin
               request_write <= 1'b1;
               acc_req_wr_count <= acc_req_wr_count + 1;
@@ -253,21 +243,12 @@ module dsm_controller #
           end
           FSM_DSM_UPDATE_WAIT_RESP: begin
             if(dsm_count_cl == NUM_CL_DSM_TOTAL_ALIGN) begin
-              if(flag_send_done) begin
-                fsm_update_dsm <= FSM_DSM_UPDATE_IDLE;
-              end else begin
-                dsm_addr_write_next <= dsm_addr_base;
-                acc_req_wr_count <= 0;
-                flag_send_done <= 1'b1;
-                reset_dsm_count_cl <= 1'b1;
-                fsm_update_dsm <= FSM_DSM_UPDATE_WR1;
-              end
+              fsm_update_dsm <= FSM_DSM_UPDATE_IDLE;
             end 
           end
         endcase
       end 
     end
   end
-
 
 endmodule

@@ -1,4 +1,5 @@
 import sys
+import re
 
 if sys.version_info < (2, 7):
     import commands
@@ -72,6 +73,7 @@ def split_modules(str_modules,dir):
         m = m.strip(' \n')
         if m.strip('\n') != '':
             name = m.split(' ')[1]
+            name = re.sub('[\n\t()!#$%&*-+@=;:<>\/\[\{\}\]]','',name)
             with open(dir+'/%s.v'%(name),'w') as fm:
                 m = m + '\n\nendmodule'
                 fm.write(m)

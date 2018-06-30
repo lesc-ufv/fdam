@@ -1,4 +1,3 @@
-
 module acc_management #
 (
   parameter ADDR_WIDTH = 48,
@@ -125,8 +124,6 @@ module acc_management #
   always @(posedge clk) begin
     if(rst) begin
       req_rd_en <= 1'b0;
-      req_rd_addr <= 0;
-      req_rd_mdata <= 0;
     end else begin
       req_rd_en <= req_rd_en_out;
       req_rd_addr <= req_rd_data_out[TAG_WIDTH+ADDR_WIDTH-1:TAG_WIDTH];
@@ -138,9 +135,6 @@ module acc_management #
   always @(posedge clk) begin
     if(rst) begin
       req_wr_en <= 1'b0;
-      req_wr_addr <= 0;
-      req_wr_mdata <= 0;
-      req_wr_data <= 0;
     end else begin
       req_wr_en <= req_wr_en_out;
       req_wr_data <= req_wr_data_out[DATA_WIDTH+TAG_WIDTH+ADDR_WIDTH-1:TAG_WIDTH+ADDR_WIDTH];
@@ -158,6 +152,5 @@ module acc_management #
 
     end
   end
-
 
 endmodule

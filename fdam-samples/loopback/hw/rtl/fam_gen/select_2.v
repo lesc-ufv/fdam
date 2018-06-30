@@ -1,4 +1,3 @@
-
 module select_2 #
 (
   parameter DATA_WIDTH = 32
@@ -15,15 +14,11 @@ module select_2 #
 
 
   always @(posedge clk) begin
-    if(rst) begin
-      data_out <= 0;
-    end else begin
-      case(data_in_valid)
-           1: data_out <= data_in_0;
-           2: data_out <= data_in_1;
-           default:data_out <= 0;
-      endcase
-    end
+    case(data_in_valid)
+         1: data_out <= data_in_0;
+         2: data_out <= data_in_1;
+         default:data_out <= 0;
+    endcase
   end
 
 
@@ -34,6 +29,5 @@ module select_2 #
       data_out_valid <= |data_in_valid;
     end
   end
-
 
 endmodule

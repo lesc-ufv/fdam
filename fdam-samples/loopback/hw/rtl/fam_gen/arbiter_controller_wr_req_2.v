@@ -1,4 +1,3 @@
-
 module arbiter_controller_wr_req_2 #
 (
   parameter DATA_WIDTH = 32,
@@ -28,7 +27,7 @@ module arbiter_controller_wr_req_2 #
   wire [2-1:0] in_fifo_almostfull;
   wire [2-1:0] in_fifo_almostempty;
 
-  reg [10-1:0]rst_reg;
+  reg rst_reg;
 
   reg [2-1:0] in_fifo_we;
   reg [DATA_WIDTH*2-1:0] in_fifo_din;
@@ -77,7 +76,7 @@ module arbiter_controller_wr_req_2 #
     in_fifo
     (
       .clk(clk),
-      .rst(rst_reg[9]),
+      .rst(rst_reg),
       .we(in_fifo_we[idx]),
       .din(in_fifo_din[idx*DATA_WIDTH+DATA_WIDTH-1:idx*DATA_WIDTH]),
       .re(in_fifo_re[idx]),
@@ -101,7 +100,7 @@ module arbiter_controller_wr_req_2 #
   select
   (
     .clk(clk),
-    .rst(rst_reg[9]),
+    .rst(rst_reg),
     .data_in_valid(in_fifo_dout_valid),
     .data_in_0(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*0)-1:DATA_WIDTH*0]),
     .data_in_1(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*1)-1:DATA_WIDTH*1]),
@@ -120,7 +119,7 @@ module arbiter_controller_wr_req_2 #
   out_fifo
   (
     .clk(clk),
-    .rst(rst_reg[9]),
+    .rst(rst_reg),
     .we(out_fifo_we),
     .din(out_fifo_din),
     .re(out_fifo_re),
@@ -144,7 +143,7 @@ module arbiter_controller_wr_req_2 #
   arbiter
   (
     .clk(clk),
-    .rst(rst_reg[9]),
+    .rst(rst_reg),
     .request(arbiter_request),
     .acknowledge({ 2{ 1'b0 } }),
     .grant(arbiter_grant),
@@ -158,19 +157,15 @@ module arbiter_controller_wr_req_2 #
   end
   endgenerate
 
-  integer i;
+
   always @(posedge clk) begin
-     rst_reg[0] <= rst;
-     for(i=1;i<10;i=i+1)begin 
-        rst_reg[i] <= rst_reg[i-1];
-     end 
+    rst_reg <= rst;
   end
 
 
   always @(posedge clk) begin
-    if(rst_reg[9]) begin
+    if(rst_reg) begin
       in_fifo_we <= 2'd0;
-      in_fifo_din <= 0;
     end else begin
       in_fifo_we <= req_wr_en_in;
       in_fifo_din <= req_wr_data_in;
@@ -179,9 +174,8 @@ module arbiter_controller_wr_req_2 #
 
 
   always @(posedge clk) begin
-    if(rst_reg[9]) begin
+    if(rst_reg) begin
       out_fifo_we <= 1'b0;
-      out_fifo_din <= 0;
       out_fifo_re <= 1'b0;
     end else begin
       out_fifo_we <= select_dout_valid;
@@ -196,9 +190,8 @@ module arbiter_controller_wr_req_2 #
 
 
   always @(posedge clk) begin
-    if(rst_reg[9]) begin
+    if(rst_reg) begin
       req_wr_en_out <= 1'b0;
-      req_wr_data_out <= 0;
     end else begin
       req_wr_en_out <= out_fifo_dout_valid;
       req_wr_data_out <= out_fifo_dout;
@@ -207,7 +200,7 @@ module arbiter_controller_wr_req_2 #
 
 
   always @(posedge clk) begin
-    if(rst_reg[9]) begin
+    if(rst_reg) begin
       req_wr_available_in <= 2'd0;
     end else begin
       for(it=0; it<2; it=it+1) begin
@@ -218,7 +211,7 @@ module arbiter_controller_wr_req_2 #
 
 
   always @(posedge clk) begin
-    if(rst_reg[9]) begin
+    if(rst_reg) begin
       in_fifo_re <= 2'd0;
       in_fifo_re_count <= 3'd0;
       fsm_in_fifo_re <= 2'd0;
@@ -267,6 +260,5 @@ module arbiter_controller_wr_req_2 #
       endcase
     end
   end
-
 
 endmodule

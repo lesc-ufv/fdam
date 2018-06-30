@@ -1,4 +1,3 @@
-
 module arbiter_controller_rd_req_1 #
 (
   parameter DATA_WIDTH = 32,
@@ -198,13 +197,10 @@ module arbiter_controller_rd_req_1 #
   always @(posedge clk) begin
     if(rst_reg) begin
       in_fifo_we <= 1'd0;
-      in_fifo_din <= { DATA_WIDTH*1{ 1'b0 } };
       in_fifo_re <= 1'd0;
       out_fifo_we <= 1'b0;
-      out_fifo_din <= { DATA_WIDTH{ 1'b0 } };
       out_fifo_re <= 1'b0;
       req_wr_en_out <= 1'b0;
-      req_wr_data_out <= { DATA_WIDTH{ 1'b0 } };
       in_fifo_re_flag <= 2'd0;
     end else begin
       in_fifo_we <= req_wr_en_in;
@@ -227,6 +223,5 @@ module arbiter_controller_rd_req_1 #
       end 
     end
   end
-
 
 endmodule

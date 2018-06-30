@@ -1,4 +1,3 @@
-
 module output_queue_controller #
 (
   parameter ID_QUEUE = 0,
@@ -195,7 +194,6 @@ module output_queue_controller #
   always @(posedge clk) begin
     if(rst_internal) begin
       request_write <= 1'b0;
-      write_data <= 0;
     end else begin
       request_write <= 1'b0;
       if(fifo_dout_valid) begin
@@ -207,6 +205,5 @@ module output_queue_controller #
       end 
     end
   end
-
 
 endmodule

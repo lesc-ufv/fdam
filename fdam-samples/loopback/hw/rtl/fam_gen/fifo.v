@@ -1,4 +1,3 @@
-
 module fifo #
 (
   parameter FIFO_WIDTH = 32,
@@ -81,7 +80,6 @@ module fifo #
 
   always @(posedge clk) begin
     if(rst) begin
-      dout <= 0;
       valid <= 1'b0;
     end else begin
       valid <= 1'b0;

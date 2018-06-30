@@ -1,4 +1,3 @@
-
 module conf_receiver #
 (
   parameter CONF_TYPE = 1,
@@ -21,7 +20,6 @@ module conf_receiver #
   always @(posedge clk) begin
     if(rst) begin
       conf_out_valid <= 1'b0;
-      conf_out_data <= 0;
       conf_reset_out <= 1'b1;
       fsm_conf_rec <= 2'd0;
     end else begin
@@ -45,6 +43,5 @@ module conf_receiver #
       endcase
     end
   end
-
 
 endmodule
