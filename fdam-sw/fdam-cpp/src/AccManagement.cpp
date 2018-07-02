@@ -121,6 +121,26 @@ bool AccManagement::isAccDone(const unsigned long accelerators) {
     return true;
 }
 
+long AccManagement::getTotalClocks(){
+   return AccManagement::readCSR(REG_CLOCK_COUNT);    
+}
+
+long AccManagement::getTotalWrittenCacheLine(){
+   return AccManagement::readCSR(REG_CL_WR_COUNT);     
+}
+
+long AccManagement::getTotalCacheLineRead(){
+   return AccManagement::readCSR(REG_CL_RD_COUNT);     
+}
+
+long AccManagement::getClockSpeed(){
+   return AccManagement::csrs->getAFUMHz();    
+}
+
+bool AccManagement::IsSimulated(){
+   return AccManagement::fpga->hwIsSimulated();    
+}
+
 void AccManagement::printHwInfo() {
 
     double totalClocks = AccManagement::readCSR(REG_CLOCK_COUNT);

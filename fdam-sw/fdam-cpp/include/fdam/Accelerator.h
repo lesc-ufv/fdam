@@ -134,6 +134,10 @@ public:
     bool isDone() const;
 
     unsigned short getId() const;
+    
+    long getInputQueueBytesRead(unsigned char idQueue);
+    
+    long getOutputQueueWrittenBytes(unsigned char idQueue);
 
     void printHwInfo();
 

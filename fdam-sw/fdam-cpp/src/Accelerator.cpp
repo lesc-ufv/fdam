@@ -469,12 +469,26 @@ unsigned short Accelerator::getId() const {
     return Accelerator::id;
 }
 
-void Accelerator::printHwInfo() {
+long Accelerator::getInputQueueBytesRead(unsigned char idQueue){
     auto *dsm = static_cast<unsigned int *>(Accelerator::getDsm());
+    return dsm[idQueue] * 64;
+}
+
+long Accelerator::getOutputQueueWrittenBytes(unsigned char idQueue){
+    auto dsm = static_cast<unsigned int *>(Accelerator::getDsm());
+    int numIn = Accelerator::getNumInputQueue();
+    auto offset = static_cast<int>(std::ceil(numIn / 16.0)) * 16;
+    
+    return dsm[idQueue + offset] * 64;
+}
+
+
+void Accelerator::printHwInfo() {
+
     int numIn = Accelerator::getNumInputQueue();
     int numOut = Accelerator::getNumOutputQueue();
     int id = Accelerator::getId();
-    int offset = static_cast<int>(std::ceil(numIn / 16.0)) * 16;
+
     MSG("INFO Accelerator:");
     MSG("ID: " << id);
     MSG("Amount of input queues: " << numIn);
@@ -487,20 +501,18 @@ void Accelerator::printHwInfo() {
     MSG("INFO Input Queues:");
     for (unsigned char i = 0; i < numIn; i++) {
         if (Accelerator::isDoneInputQueue(i)) {
-            MSG("Queue ID: " << static_cast<int >(i) << ", State: Done, Bytes read: " << dsm[i] * 64);
+            MSG("Queue ID: " << static_cast<int >(i) << ", State: Done, Bytes read: " << getInputQueueBytesRead(i));
         } else {
-            MSG("Queue ID: " << static_cast<int >(i) << ", State: Not done, Bytes read: " << dsm[i] * 64);
+            MSG("Queue ID: " << static_cast<int >(i) << ", State: Not done, Bytes read: " << getInputQueueBytesRead(i));
         }
-
     }
     MSG("INFO Output Queues:");
     for (unsigned char i = 0; i < numOut; i++) {
         if (Accelerator::isDoneOutputQueue(i)) {
-            MSG("Queue ID: " << static_cast<int >(i) << " State: Done, Written bytes: " << dsm[i + offset] * 64);
+            MSG("Queue ID: " << static_cast<int >(i) << " State: Done, Written bytes: " << getOutputQueueWrittenBytes(i));
         } else {
-            MSG("Queue ID: " << static_cast<int >(i) << " State: Not done, Written bytes: " << dsm[i + offset] * 64);
+            MSG("Queue ID: " << static_cast<int >(i) << " State: Not done, Written bytes: " << getOutputQueueWrittenBytes(i));
         }
-
     }
 }
 
