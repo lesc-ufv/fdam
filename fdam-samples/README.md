@@ -1,20 +1,34 @@
 # Samples
 
-C++:
+SW C++:
+
 ```
-$ cd <sample/cpp>
+$ source fdam/scripts/setup.fdam
+$ cd <sample/sw/cpp>
 $ mkdir build
 $ cd build
-$ cmake .. -DCMAKE_PREFIX_PATH=<full path for install dir>
+$ cmake .. -DCMAKE_PREFIX_PATH=$FDAM_INSTALLDIR
 $ make
 
 ```
-Java:
+SW Java:
 ```
-$ cd <sample/java>
+$ source fdam/scripts/setup.fdam
+$ cd <sample/sw/java>
 $ mkdir build
 $ cd build
-$ cmake .. -DCMAKE_PREFIX_PATH=<full path for install dir>
+$ cmake .. -DCMAKE_PREFIX_PATH=$FDAM_INSTALLDIR
 $ make
 
+```
+
+HW: 
+
+```
+$ source fdam/scripts/setup.fdam
+$ cd <sample/hw/sim>
+$ ./sim_setup
+$ cd afu_sim
+$ make
+$ make sim
 ```
