@@ -6,4 +6,5 @@
 **/installation
 **/install
 **/__pycache__
+**/*.pyc
 **/fmax_test
