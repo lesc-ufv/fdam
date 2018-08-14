@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 # TODO
-export VCS_HOME=/opt/synopsys/vcs
-export VCS_ARCH_OVERRIDE=linux
-export SNPSLMD_LICENSE_FILE="27000@fedora"
-export PATH=$PATH:$VCS_HOME/bin
+export VCS_HOME=
+export QUARTUS_HOME=
+export SNPSLMD_LICENSE_FILE=
+export LM_LICENSE_FILE=
 
-# TODO
-export QUARTUS_HOME=/opt/intelFPGA/17.1/quartus
-export LM_LICENSE_FILE="27000@fedora"
+export VCS_ARCH_OVERRIDE=linux
+export PATH=$PATH:$VCS_HOME/bin
 export PATH=$PATH:$QUARTUS_HOME/bin
