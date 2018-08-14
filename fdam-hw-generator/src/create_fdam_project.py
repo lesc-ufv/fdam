@@ -26,11 +26,11 @@ def create_fdam_project():
     print("###################################################")
     end_green_fontcolor()
     while True:
-        prj_name = input('Project name: ')
+        prj_name = raw_input('Project name: ')
         if prj_name != '': break
 
     while True:
-        prj_path = input('Project path[%s/fdam-samples ]: ' %FDAM_BASEDIR)
+        prj_path = raw_input('Project path[%s/fdam-samples ]: ' %FDAM_BASEDIR)
         if prj_path == '':
             prj_path = FDAM_BASEDIR + '/fdam-samples'
             if not os.path.exists(prj_path + '/' + prj_name):
@@ -49,7 +49,7 @@ def create_fdam_project():
 
     isDebug = False
     # while True:
-    # d = input('Debug project[yes/no]: ')
+    # d = raw_input('Debug project[yes/no]: ')
     # if d == 'yes':
     # isDebug =  True
     # break
@@ -57,7 +57,7 @@ def create_fdam_project():
     # break
 
     while True:
-        n = input('Number of accelerators: ')
+        n = raw_input('Number of accelerators: ')
         try:
             num_acc = int(n)
             if num_acc > 0:
@@ -69,7 +69,7 @@ def create_fdam_project():
     for i in range(num_acc):
         while True:
             try:
-                nin, nout = map(int, input('Number of input and output queues for acc %d [in out]:' % i).split())
+                nin, nout = map(int, raw_input('Number of input and output queues for acc %d [in out]:' % i).split())
                 if nin > 0 and nout > 0:
                     break
             except:
