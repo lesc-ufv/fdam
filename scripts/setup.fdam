@@ -11,10 +11,9 @@ MYPATH=`pwd`
 cd $CALLPATH
 
 # TODO 
-export JAVA_HOME=
-export SR_503_RELEASE_DIR=
+export SR_503_RELEASE_DIR=""
 
-export FDAM_INSTALLDIR=$WORKSPACE/fdam/installation
+export FDAM_INSTALLDIR=$HOME/workspace/fdam/installation
 export OPAE_INSTALLDIR=$FDAM_INSTALLDIR
 export FPGA_BBB_CCI_INSTALLDIR=$FDAM_INSTALLDIR
 export CLASSPATH=$JAVA_HOME/lib:$JAVA_HOME/jre/lib
