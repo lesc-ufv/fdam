@@ -52,7 +52,7 @@ def find_files(dir, typeFile, extensions):
     for extn in extensions:
         str = commands_getoutput("find " + dir + " -type f -name *" + extn)
         if (len(str.strip()) != 0):
-            print(str, end='')
+            print(str)
             for f in str.split('\n'):
                 if (len(f) != 0):
                     aux = f.split('/')

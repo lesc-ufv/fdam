@@ -22,7 +22,7 @@ $ make
 
 ```
 
-HW: 
+HW Simulator: 
 
 ```
 $ source fdam/scripts/setup.fdam
