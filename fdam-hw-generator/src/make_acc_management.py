@@ -2,13 +2,13 @@ import traceback
 
 from veriloggen import *
 
-from src.make_acc import make_acc
-from src.make_arbiter_controller_rd_req_tree import make_arbiter_controller_rd_req_tree
-from src.make_arbiter_controller_wr_req_tree import make_arbiter_controller_wr_req_tree
-from src.make_conf_receiver import make_conf_receiver
-from src.make_dsm_controller import make_dsm_controller
-from src.make_input_queue_controller import make_input_queue_controller
-from src.make_output_queue_controller import make_output_queue_controller
+from make_acc import make_acc
+from make_arbiter_controller_rd_req_tree import make_arbiter_controller_rd_req_tree
+from make_arbiter_controller_wr_req_tree import make_arbiter_controller_wr_req_tree
+from make_conf_receiver import make_conf_receiver
+from make_dsm_controller import make_dsm_controller
+from make_input_queue_controller import make_input_queue_controller
+from make_output_queue_controller import make_output_queue_controller
 
 
 def acc_management_args_process(accs):
@@ -36,7 +36,7 @@ def make_acc_management(accs):
         acc_count, qtd_in_queue, qtd_out_queue = acc_management_args_process(accs)
         RADIX = 8
         MAX_AFUS = 64
-        m = Module('acc_management')
+        m = Module('fdam_acc_management')
         ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 48)
         QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
         DATA_WIDTH = m.Parameter('DATA_WIDTH', 512)
@@ -106,9 +106,9 @@ def make_acc_management(accs):
             acc = make_acc(acc_id, input_queue_controller, output_queue_controller, output_queue_controller_dsm,
                            dsm_controller_accs)
             range1 = '%d*(ADDR_WIDTH+TAG_WIDTH)-1:%d*(ADDR_WIDTH+TAG_WIDTH)' % (
-            ini_in_queue_id + num_in_queue, ini_in_queue_id)
+                ini_in_queue_id + num_in_queue, ini_in_queue_id)
             range2 = '%d*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)-1:%d*(DATA_WIDTH+ADDR_WIDTH+TAG_WIDTH)' % (
-            con_out_wire + num_out_queue + 1, con_out_wire)
+                con_out_wire + num_out_queue + 1, con_out_wire)
             params = [('ADDR_WIDTH', ADDR_WIDTH), ('QTD_WIDTH', QTD_WIDTH), ('DATA_WIDTH', DATA_WIDTH),
                       ('CONF_ID_QUEUE_WIDTH', CONF_ID_QUEUE_WIDTH), ('INITIAL_INPUT_QUEUE_ID', ini_in_queue_id),
                       ('INITIAL_OUTPUT_QUEUE_ID', ini_out_queue_id), ('NUM_INPUT_QUEUES', num_in_queue),

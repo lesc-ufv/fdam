@@ -3,10 +3,9 @@ from __future__ import print_function
 
 import os
 import sys
-import traceback
 
 if sys.version_info < (2, 7):
-    import commands
+    pass
 else:
     pass
 
@@ -19,7 +18,7 @@ except:
     print("\033[1;m")
     exit(1)
 
-from src.utils import *
+from utils import *
 
 ### Supported file extensions
 # USERs may modify this if needed
@@ -53,13 +52,13 @@ fd_sim = open(SIM_SOURCES, "w")
 vincdir = commands_getoutput("ls ../rtl").strip().split('\n')
 incdir = ""
 for v in vincdir:
-    incdir= incdir + "+incdir+../rtl/%s\n"%v
-    
-header = "../rtl/base/afu.json\n\n# For now we force MPF to a particular platform.  This will be fixed later.\n+define+MPF_PLATFORM_BDX\n\nQI:../rtl/base/static_base_PAR_files.qsf\n\nSI:$FPGA_BBB_CCI_SRC/BBB_cci_mpf/hw/sim/cci_mpf_sim_addenda.txt\nSI:$FPGA_BBB_CCI_SRC/BBB_ccip_async/hw/sim/ccip_async_sim_addenda.txt\n\n%s\n"%incdir
+    incdir = incdir + "+incdir+../rtl/%s\n" % v
+
+header = "../rtl/base/afu.json\n\n# For now we force MPF to a particular platform.  This will be fixed later.\n+define+MPF_PLATFORM_BDX\n\nQI:../rtl/base/static_base_PAR_files.qsf\n\nSI:$FPGA_BBB_CCI_SRC/BBB_cci_mpf/hw/sim/cci_mpf_sim_addenda.txt\nSI:$FPGA_BBB_CCI_SRC/BBB_ccip_async/hw/sim/ccip_async_sim_addenda.txt\n\n%s\n" % incdir
 fd_sim.write(header)
 
 # Check if VHDL files exist, populate if any
-str_sim = find_files(dir_rtl,"VHDL",VHD_EXTENSIONS)
+str_sim = find_files(dir_rtl, "VHDL", VHD_EXTENSIONS)
 if len(str_sim) != 0:
     fd_sim.write(str_sim)
 else:
@@ -68,7 +67,7 @@ else:
     end_red_fontcolor()
 
 # Check if V files exist, populate if any
-str_sim = find_files(dir_rtl,"Verilog",VLOG_EXTENSIONS)
+str_sim = find_files(dir_rtl, "Verilog", VLOG_EXTENSIONS)
 if len(str_sim) != 0:
     fd_sim.write(str_sim)
 else:
@@ -77,7 +76,7 @@ else:
     end_red_fontcolor()
 
 # Check if SV files exist, populate if any
-str_sim = find_files(dir_rtl,"System Verilog",SVLOG_EXTENSIONS)
+str_sim = find_files(dir_rtl, "System Verilog", SVLOG_EXTENSIONS)
 if len(str_sim) != 0:
     fd_sim.write(str_sim)
 else:

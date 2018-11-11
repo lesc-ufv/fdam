@@ -9,11 +9,11 @@ AccManagement::AccManagement() {
     }
     AccManagement::csrs = new CSR_MGR(*AccManagement::fpga);
     AccManagement::createAccelerators();
-};
+}
 
 AccManagement::~AccManagement() {
     AccManagement::clear();
-};
+}
 
 void AccManagement::createAccelerators() {
     AccManagement::getInfoHw();

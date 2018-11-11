@@ -1,9 +1,10 @@
-from src.make_counter import make_counter
 from veriloggen import *
+
+from make_counter import make_counter
 
 
 def make_dsm_controller(conf_receiver):
-    m = Module('dsm_controller')
+    m = Module('fdam_dsm_controller')
     ACC_ID = m.Parameter('ACC_ID', 1)
     ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 48)
     QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
@@ -208,7 +209,8 @@ def make_dsm_controller(conf_receiver):
                 When(FSM_DSM_UPDATE_WR1)(
                     If(available_write)(
                         request_write(Int(1, 1, 2)),
-                        write_data(Cat(done_acc, dsm_data[acc_req_wr_count][EmbeddedCode('DATA_WIDTH-2:0')], dsm_addr_write_next,
+                        write_data(Cat(done_acc, dsm_data[acc_req_wr_count][EmbeddedCode('DATA_WIDTH-2:0')],
+                                       dsm_addr_write_next,
                                        Cat(Int(1, 1, 2), ACC_ID[0:TAG_WIDTH - 1]))),
                         acc_req_wr_count(acc_req_wr_count + 1),
                         dsm_addr_write_next(dsm_addr_write_next + 1)

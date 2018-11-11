@@ -1,10 +1,10 @@
 from veriloggen import *
 
-from src.make_fifo import make_fifo
+from make_fifo import make_fifo
 
 
 def make_input_queue_controller(conf_receiver):
-    m = Module('input_queue_controller')
+    m = Module('fdam_input_queue_controller')
     ID_QUEUE = m.Parameter('ID_QUEUE', 0)
     ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 64)
     QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)

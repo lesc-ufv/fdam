@@ -2,7 +2,7 @@ from veriloggen import *
 
 
 def make_conf_receiver():
-    m = Module('conf_receiver')
+    m = Module('fdam_conf_receiver')
     CONF_TYPE = m.Parameter('CONF_TYPE', 1)
     CONF_ID = m.Parameter('CONF_ID', 0)
     CONF_ID_WIDTH = m.Parameter('CONF_ID_WIDTH', 16)

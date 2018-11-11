@@ -1,10 +1,10 @@
 from veriloggen import *
 
-from src.make_priority_encoder import make_priority_encoder
+from make_priority_encoder import make_priority_encoder
 
 
 def make_arbiter():
-    m = Module('arbiter')
+    m = Module('fdam_arbiter')
     PORTS = m.Parameter('PORTS', 4)
     TYPE = m.Parameter('TYPE', "ROUND_ROBIN")
     BLOCK = m.Parameter('BLOCK', "NONE")

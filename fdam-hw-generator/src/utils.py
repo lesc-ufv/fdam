@@ -1,5 +1,5 @@
-import sys
 import re
+import sys
 
 if sys.version_info < (2, 7):
     import commands
@@ -67,25 +67,14 @@ def find_files(dir, typeFile, extensions):
                     str_sim = str_sim + filename + "\n"
     return str_sim
 
-def split_modules(str_modules,dir):
+
+def split_modules(str_modules, dir):
     modules = str_modules.split('endmodule')
     for m in modules:
         m = m.strip(' \n')
         if m.strip('\n') != '':
             name = m.split(' ')[1]
-            name = re.sub('[\n\t()!#$%&*-+@=;:<>\/\[\{\}\]]','',name)
-            with open(dir+'/%s.v'%(name),'w') as fm:
+            name = re.sub('[\n\t()!#$%&*-+@=;:<>\/\[\{\}\]]', '', name)
+            with open(dir + '/%s.v' % (name), 'w') as fm:
                 m = m + '\n\nendmodule'
                 fm.write(m)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

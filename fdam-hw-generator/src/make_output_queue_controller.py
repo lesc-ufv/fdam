@@ -1,10 +1,10 @@
 from veriloggen import *
 
-from src.make_fifo import make_fifo
+from make_fifo import make_fifo
 
 
 def make_output_queue_controller(conf_receiver):
-    m = Module('output_queue_controller')
+    m = Module('fdam_output_queue_controller')
     ID_QUEUE = m.Parameter('ID_QUEUE', 0)
     ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 64)
     QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
@@ -143,8 +143,8 @@ def make_output_queue_controller(conf_receiver):
             If(issue_req_data)(
                 fifo_re(Int(1, 1, 2)),
                 count_req_cl(count_req_cl + 1)
-            ).Elif(align_write_data&~fifo_dout_valid)(
-               count_req_cl(count_req_cl + 1)
+            ).Elif(align_write_data & ~fifo_dout_valid)(
+                count_req_cl(count_req_cl + 1)
             )
         )
     )

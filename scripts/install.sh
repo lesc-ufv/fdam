@@ -85,6 +85,7 @@ rm -rf $MYPATH/opae-sdk/mybuild
 rm -rf $MYPATH/intel-fpga-bbb/mybuild
 rm -rf $MYPATH/fdam-sw/fdam-cpp/mybuild
 rm -rf $MYPATH/fdam-sw/fdam-java/mybuild
+rm -rf $MYPATH/fdam-cgra/cgra-sw/mybuild
 echo "end of cleaning up!"
 echo ""
 
@@ -127,5 +128,16 @@ make $JOBS
 $SUDO make install 
 echo "end of installing fdam-java"
 echo ""
+
+echo "installing fdam-cgra..."
+echo ""
+mkdir $MYPATH/fdam-cgra/cgra-sw/mybuild
+cd $MYPATH/fdam-cgra/cgra-sw/mybuild
+cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+make $JOBS
+$SUDO make install 
+echo "end of installing fdam-cgra"
+echo ""
+
 
 cd $CALLPATH

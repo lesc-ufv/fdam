@@ -2,7 +2,7 @@ from veriloggen import *
 
 
 def make_priority_encoder():
-    m = Module('priority_encoder')
+    m = Module('fdam_priority_encoder')
     WIDTH = m.Parameter('WIDTH', 4)
     LSB_PRIORITY = m.Parameter('LSB_PRIORITY', "LOW")
     input_unencoded = m.Input('input_unencoded', WIDTH)
@@ -25,7 +25,7 @@ def make_priority_encoder():
     gen_if.Wire('valid1')
     gen_if.Wire('valid2')
     gen_if.Wire('out_un', WIDTH)
-    gen_if.EmbeddedCode('priority_encoder #(\n\
+    gen_if.EmbeddedCode('fdam_priority_encoder #(\n\
             .WIDTH(W2),\n\
             .LSB_PRIORITY(LSB_PRIORITY)\n\
         )\n\
@@ -35,7 +35,7 @@ def make_priority_encoder():
             .output_encoded(out1),\n\
             .output_unencoded(out_un[W2-1:0])\n\
         );\n\
-        priority_encoder #(\n\
+        fdam_priority_encoder #(\n\
             .WIDTH(W2),\n\
             .LSB_PRIORITY(LSB_PRIORITY)\n\
         )\n\

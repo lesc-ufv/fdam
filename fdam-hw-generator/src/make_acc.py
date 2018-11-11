@@ -1,10 +1,10 @@
 from veriloggen import *
 
-from src.make_acc_user import make_acc_user
+from make_acc_user import make_acc_user
 
 
 def make_acc(acc_id, input_queue_controller, output_queue_controller, output_queue_controller_dsm, dsm_controller):
-    m = Module('acc_%d' % acc_id)
+    m = Module('fdam_acc_%d' % acc_id)
     ADDR_WIDTH = m.Parameter('ADDR_WIDTH', 64)
     QTD_WIDTH = m.Parameter('QTD_WIDTH', 32)
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 512)

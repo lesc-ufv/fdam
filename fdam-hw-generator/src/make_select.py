@@ -4,7 +4,7 @@ from veriloggen import *
 def make_select_tree(radix, num_input):
     array = []
     array = make_select_tree_array(radix, num_input, array)
-    m = Module('select_top_%d' % num_input)
+    m = Module('fdam_select_top_%d' % num_input)
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -79,7 +79,7 @@ def make_select_tree(radix, num_input):
 
 
 def make_select(num_input):
-    m = Module('select_%d' % num_input)
+    m = Module('fdam_select_%d' % num_input)
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -98,10 +98,9 @@ def make_select(num_input):
             code = code + '     %d: data_out <= data_in_%d;\n' % (id, i)
             id = id * 2
         code = code + '     default:data_out <= 0;\nendcase'
-    else :
+    else:
         code = 'data_out <= data_in_0;'
-        
-    
+
     m.Always(Posedge(clk))(
         EmbeddedCode(code)
     )

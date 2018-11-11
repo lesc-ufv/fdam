@@ -1,25 +1,17 @@
+from utils import *
+from make_acc_management import make_acc_management
 import os
-import sys
 import traceback
-
-if sys.version_info < (2, 7):
-    import commands
-else:
-    pass
 
 try:
     FDAM_BASEDIR = os.environ['FDAM_BASEDIR']
-    sys.path.insert(0, FDAM_BASEDIR + '/fdam-hw-generator')
 except:
     print("\033[1;31m")
     print("Set FDAM_BASEDIR environment variable and rerun the script!")
     print("\033[1;m")
     exit(1)
 
-from src.utils import *
-from src.make_acc_management import make_acc_management
-
-def create_fdam_project():
+def create_fdam_project_cli():
     begin_green_fontcolor()
     print("###################################################")
     print("#              FDAM Project Creator               #")
@@ -30,7 +22,7 @@ def create_fdam_project():
         if prj_name != '': break
 
     while True:
-        prj_path = raw_input('Project path[%s/fdam-samples ]: ' %FDAM_BASEDIR)
+        prj_path = raw_input('Project path[%s/fdam-samples ]: ' % FDAM_BASEDIR)
         if prj_path == '':
             prj_path = FDAM_BASEDIR + '/fdam-samples'
             if not os.path.exists(prj_path + '/' + prj_name):
@@ -81,7 +73,7 @@ def create_fdam_project():
 
 def create_dir_project(path_project, numAcc):
     FDAM_BASEDIR = os.environ['FDAM_BASEDIR']
-    cmd = 'cp -r %s/fdam-hw-generator/model ' % FDAM_BASEDIR + path_project
+    cmd = 'cp -r %s/fdam-hw-generator/fdam-model ' % FDAM_BASEDIR + path_project
     result = commands_getoutput(cmd)
 
     if len(result) != 0:
@@ -98,29 +90,39 @@ def create_dir_project(path_project, numAcc):
         if len(result) != 0:
             print('Failed to create directory for project!')
 
-def main():
+
+def create_fdam_project(prj_name, prj_path, acc_array):
     try:
-        prj = create_fdam_project()
-        prj_name = prj[0]
-        prj_path = prj[1]
-        isDebug = prj[2]
-        acc_array = prj[3]
         path_for_project = prj_path + '/' + prj_name
         path_for_rtl = path_for_project + '/hw/rtl/fdam_gen'
         create_dir_project(path_for_project, len(acc_array))
         acc_management = make_acc_management(acc_array)
         code = acc_management.to_verilog()
-        split_modules(code,path_for_rtl)
+        split_modules(code, path_for_rtl)
         for i in range(len(acc_array)):
-            path_from = path_for_project + '/hw/rtl/fdam_gen/acc_user_%d.v'%i
-            path_to = path_for_project + '/hw/rtl/acc%d'%i
+            path_from = path_for_project + '/hw/rtl/fdam_gen/fdam_acc_user_%d.v' % i
+            path_to = path_for_project + '/hw/rtl/acc%d' % i
             cmd = 'mv %s %s' % (path_from, path_to)
             commands_getoutput(cmd)
 
+        return True
+
+    except:
+        return False
+
+
+def main():
+    prj = create_fdam_project_cli()
+    prj_name = prj[0]
+    prj_path = prj[1]
+    isDebug = prj[2]
+    acc_array = prj[3]
+
+    if create_fdam_project(prj_name, prj_path, acc_array):
         begin_green_fontcolor()
         print('FDAM project created successfully!')
         end_green_fontcolor()
-    except:
+    else:
         begin_red_fontcolor()
         print('Failed to create FDAM project!')
         end_red_fontcolor()

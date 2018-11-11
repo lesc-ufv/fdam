@@ -2,7 +2,7 @@ from veriloggen import *
 
 
 def make_fifo():
-    m = Module('fifo')
+    m = Module('fdam_fifo')
     FIFO_WIDTH = m.Parameter('FIFO_WIDTH', 32)
     FIFO_DEPTH_BITS = m.Parameter('FIFO_DEPTH_BITS', 8)
     FIFO_ALMOSTFULL_THRESHOLD = m.Parameter('FIFO_ALMOSTFULL_THRESHOLD', EmbeddedNumeric('2**FIFO_DEPTH_BITS - 4'))

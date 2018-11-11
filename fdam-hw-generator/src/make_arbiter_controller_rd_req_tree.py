@@ -1,15 +1,15 @@
 from veriloggen import *
 
-from src.make_arbiter import make_arbiter
-from src.make_fifo import make_fifo
-from src.make_select import make_select_tree
-from src.utils import numBits
+from make_arbiter import make_arbiter
+from make_fifo import make_fifo
+from make_select import make_select_tree
+from utils import numBits
 
 
 def make_arbiter_controller_rd_req_tree(radix, num_input):
     array = []
     array = make_arbiter_controller_tree_array(radix, num_input, array)
-    m = Module('arbiter_controller_rd_req_tree_%d' % num_input)
+    m = Module('fdam_arbiter_controller_rd_req_tree_%d' % num_input)
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
     m.Parameter('INPUT_FIFO_DEPTH_BITS', 4)
     m.Parameter('OUTPUT_FIFO_DEPTH_BITS', 4)
@@ -113,7 +113,7 @@ def make_arbiter_controller_tree_array(radix, num_input, array):
 
 
 def make_arbiter_controller_rd_req(num_input):
-    m = Module('arbiter_controller_rd_req_%d' % num_input)
+    m = Module('fdam_arbiter_controller_rd_req_%d' % num_input)
     NUM_INPUT = num_input
     DATA_WIDTH = m.Parameter('DATA_WIDTH', 32)
     INPUT_FIFO_DEPTH_BITS = m.Parameter('INPUT_FIFO_DEPTH_BITS', 4)
