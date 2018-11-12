@@ -1,3 +1,4 @@
+
 module cgra_memory #
 (
   parameter DATA_WIDTH = 32,
@@ -32,5 +33,6 @@ module cgra_memory #
       dout <= mem[raddr];
     end 
   end
+
 
 endmodule

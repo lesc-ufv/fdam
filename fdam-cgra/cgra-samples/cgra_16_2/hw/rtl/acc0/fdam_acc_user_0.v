@@ -22,9 +22,6 @@ module fdam_acc_user_0 #
 
 
   cgra_acc
-  #(
-    .DATA_WIDTH(16)
-  )
   cgra_acc
   (
     .clk(clk),

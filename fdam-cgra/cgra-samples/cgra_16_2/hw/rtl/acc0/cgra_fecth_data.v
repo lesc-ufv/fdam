@@ -1,3 +1,4 @@
+
 module cgra_fecth_data #
 (
   parameter INPUT_DATA_WIDTH = 512,
@@ -101,5 +102,6 @@ module cgra_fecth_data #
       end 
     end
   end
+
 
 endmodule

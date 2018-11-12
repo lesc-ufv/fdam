@@ -1,31 +1,28 @@
+
 module cgra_pe #
 (
-  parameter DATA_WIDTH = 16,
   parameter PE_ID = 0
 )
 (
   input clk,
   input rst,
   input en,
-  input [21-1:0] conf_bus_in,
-  output [21-1:0] conf_bus_out,
-  input [45-1:0] init_conf_bus_in,
-  output [45-1:0] init_conf_bus_out,
-  input [DATA_WIDTH-1:0] ina,
-  input [DATA_WIDTH-1:0] inb,
-  output [DATA_WIDTH-1:0] outa,
-  output [DATA_WIDTH-1:0] outb
+  input [60-1:0] conf_bus_in,
+  input [16-1:0] ina,
+  input [16-1:0] inb,
+  output [16-1:0] outa,
+  output [16-1:0] outb
 );
 
-  wire [DATA_WIDTH-1:0] alu_out;
+  wire [16-1:0] alu_out;
   wire [2-1:0] alu_out_addr;
   wire [2-1:0] alu_out_addr_reg;
-  wire [DATA_WIDTH-1:0] alu_ina;
-  wire [DATA_WIDTH-1:0] alu_ina_reg;
+  wire [16-1:0] alu_ina;
+  wire [16-1:0] alu_ina_reg;
   wire [2-1:0] alu_ina_addr;
   wire [2-1:0] alu_ina_addr_reg;
-  wire [DATA_WIDTH-1:0] alu_inb;
-  wire [DATA_WIDTH-1:0] alu_inb_reg;
+  wire [16-1:0] alu_inb;
+  wire [16-1:0] alu_inb_reg;
   wire [2-1:0] alu_inb_addr;
   wire [2-1:0] alu_inb_addr_reg;
   wire [4-1:0] alu_op;
@@ -34,18 +31,17 @@ module cgra_pe #
   wire [3-1:0] rf_raddr_reg;
   wire [3-1:0] rf_waddr;
   wire [3-1:0] rf_waddr_reg;
-  wire [DATA_WIDTH-1:0] rf_data_in;
-  wire [DATA_WIDTH-1:0] rf_data_out;
-  wire [DATA_WIDTH-1:0] rf_data_out_reg;
-  wire [DATA_WIDTH-1:0] mux_rf_const_out;
+  wire [16-1:0] rf_data_in;
+  wire [16-1:0] rf_data_out;
+  wire [16-1:0] rf_data_out_reg;
+  wire [16-1:0] mux_rf_const_out;
   wire [3-1:0] mux_rf_const_waddr_out;
-  wire rf_const_end_counter;
 
   wire [8-1:0] conf_wr_addr;
   wire [16-1:0] conf_wr_data;
   wire conf_wr_en;
 
-  wire init_conf_we;
+  wire init_const_we;
   wire [3-1:0] init_conf_const_waddr;
   wire [16-1:0] init_conf_const;
   wire [8-1:0] pc_max;
@@ -54,8 +50,8 @@ module cgra_pe #
   wire mem_re;
   wire [8-1:0] ignore_until;
 
-  wire [DATA_WIDTH-1:0] ina_reg;
-  wire [DATA_WIDTH-1:0] inb_reg;
+  wire [16-1:0] ina_reg;
+  wire [16-1:0] inb_reg;
   wire [16-1:0] inst_mem_out;
   wire [3-1:0] alu_out_decode_out;
   wire rf_we;
@@ -64,7 +60,7 @@ module cgra_pe #
 
   cgra_mux3x1
   #(
-    .WIDTH(DATA_WIDTH)
+    .WIDTH(16)
   )
   mux_alu_ina
   (
@@ -78,7 +74,7 @@ module cgra_pe #
 
   cgra_mux3x1
   #(
-    .WIDTH(DATA_WIDTH)
+    .WIDTH(16)
   )
   mux_alu_inb
   (
@@ -101,7 +97,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   ina_reg_inst
   (
@@ -115,7 +111,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   inb_reg_inst
   (
@@ -129,7 +125,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   outa_reg_inst
   (
@@ -143,7 +139,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   outb_reg_inst
   (
@@ -157,7 +153,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   alu_ina_reg_inst
   (
@@ -185,7 +181,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   alu_inb_reg_inst
   (
@@ -227,7 +223,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   rf_data_in_reg_inst
   (
@@ -255,7 +251,7 @@ module cgra_pe #
   cgra_reg_pipe
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   rf_data_out_reg_inst
   (
@@ -310,11 +306,11 @@ module cgra_pe #
 
   cgra_mux2x1
   #(
-    .WIDTH(DATA_WIDTH)
+    .WIDTH(16)
   )
   mux_rf_const
   (
-    .sel(init_conf_we),
+    .sel(init_const_we),
     .in0(rf_data_in),
     .in1(init_conf_const),
     .out(mux_rf_const_out)
@@ -327,37 +323,22 @@ module cgra_pe #
   )
   mux_rf_const_waddr
   (
-    .sel(init_conf_we),
+    .sel(init_const_we),
     .in0(rf_waddr_reg),
     .in1(init_conf_const_waddr),
     .out(mux_rf_const_waddr_out)
   );
 
 
-  cgra_counter
-  #(
-    .WIDTH(3)
-  )
-  rf_const_waddr_count
-  (
-    .clk(clk),
-    .rst(rst),
-    .en(init_conf_we),
-    .limit(3'd7),
-    .end_counter(rf_const_end_counter),
-    .out(init_conf_const_waddr)
-  );
-
-
   cgra_memory
   #(
-    .DATA_WIDTH(DATA_WIDTH),
+    .DATA_WIDTH(16),
     .ADDR_WIDTH(3)
   )
   rf
   (
     .clk(clk),
-    .we(rf_we | init_conf_we),
+    .we(rf_we | init_const_we),
     .re(rf_rd_en),
     .raddr(rf_raddr_reg),
     .waddr(mux_rf_const_waddr_out),
@@ -368,7 +349,7 @@ module cgra_pe #
 
   cgra_alu
   #(
-    .DATA_WIDTH(DATA_WIDTH)
+    .DATA_WIDTH(16)
   )
   alu
   (
@@ -397,19 +378,24 @@ module cgra_pe #
   );
 
 
-  cgra_conf_reader
+  cgra_conf_reader_pe
   #(
     .PE_ID(PE_ID)
   )
-  conf_reader
+  cgra_conf_reader_pe
   (
     .clk(clk),
     .rst(rst),
-    .conf_in(conf_bus_in),
-    .conf_out(conf_bus_out),
+    .conf_bus_in(conf_bus_in),
+    .conf_wr_en(conf_wr_en),
     .conf_wr_addr(conf_wr_addr),
     .conf_wr_data(conf_wr_data),
-    .conf_wr_en(conf_wr_en)
+    .init_const_we(init_const_we),
+    .init_const_waddr(init_conf_const_waddr),
+    .init_const(init_conf_const),
+    .pc_max(pc_max),
+    .pc_loop(pc_loop),
+    .ignore_until(ignore_until)
   );
 
 
@@ -426,24 +412,6 @@ module cgra_pe #
   );
 
 
-  cgra_initial_conf
-  #(
-    .PE_ID(PE_ID)
-  )
-  init_conf
-  (
-    .clk(clk),
-    .rst(rst),
-    .initial_conf_in(init_conf_bus_in),
-    .initial_conf_out(init_conf_bus_out),
-    .init_conf_we(init_conf_we),
-    .init_const(init_conf_const),
-    .pc_max(pc_max),
-    .pc_loop(pc_loop),
-    .ignore_until(ignore_until)
-  );
-
-
   cgra_inst_decode
   inst_decode
   (
@@ -455,5 +423,6 @@ module cgra_pe #
     .rf_raddr(rf_raddr),
     .rf_waddr(rf_waddr)
   );
+
 
 endmodule

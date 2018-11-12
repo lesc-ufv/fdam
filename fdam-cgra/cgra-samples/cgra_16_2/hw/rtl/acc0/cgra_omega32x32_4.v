@@ -1,3 +1,4 @@
+
 module cgra_omega32x32_4 #
 (
   parameter WIDTH = 16,
@@ -2347,5 +2348,6 @@ module cgra_omega32x32_4 #
     .out2(in_reg_wire_5[30]),
     .out3(in_reg_wire_5[31])
   );
+
 
 endmodule

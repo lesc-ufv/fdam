@@ -1,98 +1,122 @@
-import math
-
 from veriloggen import *
 
 
-# conf_pe packt = {id,conf_pe}
+# pe_conf  packt = {op_conf,id_pe,conf_data}
 
-def make_control_pe_conf(num_pe):
+def make_control_pe_conf(num_pe_io):
     m = Module('cgra_pe_conf_control')
-
-    conf_id_width = int(math.ceil(math.log(num_pe, 2)) + 1)
-    conf_width = 16
 
     clk = m.Input('clk')
     rst = m.Input('rst')
     start = m.Input('start')
-    qtd_conf = m.Input('qtd_conf', 32)
 
     available_read = m.Input('available_read')
     req_rd_data = m.Output('req_rd_data')
     rd_data = m.Input('rd_data', 512)
     rd_data_valid = m.Input('rd_data_valid')
 
-    conf_pe_out_bus = m.OutputReg('conf_pe_out_bus', conf_id_width + conf_width)
+    conf_pe_out_bus = m.OutputReg('conf_pe_out_bus', 60)
+
+    qtd_net_conf = m.OutputReg('qtd_net_conf', 32)
+    read_fifo_mask = m.OutputReg('read_fifo_mask', num_pe_io)
+    write_fifo_mask = m.OutputReg('write_fifo_mask', num_pe_io)
+
     done = m.OutputReg('done')
 
-    FSM_CONF_PE_CTRL_IDLE = m.Localparam('FSM_CONF_PE_CTRL_IDLE', 0)
-    FSM_SEND_CONF_PE = m.Localparam('FSM_SEND_CONF_PE', 1)
-    FSM_CONF_PE_CTRL_WAIT_DATA = m.Localparam('FSM_CONF_PE_CTRL_WAIT_DATA', 2)
-    FSM_CONF_PE_CTRL_REQ_DATA = m.Localparam('FSM_CONF_PE_CTRL_REQ_DATA', 3)
-    FSM_CONF_PE_DONE = m.Localparam('FSM_CONF_PE_DONE', 4)
+    FSM_INIT_CTRL_IDLE = m.Localparam('FSM_INIT_CTRL_IDLE', 0)
+    FSM_INIT_CTRL_INIT = m.Localparam('FSM_INIT_CTRL_INIT', 1)
+    FSM_SEND_INIT_CONF_PE = m.Localparam('FSM_SEND_INIT_CONF_PE', 2)
+    FSM_INIT_CTRL_WAIT_DATA = m.Localparam('FSM_INIT_CTRL_WAIT_DATA', 3)
+    FSM_INIT_CTRL_REQ_DATA = m.Localparam('FSM_INIT_CTRL_REQ_DATA', 4)
+    FSM_INIT_CONF_DONE = m.Localparam('FSM_INIT_CONF_DONE', 5)
     m.EmbeddedCode('')
-    fsm_conf_ctrl = m.Reg('fsm_conf_ctrl', 3)
-    fsm_conf_ctrl_next = m.Reg('fsm_conf_ctrl_next', 3)
-    conf_req_data = m.Reg('conf_req_data')
-    conf_cl = m.Reg('conf_cl', 512)
-    conf_id = m.Reg('conf_id', conf_id_width)
-    conf_pe = m.Reg('conf_pe', conf_width)
-    send_conf = m.Reg('send_conf')
-    conf_counter = m.Reg('conf_counter', 32)
-    conf_counter_cl = m.Reg('conf_counter_cl', 5)
+    fsm_init_conf_ctrl = m.Reg('fsm_init_conf_ctrl', 3)
+    fsm_init_conf_ctrl_next = m.Reg('fsm_init_conf_ctrl_next', 3)
+
+    init_conf_req_data = m.Reg('init_conf_req_data')
+    init_conf_cl = m.Reg('init_conf_cl', 512)
+    qtd_pe_conf = m.Reg('qtd_pe_conf', 32)
+
+    init_conf_op = m.Reg('init_conf_op', 4)
+    init_conf_id = m.Reg('init_conf_id', 16)
+    init_conf_data = m.Reg('init_conf_data', 40)
+
+    send_init_conf = m.Reg('send_init_conf')
+    conf_init_counter = m.Reg('conf_init_counter', 32)
+    conf_init_counter_cl = m.Reg('conf_init_counter_cl', 4)
+
     m.EmbeddedCode('')
-    req_rd_data.assign(conf_req_data)
+    req_rd_data.assign(init_conf_req_data)
 
     m.Always(Posedge(clk))(
         If(rst)(
-            fsm_conf_ctrl(FSM_CONF_PE_CTRL_IDLE),
-            fsm_conf_ctrl_next(FSM_CONF_PE_CTRL_IDLE),
-            conf_req_data(0),
-            send_conf(0),
-            conf_counter(0),
-            conf_counter_cl(Int(16, conf_counter_cl.width, 10)),
+            fsm_init_conf_ctrl(FSM_INIT_CTRL_IDLE),
+            fsm_init_conf_ctrl_next(FSM_INIT_CTRL_IDLE),
+            init_conf_req_data(0),
+            init_conf_id(0),
+            init_conf_op(0),
+            init_conf_data(0),
+            qtd_pe_conf(0),
+            qtd_net_conf(0),
+            send_init_conf(0),
+            conf_init_counter(0),
+            conf_init_counter_cl(Int(8, conf_init_counter_cl.width, 10)),
             done(0),
+            read_fifo_mask(0),
+            write_fifo_mask(0)
         ).Else(
-            conf_req_data(0),
-            send_conf(0),
-            Case(fsm_conf_ctrl)(
-                When(FSM_CONF_PE_CTRL_IDLE)(
+            init_conf_req_data(0),
+            send_init_conf(0),
+            Case(fsm_init_conf_ctrl)(
+                When(FSM_INIT_CTRL_IDLE)(
                     If(start)(
-                        fsm_conf_ctrl(FSM_SEND_CONF_PE),
+                        fsm_init_conf_ctrl(FSM_INIT_CTRL_REQ_DATA),
+                        fsm_init_conf_ctrl_next(FSM_INIT_CTRL_INIT)
                     )
                 ),
-                When(FSM_SEND_CONF_PE)(
-                    If(conf_counter >= qtd_conf)(
-                        fsm_conf_ctrl(FSM_CONF_PE_DONE),
+                When(FSM_INIT_CTRL_INIT)(
+                    qtd_pe_conf(init_conf_cl[0:32]),
+                    qtd_net_conf(init_conf_cl[32:64]),
+                    read_fifo_mask(init_conf_cl[64:64 + num_pe_io]),
+                    write_fifo_mask(init_conf_cl[96:96 + num_pe_io]),
+                    fsm_init_conf_ctrl(FSM_SEND_INIT_CONF_PE),
+                ),
+                When(FSM_SEND_INIT_CONF_PE)(
+                    If(conf_init_counter >= qtd_pe_conf)(
+                        fsm_init_conf_ctrl(FSM_INIT_CONF_DONE)
                     ).Else(
-                        If(conf_counter_cl < Int(16, conf_counter_cl.width, 10))(
-                            conf_id(conf_cl[0:conf_id_width]),
-                            conf_pe(conf_cl[16:16 + conf_width]),
-                            conf_cl(conf_cl[16 + conf_width:]),
-                            send_conf(1),
-                            conf_counter.inc(),
-                            conf_counter_cl.inc()
+                        If(conf_init_counter_cl < Int(8, conf_init_counter_cl.width, 10))(
+                            init_conf_op(init_conf_cl[0:4]),
+                            init_conf_id(init_conf_cl[16:32]),
+
+                            init_conf_data(Cat(init_conf_cl[8:16],init_conf_cl[32:64])),
+
+                            init_conf_cl(init_conf_cl[64:]),
+                            send_init_conf(1),
+                            conf_init_counter.inc(),
+                            conf_init_counter_cl.inc(),
                         ).Else(
-                            conf_counter_cl(Int(0, conf_counter_cl.width, 10)),
-                            fsm_conf_ctrl(FSM_CONF_PE_CTRL_REQ_DATA),
-                            fsm_conf_ctrl_next(FSM_SEND_CONF_PE)
+                            conf_init_counter_cl(Int(0, conf_init_counter_cl.width, 10)),
+                            fsm_init_conf_ctrl(FSM_INIT_CTRL_REQ_DATA),
+                            fsm_init_conf_ctrl_next(FSM_SEND_INIT_CONF_PE)
                         )
                     )
                 ),
-                When(FSM_CONF_PE_CTRL_REQ_DATA)(
+                When(FSM_INIT_CTRL_REQ_DATA)(
                     If(available_read)(
-                        conf_req_data(1),
-                        fsm_conf_ctrl(FSM_CONF_PE_CTRL_WAIT_DATA)
+                        init_conf_req_data(1),
+                        fsm_init_conf_ctrl(FSM_INIT_CTRL_WAIT_DATA)
                     )
                 ),
-                When(FSM_CONF_PE_CTRL_WAIT_DATA)(
+                When(FSM_INIT_CTRL_WAIT_DATA)(
                     If(rd_data_valid)(
-                        conf_cl(rd_data),
-                        fsm_conf_ctrl(fsm_conf_ctrl_next),
+                        init_conf_cl(rd_data),
+                        fsm_init_conf_ctrl(fsm_init_conf_ctrl_next),
                     )
                 ),
-                When(FSM_CONF_PE_DONE)(
+                When(FSM_INIT_CONF_DONE)(
                     done(1)
-                ),
+                )
             )
         )
     )
@@ -101,11 +125,11 @@ def make_control_pe_conf(num_pe):
         If(rst)(
             conf_pe_out_bus(0),
         ).Else(
-            If(send_conf)(
-                conf_pe_out_bus(Cat(conf_pe, conf_id))
+            If(send_init_conf)(
+                conf_pe_out_bus(Cat(init_conf_data, init_conf_id, init_conf_op)),
             ).Else(
                 conf_pe_out_bus(0)
-            )
+            ),
         )
     )
 

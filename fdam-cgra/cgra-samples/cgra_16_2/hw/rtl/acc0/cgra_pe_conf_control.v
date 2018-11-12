@@ -1,82 +1,104 @@
+
 module cgra_pe_conf_control
 (
   input clk,
   input rst,
   input start,
-  input [32-1:0] qtd_conf,
   input available_read,
   output req_rd_data,
   input [512-1:0] rd_data,
   input rd_data_valid,
-  output reg [21-1:0] conf_pe_out_bus,
+  output reg [60-1:0] conf_pe_out_bus,
+  output reg [32-1:0] qtd_net_conf,
+  output reg [2-1:0] read_fifo_mask,
+  output reg [2-1:0] write_fifo_mask,
   output reg done
 );
 
-  localparam FSM_CONF_PE_CTRL_IDLE = 0;
-  localparam FSM_SEND_CONF_PE = 1;
-  localparam FSM_CONF_PE_CTRL_WAIT_DATA = 2;
-  localparam FSM_CONF_PE_CTRL_REQ_DATA = 3;
-  localparam FSM_CONF_PE_DONE = 4;
+  localparam FSM_INIT_CTRL_IDLE = 0;
+  localparam FSM_INIT_CTRL_INIT = 1;
+  localparam FSM_SEND_INIT_CONF_PE = 2;
+  localparam FSM_INIT_CTRL_WAIT_DATA = 3;
+  localparam FSM_INIT_CTRL_REQ_DATA = 4;
+  localparam FSM_INIT_CONF_DONE = 5;
 
-  reg [3-1:0] fsm_conf_ctrl;
-  reg [3-1:0] fsm_conf_ctrl_next;
-  reg conf_req_data;
-  reg [512-1:0] conf_cl;
-  reg [5-1:0] conf_id;
-  reg [16-1:0] conf_pe;
-  reg send_conf;
-  reg [32-1:0] conf_counter;
-  reg [5-1:0] conf_counter_cl;
+  reg [3-1:0] fsm_init_conf_ctrl;
+  reg [3-1:0] fsm_init_conf_ctrl_next;
+  reg init_conf_req_data;
+  reg [512-1:0] init_conf_cl;
+  reg [32-1:0] qtd_pe_conf;
+  reg [4-1:0] init_conf_op;
+  reg [16-1:0] init_conf_id;
+  reg [40-1:0] init_conf_data;
+  reg send_init_conf;
+  reg [32-1:0] conf_init_counter;
+  reg [4-1:0] conf_init_counter_cl;
 
-  assign req_rd_data = conf_req_data;
+  assign req_rd_data = init_conf_req_data;
 
   always @(posedge clk) begin
     if(rst) begin
-      fsm_conf_ctrl <= FSM_CONF_PE_CTRL_IDLE;
-      fsm_conf_ctrl_next <= FSM_CONF_PE_CTRL_IDLE;
-      conf_req_data <= 0;
-      send_conf <= 0;
-      conf_counter <= 0;
-      conf_counter_cl <= 5'd16;
+      fsm_init_conf_ctrl <= FSM_INIT_CTRL_IDLE;
+      fsm_init_conf_ctrl_next <= FSM_INIT_CTRL_IDLE;
+      init_conf_req_data <= 0;
+      init_conf_id <= 0;
+      init_conf_op <= 0;
+      init_conf_data <= 0;
+      qtd_pe_conf <= 0;
+      qtd_net_conf <= 0;
+      send_init_conf <= 0;
+      conf_init_counter <= 0;
+      conf_init_counter_cl <= 4'd8;
       done <= 0;
+      read_fifo_mask <= 0;
+      write_fifo_mask <= 0;
     end else begin
-      conf_req_data <= 0;
-      send_conf <= 0;
-      case(fsm_conf_ctrl)
-        FSM_CONF_PE_CTRL_IDLE: begin
+      init_conf_req_data <= 0;
+      send_init_conf <= 0;
+      case(fsm_init_conf_ctrl)
+        FSM_INIT_CTRL_IDLE: begin
           if(start) begin
-            fsm_conf_ctrl <= FSM_SEND_CONF_PE;
+            fsm_init_conf_ctrl <= FSM_INIT_CTRL_REQ_DATA;
+            fsm_init_conf_ctrl_next <= FSM_INIT_CTRL_INIT;
           end 
         end
-        FSM_SEND_CONF_PE: begin
-          if(conf_counter >= qtd_conf) begin
-            fsm_conf_ctrl <= FSM_CONF_PE_DONE;
-          end else if(conf_counter_cl < 5'd16) begin
-            conf_id <= conf_cl[4:0];
-            conf_pe <= conf_cl[31:16];
-            conf_cl <= conf_cl[511:32];
-            send_conf <= 1;
-            conf_counter <= conf_counter + 1;
-            conf_counter_cl <= conf_counter_cl + 1;
+        FSM_INIT_CTRL_INIT: begin
+          qtd_pe_conf <= init_conf_cl[31:0];
+          qtd_net_conf <= init_conf_cl[63:32];
+          read_fifo_mask <= init_conf_cl[65:64];
+          write_fifo_mask <= init_conf_cl[97:96];
+          fsm_init_conf_ctrl <= FSM_SEND_INIT_CONF_PE;
+        end
+        FSM_SEND_INIT_CONF_PE: begin
+          if(conf_init_counter >= qtd_pe_conf) begin
+            fsm_init_conf_ctrl <= FSM_INIT_CONF_DONE;
+          end else if(conf_init_counter_cl < 4'd8) begin
+            init_conf_op <= init_conf_cl[3:0];
+            init_conf_id <= init_conf_cl[31:16];
+            init_conf_data <= { init_conf_cl[15:8], init_conf_cl[63:32] };
+            init_conf_cl <= init_conf_cl[511:64];
+            send_init_conf <= 1;
+            conf_init_counter <= conf_init_counter + 1;
+            conf_init_counter_cl <= conf_init_counter_cl + 1;
           end else begin
-            conf_counter_cl <= 5'd0;
-            fsm_conf_ctrl <= FSM_CONF_PE_CTRL_REQ_DATA;
-            fsm_conf_ctrl_next <= FSM_SEND_CONF_PE;
+            conf_init_counter_cl <= 4'd0;
+            fsm_init_conf_ctrl <= FSM_INIT_CTRL_REQ_DATA;
+            fsm_init_conf_ctrl_next <= FSM_SEND_INIT_CONF_PE;
           end
         end
-        FSM_CONF_PE_CTRL_REQ_DATA: begin
+        FSM_INIT_CTRL_REQ_DATA: begin
           if(available_read) begin
-            conf_req_data <= 1;
-            fsm_conf_ctrl <= FSM_CONF_PE_CTRL_WAIT_DATA;
+            init_conf_req_data <= 1;
+            fsm_init_conf_ctrl <= FSM_INIT_CTRL_WAIT_DATA;
           end 
         end
-        FSM_CONF_PE_CTRL_WAIT_DATA: begin
+        FSM_INIT_CTRL_WAIT_DATA: begin
           if(rd_data_valid) begin
-            conf_cl <= rd_data;
-            fsm_conf_ctrl <= fsm_conf_ctrl_next;
+            init_conf_cl <= rd_data;
+            fsm_init_conf_ctrl <= fsm_init_conf_ctrl_next;
           end 
         end
-        FSM_CONF_PE_DONE: begin
+        FSM_INIT_CONF_DONE: begin
           done <= 1;
         end
       endcase
@@ -88,12 +110,13 @@ module cgra_pe_conf_control
     if(rst) begin
       conf_pe_out_bus <= 0;
     end else begin
-      if(send_conf) begin
-        conf_pe_out_bus <= { conf_pe, conf_id };
+      if(send_init_conf) begin
+        conf_pe_out_bus <= { init_conf_data, init_conf_id, init_conf_op };
       end else begin
         conf_pe_out_bus <= 0;
       end
     end
   end
+
 
 endmodule

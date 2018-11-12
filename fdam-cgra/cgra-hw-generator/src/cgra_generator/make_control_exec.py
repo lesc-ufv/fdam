@@ -60,9 +60,9 @@ def make_control_exec(num_pe, num_pe_io, net_radix):
             available_push_masked(0),
             available_queues(0)
         ).Else(
-            available_pop_masked(available_pop|Unot(read_fifo_mask)),
-            available_push_masked(available_push|Unot(write_fifo_mask)),
-            available_queues(Uand(available_pop_masked&available_push_masked))
+            available_pop_masked(available_pop | Unot(read_fifo_mask)),
+            available_push_masked(available_push | Unot(write_fifo_mask)),
+            available_queues(Uand(available_pop_masked & available_push_masked))
         )
     )
     m.Always(Posedge(clk))(
@@ -82,7 +82,7 @@ def make_control_exec(num_pe, num_pe_io, net_radix):
             en_read1(And(en_read, read_fifo_mask)),
             en_write1(And(en_write, write_fifo_mask)),
             For(i(0), i < en_process.width, i.inc())(
-                en_process[i](And(Uor(en_read1),Uor(en_write1))),
+                en_process[i](And(Uor(en_read1), Uor(en_write1))),
                 en_process1[i](And(en_process[i], fsm_state[0]))
             ),
             For(i(0), i < en_pe.width, i.inc())(

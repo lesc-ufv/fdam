@@ -8,7 +8,6 @@ from omega_generator.make_switch_box import make_swicth_box
 
 
 def make_omega(size, num_extra_stagies, radix, print_status=False):
-    
     bits_conf_cross = int(ceil(log(radix, 2)) * radix)
     num_stagies = int(ceil(log(size, radix)) + num_extra_stagies)
     num_cross_stagies = int(ceil(size / radix))
@@ -66,7 +65,8 @@ def make_omega(size, num_extra_stagies, radix, print_status=False):
         for j in range(num_cross_stagies):
             param = [('WIDTH', WIDTH)]
             con0 = [('sel', conf[conf_idx][j * bits_conf_cross:(j + 1) * bits_conf_cross])]
-            con1 = [('in%d' % p, in_reg_wire[i][bit_rotate_rigth(j * radix + p, int(ceil(log(radix, 2))), max_bits)]) for
+            con1 = [('in%d' % p, in_reg_wire[i][bit_rotate_rigth(j * radix + p, int(ceil(log(radix, 2))), max_bits)])
+                    for
                     p in
                     range(radix)]
             con2 = [('out%d' % p, in_reg_wire[i + 1][j * radix + p]) for p in range(radix)]

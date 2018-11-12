@@ -1,3 +1,4 @@
+
 module cgra_net_conf_control
 (
   input clk,
@@ -100,5 +101,6 @@ module cgra_net_conf_control
     end
     conf_net_data_out <= conf_net;
   end
+
 
 endmodule

@@ -32,18 +32,15 @@ void Cgra::prepareProgram(cgra_program_t *program) {
     auto num_bytes = Cgra::cgra_program->input_queues[0].length * sizeof(unsigned short);
 
     size_t cgra_intial_conf_bytes = sizeof(cgra_intial_conf_t);
-    size_t pe_initial_conf_bytes = Cgra::cgra_program->cgra_intial_conf.qtd_pe_init_conf * sizeof(pe_initial_conf_t);
-    size_t pe_conf_bytes = Cgra::cgra_program->cgra_intial_conf.qtd_pe_conf * sizeof(pe_conf_t);
+    size_t pe_conf_bytes = Cgra::cgra_program->cgra_intial_conf.qtd_pe_conf * sizeof(pe_initial_conf_t);
     size_t net_conf_total_bytes = Cgra::cgra_program->cgra_intial_conf.qtd_net_conf * Cgra::net_conf_bytes;
 
     auto cgra_intial_conf_bytes_align = static_cast<int>((std::ceil(cgra_intial_conf_bytes / 64.0)) * 64.0);
-    auto pe_initial_conf_bytes_align = static_cast<int>((std::ceil(pe_initial_conf_bytes / 64.0)) * 64.0);
     auto pe_conf_bytes_align = static_cast<int>((std::ceil(pe_conf_bytes / 64.0)) * 64.0);
     auto net_conf_bytes_align = static_cast<int>((std::ceil(net_conf_total_bytes / 64.0)) * 64.0);
 
     long long int total_bytes;
     total_bytes = cgra_intial_conf_bytes_align;
-    total_bytes += pe_initial_conf_bytes_align;
     total_bytes += pe_conf_bytes_align;
     total_bytes += net_conf_bytes_align;
     total_bytes += num_bytes;
@@ -53,9 +50,7 @@ void Cgra::prepareProgram(cgra_program_t *program) {
 
     memcpy(queue_data_ptr, &Cgra::cgra_program->cgra_intial_conf, cgra_intial_conf_bytes);
     queue_data_ptr = queue_data_ptr + cgra_intial_conf_bytes_align;
-    memcpy(queue_data_ptr, Cgra::cgra_program->pe_initial_conf, pe_initial_conf_bytes);
-    queue_data_ptr = queue_data_ptr + pe_initial_conf_bytes_align;
-    memcpy(queue_data_ptr, Cgra::cgra_program->pe_conf, pe_conf_bytes);
+    memcpy(queue_data_ptr, Cgra::cgra_program->pe_initial_conf, pe_conf_bytes);
     queue_data_ptr = queue_data_ptr + pe_conf_bytes_align;
     int n = Cgra::cgra_program->cgra_intial_conf.qtd_net_conf;
     for (int j = 0; j < n; ++j) {

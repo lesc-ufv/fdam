@@ -1,3 +1,4 @@
+
 module cgra_alu #
 (
   parameter DATA_WIDTH = 16
@@ -57,5 +58,6 @@ module cgra_alu #
       result[i] = 0;
     end
   end
+
 
 endmodule

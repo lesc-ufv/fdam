@@ -1,8 +1,9 @@
-from utils import *
-from make_acc_management import make_acc_management
-from cgra_generator.make_cgra_acc_user import make_cgra_acc_user
 import os
 import traceback
+
+from cgra_generator.make_cgra_acc_user import make_cgra_acc_user
+from make_acc_management import make_acc_management
+from utils import *
 
 try:
     FDAM_BASEDIR = os.environ['FDAM_BASEDIR']
@@ -11,6 +12,7 @@ except:
     print("Set FDAM_BASEDIR environment variable and rerun the script!")
     print("\033[1;m")
     exit(1)
+
 
 def create_fdam_project_cli():
     begin_green_fontcolor()

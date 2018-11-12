@@ -7,7 +7,7 @@ def make_counter():
     clk = m.Input('clk')
     rst = m.Input('rst')
     en = m.Input('en')
-    out = m.Output('out',WIDTH)
+    out = m.Output('out', WIDTH)
     limit = m.Input('limit', WIDTH)
     end_counter = m.OutputReg('end_counter')
     count = m.Reg('count', WIDTH)

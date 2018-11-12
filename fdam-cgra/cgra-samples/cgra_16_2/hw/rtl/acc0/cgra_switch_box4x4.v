@@ -1,3 +1,4 @@
+
 module cgra_switch_box4x4 #
 (
   parameter WIDTH = 16
@@ -73,5 +74,6 @@ module cgra_switch_box4x4 #
     .sel(sel[7:6]),
     .out(out3)
   );
+
 
 endmodule

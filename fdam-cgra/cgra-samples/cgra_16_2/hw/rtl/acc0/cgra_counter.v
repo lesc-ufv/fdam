@@ -1,3 +1,4 @@
+
 module cgra_counter #
 (
   parameter WIDTH = 32
@@ -27,5 +28,6 @@ module cgra_counter #
       end 
     end
   end
+
 
 endmodule

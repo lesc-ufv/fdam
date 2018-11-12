@@ -22,8 +22,8 @@ def make_cgra_acc_user(acc_id, num_pe, num_pe_io, radix, mem_conf_depth, data_wi
     acc_user_write_data = m.OutputReg('acc_user_write_data', DATA_WIDTH * NUM_OUTPUT_QUEUES)
     acc_user_done = m.OutputReg('acc_user_done')
 
-    cgra_acc = make_cgra_accelerator(num_pe, num_pe_io, radix, mem_conf_depth)
-    param = [('DATA_WIDTH', data_width)]
-    m.Instance(cgra_acc, 'cgra_acc', param, m.get_ports())
+    cgra_acc = make_cgra_accelerator(num_pe, num_pe_io, data_width, radix, mem_conf_depth)
+
+    m.Instance(cgra_acc, 'cgra_acc', [], m.get_ports())
 
     return m
