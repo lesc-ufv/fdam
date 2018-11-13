@@ -1,5 +1,5 @@
 
-module cgra_counter #
+module cgra0_counter #
 (
   parameter WIDTH = 32
 )

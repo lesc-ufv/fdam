@@ -1,5 +1,5 @@
 
-module cgra_reg_pipe_ #
+module cgra0_reg_pipe_ #
 (
   parameter NUM_STAGES = 1,
   parameter DATA_WIDTH = 16

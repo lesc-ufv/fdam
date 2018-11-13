@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_conf_reader_pc_net(conf_depth):
-    m = Module('cgra_conf_reader_pc_net')
+def make_conf_reader_pc_net(cgra_id, conf_depth):
+    m = Module('cgra%d_conf_reader_pc_net'%cgra_id)
 
     PE_ID = m.Parameter('PE_ID', 0)
 

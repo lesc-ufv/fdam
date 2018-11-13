@@ -1,5 +1,5 @@
 
-module cgra_control_exec
+module cgra0_control_exec
 (
   input clk,
   input rst,

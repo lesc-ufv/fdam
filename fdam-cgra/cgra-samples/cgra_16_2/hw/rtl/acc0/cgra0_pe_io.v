@@ -1,5 +1,5 @@
 
-module cgra_pe_io #
+module cgra0_pe_io #
 (
   parameter PE_ID = 0
 )
@@ -70,7 +70,7 @@ module cgra_pe_io #
   assign ignore_counter_en = (alu_out_addr_reg == 2'd3) && en;
   assign rf_rd_en = ((alu_ina_addr_reg == 2'd2) || (alu_inb_addr_reg == 2'd2)) && en;
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -84,7 +84,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -98,7 +98,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_counter
+  cgra0_counter
   #(
     .WIDTH(8)
   )
@@ -113,7 +113,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_mux4x1
+  cgra0_mux4x1
   #(
     .WIDTH(16)
   )
@@ -128,7 +128,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_mux4x1
+  cgra0_mux4x1
   #(
     .WIDTH(16)
   )
@@ -143,7 +143,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_alu_out_decode_io
+  cgra0_alu_out_decode_io
   alu_out_decode
   (
     .sel(alu_out_addr_reg),
@@ -151,7 +151,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -165,7 +165,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -179,7 +179,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -193,7 +193,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -207,7 +207,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -221,7 +221,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(2)
@@ -235,7 +235,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -249,7 +249,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(2)
@@ -263,7 +263,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(4),
     .DATA_WIDTH(2)
@@ -277,7 +277,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -291,7 +291,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(1)
@@ -305,7 +305,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -319,7 +319,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(2),
     .DATA_WIDTH(4)
@@ -333,7 +333,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(3)
@@ -347,7 +347,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(5),
     .DATA_WIDTH(3)
@@ -361,7 +361,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_mux2x1
+  cgra0_mux2x1
   #(
     .WIDTH(16)
   )
@@ -374,7 +374,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_mux2x1
+  cgra0_mux2x1
   #(
     .WIDTH(3)
   )
@@ -387,7 +387,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_memory
+  cgra0_memory
   #(
     .DATA_WIDTH(16),
     .ADDR_WIDTH(3)
@@ -404,7 +404,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_alu
+  cgra0_alu
   #(
     .DATA_WIDTH(16)
   )
@@ -418,7 +418,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_memory
+  cgra0_memory
   #(
     .DATA_WIDTH(16),
     .ADDR_WIDTH(8)
@@ -435,11 +435,11 @@ module cgra_pe_io #
   );
 
 
-  cgra_conf_reader_pe
+  cgra0_conf_reader_pe
   #(
     .PE_ID(PE_ID)
   )
-  cgra_conf_reader_pe
+  cgra0_conf_reader_pe
   (
     .clk(clk),
     .rst(rst),
@@ -456,7 +456,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_program_counter
+  cgra0_program_counter
   pc
   (
     .clk(clk),
@@ -469,7 +469,7 @@ module cgra_pe_io #
   );
 
 
-  cgra_inst_decode
+  cgra0_inst_decode
   inst_decode
   (
     .instruction(inst_mem_out),

@@ -27,7 +27,7 @@ module fdam_arbiter_controller_wr_req_3 #
   wire [3-1:0] in_fifo_almostfull;
   wire [3-1:0] in_fifo_almostempty;
 
-  reg rst_reg;
+  wire [11-1:0] rst_reg;
 
   reg [3-1:0] in_fifo_we;
   reg [DATA_WIDTH*3-1:0] in_fifo_din;
@@ -64,6 +64,28 @@ module fdam_arbiter_controller_wr_req_3 #
   integer it;
   genvar idx;
 
+  fdam_reg_tree_4_11_2
+  #(
+    .DATA_WIDTH(1)
+  )
+  fdam_reg_tree_4_11_2
+  (
+    .clk(clk),
+    .in(rst),
+    .out_0(rst_reg[0]),
+    .out_1(rst_reg[1]),
+    .out_2(rst_reg[2]),
+    .out_3(rst_reg[3]),
+    .out_4(rst_reg[4]),
+    .out_5(rst_reg[5]),
+    .out_6(rst_reg[6]),
+    .out_7(rst_reg[7]),
+    .out_8(rst_reg[8]),
+    .out_9(rst_reg[9]),
+    .out_10(rst_reg[10])
+  );
+
+
   generate for(idx=0; idx<3; idx=idx+1) begin : gen_in_fifos
 
     fdam_fifo
@@ -76,7 +98,7 @@ module fdam_arbiter_controller_wr_req_3 #
     in_fifo
     (
       .clk(clk),
-      .rst(rst_reg),
+      .rst(rst_reg[idx]),
       .we(in_fifo_we[idx]),
       .din(in_fifo_din[idx*DATA_WIDTH+DATA_WIDTH-1:idx*DATA_WIDTH]),
       .re(in_fifo_re[idx]),
@@ -100,7 +122,7 @@ module fdam_arbiter_controller_wr_req_3 #
   select
   (
     .clk(clk),
-    .rst(rst_reg),
+    .rst(rst_reg[3]),
     .data_in_valid(in_fifo_dout_valid),
     .data_in_0(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*0)-1:DATA_WIDTH*0]),
     .data_in_1(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*1)-1:DATA_WIDTH*1]),
@@ -120,7 +142,7 @@ module fdam_arbiter_controller_wr_req_3 #
   out_fifo
   (
     .clk(clk),
-    .rst(rst_reg),
+    .rst(rst_reg[4]),
     .we(out_fifo_we),
     .din(out_fifo_din),
     .re(out_fifo_re),
@@ -144,7 +166,7 @@ module fdam_arbiter_controller_wr_req_3 #
   arbiter
   (
     .clk(clk),
-    .rst(rst_reg),
+    .rst(rst_reg[5]),
     .request(arbiter_request),
     .acknowledge({ 3{ 1'b0 } }),
     .grant(arbiter_grant),
@@ -160,12 +182,7 @@ module fdam_arbiter_controller_wr_req_3 #
 
 
   always @(posedge clk) begin
-    rst_reg <= rst;
-  end
-
-
-  always @(posedge clk) begin
-    if(rst_reg) begin
+    if(rst_reg[6]) begin
       in_fifo_we <= 3'd0;
     end else begin
       in_fifo_we <= req_wr_en_in;
@@ -175,7 +192,7 @@ module fdam_arbiter_controller_wr_req_3 #
 
 
   always @(posedge clk) begin
-    if(rst_reg) begin
+    if(rst_reg[7]) begin
       out_fifo_we <= 1'b0;
       out_fifo_re <= 1'b0;
     end else begin
@@ -191,7 +208,7 @@ module fdam_arbiter_controller_wr_req_3 #
 
 
   always @(posedge clk) begin
-    if(rst_reg) begin
+    if(rst_reg[8]) begin
       req_wr_en_out <= 1'b0;
     end else begin
       req_wr_en_out <= out_fifo_dout_valid;
@@ -201,7 +218,7 @@ module fdam_arbiter_controller_wr_req_3 #
 
 
   always @(posedge clk) begin
-    if(rst_reg) begin
+    if(rst_reg[9]) begin
       req_wr_available_in <= 3'd0;
     end else begin
       for(it=0; it<3; it=it+1) begin
@@ -212,7 +229,7 @@ module fdam_arbiter_controller_wr_req_3 #
 
 
   always @(posedge clk) begin
-    if(rst_reg) begin
+    if(rst_reg[10]) begin
       in_fifo_re <= 3'd0;
       in_fifo_re_count <= 3'd0;
       fsm_in_fifo_re <= 2'd0;

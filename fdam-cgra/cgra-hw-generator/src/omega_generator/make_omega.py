@@ -7,14 +7,14 @@ from common.make_reg_pipe import make_reg_pipe
 from omega_generator.make_switch_box import make_swicth_box
 
 
-def make_omega(size, num_extra_stagies, radix, print_status=False):
+def make_omega(cgra_id,size, num_extra_stagies, radix, print_status=False):
     bits_conf_cross = int(ceil(log(radix, 2)) * radix)
     num_stagies = int(ceil(log(size, radix)) + num_extra_stagies)
     num_cross_stagies = int(ceil(size / radix))
     bits_conf = int(num_stagies * num_cross_stagies * bits_conf_cross)
     max_bits = int(ceil(log(size, 2)))
 
-    m = Module('cgra_omega%dx%d_%d' % (size, size, radix))
+    m = Module('cgra%d_omega%dx%d_%d' % (cgra_id,size, size, radix))
     WIDTH = m.Parameter('WIDTH', 16)
     PIPE_EXTRA = m.Parameter('PIPE_EXTRA', 0)
     clk = m.Input('clk')
@@ -24,8 +24,8 @@ def make_omega(size, num_extra_stagies, radix, print_status=False):
     inputs = [m.Input('in%d' % i, WIDTH) for i in range(size)]
     outputs = [m.Output('out%d' % i, WIDTH) for i in range(size)]
 
-    switch_box = make_swicth_box(radix, radix)
-    reg_pipe = make_reg_pipe()
+    switch_box = make_swicth_box(cgra_id,radix, radix)
+    reg_pipe = make_reg_pipe(cgra_id)
 
     conf_stage_width = num_cross_stagies * bits_conf_cross
     conf = [m.Wire('conf_reg_%d' % e, conf_stage_width) for e in range(num_stagies)]

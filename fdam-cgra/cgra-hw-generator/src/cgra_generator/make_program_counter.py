@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_program_counter(pc_depth):
-    m = Module('cgra_program_counter')
+def make_program_counter(cgra_id, pc_depth):
+    m = Module('cgra%d_program_counter'%cgra_id)
     clk = m.Input('clk')
     rst = m.Input('rst')
     en = m.Input('en')

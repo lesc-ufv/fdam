@@ -7,10 +7,10 @@ from omega_generator.make_omega import make_omega
 
 # conf_net packt = {conf_net}
 
-def make_control_net_conf(num_pe, net_radix, conf_depth):
-    m = Module('cgra_net_conf_control')
+def make_control_net_conf(cgra_id, num_pe, net_radix, conf_depth):
+    m = Module('cgra%d_net_conf_control'%cgra_id)
 
-    net = make_omega(num_pe * 2, 0, net_radix)
+    net = make_omega(cgra_id,num_pe * 2, 0, net_radix)
     conf_net_width = net.get_ports().get('conf').width
 
     num_cl_conf_net = int(math.ceil(conf_net_width / 512))

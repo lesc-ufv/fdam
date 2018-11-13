@@ -3,8 +3,8 @@ from veriloggen import *
 
 # pe_conf  packt = {op_conf,id_pe,conf_data}
 
-def make_control_pe_conf(num_pe_io):
-    m = Module('cgra_pe_conf_control')
+def make_control_pe_conf(cgra_id, num_pe_io):
+    m = Module('cgra%d_pe_conf_control'%cgra_id)
 
     clk = m.Input('clk')
     rst = m.Input('rst')

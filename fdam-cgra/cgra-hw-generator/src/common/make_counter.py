@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_counter():
-    m = Module('cgra_counter')
+def make_counter(cgra_id):
+    m = Module('cgra%d_counter'%cgra_id)
     WIDTH = m.Parameter('WIDTH', 32)
     clk = m.Input('clk')
     rst = m.Input('rst')

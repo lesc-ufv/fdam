@@ -1,5 +1,5 @@
 
-module cgra_conf_reader_pe #
+module cgra0_conf_reader_pe #
 (
   parameter PE_ID = 0
 )

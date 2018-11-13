@@ -1,5 +1,5 @@
 
-module cgra_net_conf_control
+module cgra0_net_conf_control
 (
   input clk,
   input rst,

@@ -5,8 +5,8 @@ from veriloggen import Module
 from common.make_mux import make_mux
 
 
-def make_swicth_box(num_in, num_out):
-    m = Module('cgra_switch_box%dx%d' % (num_in, num_out))
+def make_swicth_box(cgra_id, num_in, num_out):
+    m = Module('cgra%d_switch_box%dx%d' % (cgra_id,num_in, num_out))
     WIDTH = m.Parameter('WIDTH', 16)
 
     ports_in = []
@@ -23,7 +23,7 @@ def make_swicth_box(num_in, num_out):
     for i in range(num_out):
         ports_out.append(m.Output('out%d' % i, WIDTH))
 
-    mux = make_mux(num_in)
+    mux = make_mux(cgra_id,num_in)
     ports_cross = m.get_ports()
     for i in range(num_out):
         p = []

@@ -1,5 +1,5 @@
 
-module cgra_program_counter
+module cgra0_program_counter
 (
   input clk,
   input rst,

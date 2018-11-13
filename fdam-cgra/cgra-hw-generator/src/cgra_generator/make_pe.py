@@ -9,10 +9,10 @@ from common.make_mux import make_mux
 from common.make_reg_pipe import make_reg_pipe
 
 
-def make_pe(is_io, pc, memory, data_width,conf_depth):
-    name = 'cgra_pe'
+def make_pe(cgra_id, is_io, pc, memory, data_width,conf_depth):
+    name = 'cgra%d_pe'%cgra_id
     if is_io:
-        name = 'cgra_pe_io'
+        name = name + '_io'
     m = Module(name)
 
     PE_ID = m.Parameter('PE_ID', 0)
@@ -77,8 +77,8 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
     alu_out_decode_out = m.Wire('alu_out_decode_out', n)
     rf_we = m.Wire('rf_we')
     rf_rd_en = m.Wire('rf_rd_en')
-    reg = make_reg_pipe()
-    counter = make_counter()
+    reg = make_reg_pipe(cgra_id)
+    counter = make_counter(cgra_id)
 
     if is_io:
         fifo_in_data = m.Input('fifo_in_data', data_width)
@@ -108,7 +108,7 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
                ('end_counter', ignore_until_en), ('out', ignore_counter_out)]
         m.Instance(counter, 'ignore_counter', param, con)
 
-        mux4 = make_mux(4)
+        mux4 = make_mux(cgra_id,4)
         param = [('WIDTH', data_width)]
         con = [('sel', alu_ina_addr_reg), ('in0', ina_reg), ('in1', inb_reg), ('in2', rf_data_out_reg),
                ('in3', fifo_in_data_reg),
@@ -120,13 +120,13 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
                ('out', alu_inb)]
         m.Instance(mux4, 'mux_alu_inb', param, con)
 
-        alu_out_decode = make_alu_out_decode(True)
+        alu_out_decode = make_alu_out_decode(cgra_id,True)
         param = []
         con = [('sel', alu_out_addr_reg), ('out', alu_out_decode_out)]
         m.Instance(alu_out_decode, 'alu_out_decode', param, con)
     else:
         rf_rd_en.assign(AndList(OrList(alu_ina_addr_reg == Int(2, 2, 10), alu_inb_addr_reg == Int(2, 2, 10)), en))
-        mux3 = make_mux(3)
+        mux3 = make_mux(cgra_id,3)
         param = [('WIDTH', data_width)]
         con = [('sel', alu_ina_addr_reg), ('in0', ina_reg), ('in1', inb_reg), ('in2', rf_data_out_reg),
                ('out', alu_ina)]
@@ -135,7 +135,7 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
         con = [('sel', alu_inb_addr_reg), ('in0', ina_reg), ('in1', inb_reg), ('in2', rf_data_out_reg),
                ('out', alu_inb)]
         m.Instance(mux3, 'mux_alu_inb', param, con)
-        alu_out_decode = make_alu_out_decode(False)
+        alu_out_decode = make_alu_out_decode(cgra_id,False)
         param = []
         con = [('sel', alu_out_addr_reg), ('out', alu_out_decode_out)]
         m.Instance(alu_out_decode, 'alu_out_decode', param, con)
@@ -200,7 +200,7 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
     con = [('clk', clk), ('en', en), ('in', rf_waddr), ('out', rf_waddr_reg)]
     m.Instance(reg, 'rf_waddr_reg_inst', param, con)
 
-    mux2 = make_mux(2)
+    mux2 = make_mux(cgra_id,2)
     param = [('WIDTH', data_width)]
     con = [('sel', init_const_we), ('in0', rf_data_in), ('in1', init_conf_const), ('out', mux_rf_const_out)]
     m.Instance(mux2, 'mux_rf_const', param, con)
@@ -215,7 +215,7 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
            ('waddr', mux_rf_const_waddr_out), ('din', mux_rf_const_out), ('dout', rf_data_out)]
     m.Instance(memory, 'rf', param, con)
 
-    alu = make_alu()
+    alu = make_alu(cgra_id)
     param = [('DATA_WIDTH', data_width)]
     con = [('clk', clk), ('op', alu_op_reg), ('ina', alu_ina_reg), ('inb', alu_inb_reg), ('out', alu_out)]
     m.Instance(alu, 'alu', param, con)
@@ -225,7 +225,7 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
            ('din', conf_wr_data), ('dout', inst_mem_out)]
     m.Instance(memory, 'inst_mem', param, con)
 
-    conf_reader_pe = make_conf_reader_pe(data_width,16, conf_depth)
+    conf_reader_pe = make_conf_reader_pe(cgra_id,data_width,16, conf_depth)
     param = [('PE_ID', PE_ID)]
     con = [('clk', clk), ('rst', rst), ('conf_bus_in', conf_bus_in), ('conf_wr_en', conf_wr_en),
            ('conf_wr_addr', conf_wr_addr), ('conf_wr_data', conf_wr_data), ('init_const_we', init_const_we),
@@ -240,7 +240,7 @@ def make_pe(is_io, pc, memory, data_width,conf_depth):
            ('pc_en', mem_re)]
     m.Instance(pc, 'pc', param, con)
 
-    inst_decode = make_inst_decode()
+    inst_decode = make_inst_decode(cgra_id)
     param = []
     con_inst_decode = [('instruction', inst_mem_out), ('alu_op', alu_op), ('alu_a', alu_ina_addr),
                        ('alu_b', alu_inb_addr), ('alu_out', alu_out_addr), ('rf_raddr', rf_raddr),

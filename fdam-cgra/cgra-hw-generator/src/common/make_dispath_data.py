@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_dispath_data():
-    m = Module('cgra_dispath_data')
+def make_dispath_data(cgra_id):
+    m = Module('cgra%d_dispath_data'%cgra_id)
     INPUT_DATA_WIDTH = m.Parameter('INPUT_DATA_WIDTH', 16)
     OUTPUT_DATA_WIDTH = m.Parameter('OUTPUT_DATA_WIDTH', 512)
 

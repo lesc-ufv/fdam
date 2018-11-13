@@ -3,8 +3,8 @@ from math import log, ceil
 from veriloggen import *
 
 
-def make_mux(n):
-    m = Module('cgra_mux%dx1' % n)
+def make_mux(cgra_id,n):
+    m = Module('cgra%d_mux%dx1' %(cgra_id, n))
     WIDTH = m.Parameter('WIDTH', 16)
     s_bits = int(ceil(log(n, 2)))
     s = m.Input('sel', s_bits)

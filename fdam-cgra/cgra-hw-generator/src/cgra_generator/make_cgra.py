@@ -8,8 +8,8 @@ from common.make_reg_pipe import make_reg_pipe
 from omega_generator.make_omega import make_omega
 
 
-def make_cgra(num_pe, num_pe_io,data_width,net_radix, conf_depth):
-    m = Module('cgra_top')
+def make_cgra(cgra_id,num_pe, num_pe_io,data_width,net_radix, conf_depth):
+    m = Module('cgra%d_top'%cgra_id)
 
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -20,7 +20,7 @@ def make_cgra(num_pe, num_pe_io,data_width,net_radix, conf_depth):
 
     conf_bus_in = m.Input('conf_bus_in', conf_bus_width)
 
-    net = make_omega(num_pe * 2, 0, net_radix)
+    net = make_omega(cgra_id,num_pe * 2, 0, net_radix)
     net_en = m.Input('net_en', net.get_ports().get('en').width)
     en_pc_net = m.Input('en_pc_net')
     net_conf_mem_we = m.Input('net_conf_mem_we')
@@ -51,11 +51,11 @@ def make_cgra(num_pe, num_pe_io,data_width,net_radix, conf_depth):
     genv = m.Genvar('genv')
     m.EmbeddedCode('')
 
-    pc = make_program_counter(conf_depth)
-    memory = make_memory()
-    pe_io = make_pe(True, pc, memory,data_width, conf_depth)
-    pe = make_pe(False, pc, memory,data_width, conf_depth)
-    reg_pipe = make_reg_pipe()
+    pc = make_program_counter(cgra_id,conf_depth)
+    memory = make_memory(cgra_id)
+    pe_io = make_pe(cgra_id,True, pc, memory,data_width, conf_depth)
+    pe = make_pe(cgra_id,False, pc, memory,data_width, conf_depth)
+    reg_pipe = make_reg_pipe(cgra_id)
 
     param = [('NUM_STAGES', 1), ('DATA_WIDTH', conf_bus_width)]
     con = [('clk', clk), ('en', Int(1, 1, 2)), ('in', conf_bus_in), ('out', conf_bus_in_reg)]
@@ -90,7 +90,7 @@ def make_cgra(num_pe, num_pe_io,data_width,net_radix, conf_depth):
     genInstPE.Instance(pe, 'pe', params_pe, con_pe)
     genInstPE.Instance(reg_pipe, 'conf_bus_reg_pe', param_reg_pipe, con_reg_pipe)
 
-    conf_reader_pc_net = make_conf_reader_pc_net(conf_depth)
+    conf_reader_pc_net = make_conf_reader_pc_net(cgra_id,conf_depth)
     param = [('PE_ID', num_pe + 1)]
     con = [('clk', clk), ('rst', rst), ('conf_bus_in', conf_bus_in_reg), ('pc_max', net_pc_max),
            ('pc_loop', net_pc_loop)]

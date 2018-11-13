@@ -75,6 +75,23 @@ def split_modules(str_modules, dir):
         if m.strip('\n') != '':
             name = m.split(' ')[1]
             name = re.sub('[\n\t()!#$%&*-+@=;:<>\/\[\{\}\]]', '', name)
+
             with open(dir + '/%s.v' % (name), 'w') as fm:
                 m = m + '\n\nendmodule'
                 fm.write(m)
+
+def make_tree_array(radix, num_input, array):
+    if radix < 2:
+        return [[num_input]]
+    m_array = []
+    while num_input > radix:
+        m_array.append(radix)
+        num_input = num_input - radix
+    else:
+        m_array.append(num_input)
+
+    array.append(m_array)
+    if len(m_array) == 1:
+        return array
+    else:
+        return make_tree_array(radix, len(m_array), array)

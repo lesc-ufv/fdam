@@ -1,5 +1,5 @@
 
-module cgra_top
+module cgra0_top
 (
   input clk,
   input rst,
@@ -34,7 +34,7 @@ module cgra_top
   genvar genv;
 
 
-  cgra_reg_pipe_
+  cgra0_reg_pipe_
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(60)
@@ -48,7 +48,7 @@ module cgra_top
   );
 
 
-  cgra_reg_pipe_
+  cgra0_reg_pipe_
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(60)
@@ -64,7 +64,7 @@ module cgra_top
 
   generate for(genv=0; genv<2; genv=genv+1) begin : inst_pe_io
 
-    cgra_pe_io
+    cgra0_pe_io
     #(
       .PE_ID(genv + 1)
     )
@@ -85,7 +85,7 @@ module cgra_top
     );
 
 
-    cgra_reg_pipe_
+    cgra0_reg_pipe_
     #(
       .NUM_STAGES(1),
       .DATA_WIDTH(60)
@@ -104,7 +104,7 @@ module cgra_top
 
   generate for(genv=2; genv<16; genv=genv+1) begin : inst_pe
 
-    cgra_pe
+    cgra0_pe
     #(
       .PE_ID(genv + 1)
     )
@@ -121,7 +121,7 @@ module cgra_top
     );
 
 
-    cgra_reg_pipe_
+    cgra0_reg_pipe_
     #(
       .NUM_STAGES(1),
       .DATA_WIDTH(60)
@@ -138,11 +138,11 @@ module cgra_top
   endgenerate
 
 
-  cgra_conf_reader_pc_net
+  cgra0_conf_reader_pc_net
   #(
     .PE_ID(17)
   )
-  cgra_conf_reader_pc_net
+  cgra0_conf_reader_pc_net
   (
     .clk(clk),
     .rst(rst),
@@ -152,7 +152,7 @@ module cgra_top
   );
 
 
-  cgra_program_counter
+  cgra0_program_counter
   pc
   (
     .clk(clk),
@@ -167,7 +167,7 @@ module cgra_top
 
   generate for(genv=0; genv<6; genv=genv+1) begin : inst_mem_conf
 
-    cgra_memory
+    cgra0_memory
     #(
       .DATA_WIDTH(32),
       .ADDR_WIDTH(8)
@@ -187,7 +187,7 @@ module cgra_top
   endgenerate
 
 
-  cgra_omega32x32_4
+  cgra0_omega32x32_4
   #(
     .WIDTH(16),
     .PIPE_EXTRA(0)

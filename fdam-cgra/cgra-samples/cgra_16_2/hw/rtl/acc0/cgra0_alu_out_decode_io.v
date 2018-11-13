@@ -1,5 +1,5 @@
 
-module cgra_alu_out_decode_io
+module cgra0_alu_out_decode_io
 (
   input [2-1:0] sel,
   output [4-1:0] out

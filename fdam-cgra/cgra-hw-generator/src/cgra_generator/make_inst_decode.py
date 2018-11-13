@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_inst_decode():
-    name = 'cgra_inst_decode'
+def make_inst_decode(cgra_id):
+    name = 'cgra%d_inst_decode'%cgra_id
 
     m = Module(name)
 

@@ -66,7 +66,7 @@ def create_fdam_project_cli():
                     break
             except:
                 pass
-        acc_array.append((nin, nout))
+        acc_array.append((nin, nout,None))
 
     return [prj_name, prj_path, isDebug, acc_array]
 
@@ -127,6 +127,8 @@ def main():
         print('Failed to create FDAM project!')
         end_red_fontcolor()
         print(traceback.format_exc())
+        cmd = 'rm -r %s' % (prj_path+'/'+prj_name)
+        commands_getoutput(cmd)
         exit(1)
 
 

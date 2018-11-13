@@ -1,5 +1,5 @@
 
-module cgra_acc
+module cgra0_acc
 (
   input clk,
   input rst,
@@ -45,7 +45,7 @@ module cgra_acc
 
   generate for(genv=0; genv<2; genv=genv+1) begin : inst_fecth_data
 
-    cgra_fecth_data
+    cgra0_fecth_data
     #(
       .INPUT_DATA_WIDTH(512),
       .OUTPUT_DATA_WIDTH(16)
@@ -70,7 +70,7 @@ module cgra_acc
 
   generate for(genv=0; genv<2; genv=genv+1) begin : inst_dispath_data
 
-    cgra_dispath_data
+    cgra0_dispath_data
     #(
       .INPUT_DATA_WIDTH(16),
       .OUTPUT_DATA_WIDTH(512)
@@ -92,7 +92,7 @@ module cgra_acc
   endgenerate
 
 
-  cgra_control_exec
+  cgra0_control_exec
   control_exec
   (
     .clk(clk),
@@ -115,7 +115,7 @@ module cgra_acc
   );
 
 
-  cgra_pe_conf_control
+  cgra0_pe_conf_control
   control_pe_conf
   (
     .clk(clk),
@@ -133,7 +133,7 @@ module cgra_acc
   );
 
 
-  cgra_net_conf_control
+  cgra0_net_conf_control
   control_net_conf
   (
     .clk(clk),
@@ -151,7 +151,7 @@ module cgra_acc
   );
 
 
-  cgra_top
+  cgra0_top
   cgra
   (
     .clk(clk),

@@ -9,20 +9,20 @@ from common.make_fecth_data import make_fecth_data
 from omega_generator.make_omega import make_omega
 
 
-def make_cgra_accelerator(num_pe, num_pe_io, data_width, net_radix, mem_conf_depth):
-    net = make_omega(num_pe * 2, 0, net_radix)
+def make_cgra_accelerator(cgra_id, num_pe, num_pe_io, data_width, net_radix, mem_conf_depth):
+    net = make_omega(cgra_id,num_pe * 2, 0, net_radix)
     conf_net_width = net.get_ports().get('conf').width
     en_net_bits = net.get_ports().get('en').width
     conf_bus_width = 60
-    fd = make_fecth_data()
-    dd = make_dispath_data()
-    control_pe_conf = make_control_pe_conf(num_pe_io)
-    control_net_conf = make_control_net_conf(num_pe, net_radix, mem_conf_depth)
+    fd = make_fecth_data(cgra_id)
+    dd = make_dispath_data(cgra_id)
+    control_pe_conf = make_control_pe_conf(cgra_id,num_pe_io)
+    control_net_conf = make_control_net_conf(cgra_id,num_pe, net_radix, mem_conf_depth)
 
-    control_exec = make_control_exec(num_pe, num_pe_io, net_radix)
-    cgra = make_cgra(num_pe, num_pe_io, data_width, net_radix, mem_conf_depth)
+    control_exec = make_control_exec(cgra_id,num_pe, num_pe_io, net_radix)
+    cgra = make_cgra(cgra_id,num_pe, num_pe_io, data_width, net_radix, mem_conf_depth)
 
-    m = Module('cgra_acc')
+    m = Module('cgra%d_acc' % (cgra_id))
 
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -90,17 +90,6 @@ def make_cgra_accelerator(num_pe, num_pe_io, data_width, net_radix, mem_conf_dep
     genInstFor2.Instance(dd, 'dispath_data', params, con)
 
     params = []
-    con = [('clk', clk), ('rst', rst), ('start', net_conf_done), ('read_fifo_mask', read_fifo_mask),
-           ('write_fifo_mask', write_fifo_mask), ('available_read', acc_user_available_read),
-           ('available_write', acc_user_available_write),
-           ('available_pop', available_pop), ('available_push', available_push),
-           ('read_fifo_done', acc_user_done_rd_data),
-           ('write_fifo_done', acc_user_done_wr_data), ('en_pe', en_pe), ('en_net', en_net), ('en_pc_net', en_pc_net),
-           ('en_fecth_data', en_fecth_data), ('en_dispath_data', en_dispath_data), ('done', acc_user_done)
-           ]
-    m.Instance(control_exec, 'control_exec', params, con)
-
-    params = []
     con = [
         ('clk', clk), ('rst', rst), ('start', start), ('available_read', acc_user_available_read[0]),
         ('req_rd_data', conf_control_req_rd_data), ('rd_data', acc_user_read_data[0:512]),
@@ -120,6 +109,17 @@ def make_cgra_accelerator(num_pe, num_pe_io, data_width, net_radix, mem_conf_dep
     m.Instance(control_net_conf, 'control_net_conf', params, con)
 
     params = []
+    con = [('clk', clk), ('rst', rst), ('start', net_conf_done), ('read_fifo_mask', read_fifo_mask),
+           ('write_fifo_mask', write_fifo_mask), ('available_read', acc_user_available_read),
+           ('available_write', acc_user_available_write),
+           ('available_pop', available_pop), ('available_push', available_push),
+           ('read_fifo_done', acc_user_done_rd_data),
+           ('write_fifo_done', acc_user_done_wr_data), ('en_pe', en_pe), ('en_net', en_net), ('en_pc_net', en_pc_net),
+           ('en_fecth_data', en_fecth_data), ('en_dispath_data', en_dispath_data), ('done', acc_user_done)
+           ]
+    m.Instance(control_exec, 'control_exec', params, con)
+    
+    params = []
     con = [
         ('clk', clk), ('rst', rst), ('pes_en', en_pe), ('conf_bus_in', conf_pe_out_bus),
         ('net_en', en_net), ('en_pc_net', en_pc_net), ('net_conf_mem_we', conf_net_we),
@@ -132,5 +132,5 @@ def make_cgra_accelerator(num_pe, num_pe_io, data_width, net_radix, mem_conf_dep
     return m
 
 
-make_cgra_accelerator(16, 2, 16, 4, 8).to_verilog(
+make_cgra_accelerator(0,16, 2, 16, 4, 8).to_verilog(
     '/home/lucas/Documentos/ufv-projects/fdam/fdam-cgra/cgra-samples/cgra_16_2/hw/rtl/acc0')

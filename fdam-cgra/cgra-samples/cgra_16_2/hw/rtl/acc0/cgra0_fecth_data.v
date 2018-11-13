@@ -1,5 +1,5 @@
 
-module cgra_fecth_data #
+module cgra0_fecth_data #
 (
   parameter INPUT_DATA_WIDTH = 512,
   parameter OUTPUT_DATA_WIDTH = 16

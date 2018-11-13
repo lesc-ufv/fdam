@@ -1,7 +1,10 @@
 import os
+import shutil
 import traceback
 
-from cgra_generator.make_cgra_acc_user import make_cgra_acc_user
+import time
+
+from cgra_generator.make_cgra_accelerator import make_cgra_accelerator
 from make_acc_management import make_acc_management
 from utils import *
 
@@ -119,29 +122,34 @@ def create_dir_project(path_project, numAcc):
 def create_fdam_project(prj_name, prj_path, cgra_array):
     try:
         path_for_project = prj_path + '/' + prj_name
-        path_for_rtl = path_for_project + '/hw/rtl/fdam_gen'
+        path_for_rtl = path_for_project + '/hw/rtl/fdam_gen/'
         create_dir_project(path_for_project, len(cgra_array))
         acc_array = []
         for i in range(len(cgra_array)):
-            acc_array.append((cgra_array[i][1], cgra_array[i][1]))
-        acc_management = make_acc_management(acc_array)
-        code = acc_management.to_verilog()
-        split_modules(code, path_for_rtl)
-        for i in range(len(acc_array)):
             num_pe = cgra_array[i][0]
             num_pe_io = cgra_array[i][1]
             radix = cgra_array[i][2]
             mem_conf_depth = cgra_array[i][3]
             data_width = cgra_array[i][4]
-            path_from = path_for_project + '/hw/rtl/fdam_gen/fdam_acc_user_%d.v' % i
-            cmd = 'rm %s' % path_from
-            commands_getoutput(cmd)
-            cgra = make_cgra_acc_user(i, num_pe, num_pe_io, radix, mem_conf_depth, data_width)
-            code = cgra.to_verilog()
-            split_modules(code, path_for_project + '/hw/rtl/acc%d' % i)
+            cgra_acc = make_cgra_accelerator(i, num_pe, num_pe_io, data_width, radix, mem_conf_depth)
+            acc_array.append((cgra_array[i][1], cgra_array[i][1], cgra_acc))
+        acc_management = make_acc_management(acc_array)
+        code = acc_management.to_verilog()
+        split_modules(code, path_for_rtl)
+        for i in range(len(cgra_array)):
+            files = os.listdir(path_for_rtl)
+            files.sort()
+            for f in files:
+                name = f.split('_')
+                if(name[0] == 'cgra%d'%i):
+                    src = path_for_rtl + f
+                    dst = path_for_project+'/hw/rtl/acc%d/'%i + f
+                    shutil.move(src, dst)
+
         return True
 
     except:
+        print(traceback.format_exc())
         return False
 
 
@@ -161,6 +169,8 @@ def main():
         print('Failed to create FDAM-CGRA project!')
         end_red_fontcolor()
         print(traceback.format_exc())
+        cmd = 'rm -r %s' % (prj_path + '/' + prj_name)
+        commands_getoutput(cmd)
         exit(1)
 
 

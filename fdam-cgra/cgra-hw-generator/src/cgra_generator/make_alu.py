@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_alu():
-    m = Module('cgra_alu')
+def make_alu(cgra_id):
+    m = Module('cgra%d_alu'%cgra_id)
     width = m.Parameter('DATA_WIDTH', 16)
 
     clk = m.Input('clk')

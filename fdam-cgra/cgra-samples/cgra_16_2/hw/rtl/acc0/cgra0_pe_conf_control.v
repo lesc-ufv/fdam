@@ -1,5 +1,5 @@
 
-module cgra_pe_conf_control
+module cgra0_pe_conf_control
 (
   input clk,
   input rst,

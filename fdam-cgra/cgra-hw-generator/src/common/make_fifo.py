@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_fifo():
-    m = Module('cgra_fifo')
+def make_fifo(cgra_id):
+    m = Module('cgra%d_fifo'%cgra_id)
     FIFO_WIDTH = m.Parameter('FIFO_WIDTH', 32)
     FIFO_DEPTH_BITS = m.Parameter('FIFO_DEPTH_BITS', 8)
     FIFO_ALMOSTFULL_THRESHOLD = m.Parameter('FIFO_ALMOSTFULL_THRESHOLD', EmbeddedNumeric('2**FIFO_DEPTH_BITS - 4'))

@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_memory():
-    m = Module('cgra_memory')
+def make_memory(cgra_id):
+    m = Module('cgra%d_memory'%cgra_id)
     data_width = m.Parameter('DATA_WIDTH', 32)
     addr_width = m.Parameter('ADDR_WIDTH', 8)
     clk = m.Input('clk')

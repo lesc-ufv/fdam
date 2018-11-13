@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_reg_pipe():
-    m = Module('cgra_reg_pipe')
+def make_reg_pipe(cgra_id):
+    m = Module('cgra%d_reg_pipe'%cgra_id)
     num_stages = m.Parameter('NUM_STAGES', 1)
     data_width = m.Parameter('DATA_WIDTH', 16)
 

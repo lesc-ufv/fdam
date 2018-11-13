@@ -1,5 +1,5 @@
 
-module cgra_switch_box4x4 #
+module cgra0_switch_box4x4 #
 (
   parameter WIDTH = 16
 )
@@ -16,7 +16,7 @@ module cgra_switch_box4x4 #
 );
 
 
-  cgra_mux4x1
+  cgra0_mux4x1
   #(
     .WIDTH(WIDTH)
   )
@@ -31,7 +31,7 @@ module cgra_switch_box4x4 #
   );
 
 
-  cgra_mux4x1
+  cgra0_mux4x1
   #(
     .WIDTH(WIDTH)
   )
@@ -46,7 +46,7 @@ module cgra_switch_box4x4 #
   );
 
 
-  cgra_mux4x1
+  cgra0_mux4x1
   #(
     .WIDTH(WIDTH)
   )
@@ -61,7 +61,7 @@ module cgra_switch_box4x4 #
   );
 
 
-  cgra_mux4x1
+  cgra0_mux4x1
   #(
     .WIDTH(WIDTH)
   )

@@ -1,5 +1,5 @@
 
-module cgra_alu #
+module cgra0_alu #
 (
   parameter DATA_WIDTH = 16
 )

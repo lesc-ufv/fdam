@@ -1,5 +1,5 @@
 
-module cgra_dispath_data #
+module cgra0_dispath_data #
 (
   parameter INPUT_DATA_WIDTH = 16,
   parameter OUTPUT_DATA_WIDTH = 512

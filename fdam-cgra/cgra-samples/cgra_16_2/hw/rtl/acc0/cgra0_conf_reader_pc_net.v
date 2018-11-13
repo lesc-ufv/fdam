@@ -1,5 +1,5 @@
 
-module cgra_conf_reader_pc_net #
+module cgra0_conf_reader_pc_net #
 (
   parameter PE_ID = 0
 )

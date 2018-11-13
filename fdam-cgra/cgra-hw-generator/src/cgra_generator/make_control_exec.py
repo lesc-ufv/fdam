@@ -3,11 +3,11 @@ from veriloggen import *
 from omega_generator.make_omega import make_omega
 
 
-def make_control_exec(num_pe, num_pe_io, net_radix):
-    net = make_omega(num_pe * 2, 0, net_radix)
+def make_control_exec(cgra_id, num_pe, num_pe_io, net_radix):
+    net = make_omega(cgra_id,num_pe * 2, 0, net_radix)
     en_net_bits = net.get_ports().get('en').width
 
-    m = Module('cgra_control_exec')
+    m = Module('cgra%d_control_exec'%cgra_id)
     clk = m.Input('clk')
     rst = m.Input('rst')
 

@@ -1,5 +1,5 @@
 
-module cgra_omega32x32_4 #
+module cgra0_omega32x32_4 #
 (
   parameter WIDTH = 16,
   parameter PIPE_EXTRA = 0
@@ -84,7 +84,7 @@ module cgra_omega32x32_4 #
   wire [WIDTH-1:0] in_reg_wire_4 [0:32-1];
   wire [WIDTH-1:0] in_reg_wire_5 [0:32-1];
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(64)
@@ -98,7 +98,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 2),
     .DATA_WIDTH(64)
@@ -112,7 +112,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 3),
     .DATA_WIDTH(64)
@@ -126,7 +126,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -140,7 +140,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -154,7 +154,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -168,7 +168,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -182,7 +182,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -196,7 +196,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -210,7 +210,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -224,7 +224,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -238,7 +238,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -252,7 +252,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -266,7 +266,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -280,7 +280,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -294,7 +294,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -308,7 +308,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -322,7 +322,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -336,7 +336,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -350,7 +350,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -364,7 +364,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -378,7 +378,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -392,7 +392,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -406,7 +406,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -420,7 +420,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -434,7 +434,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -448,7 +448,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -462,7 +462,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -476,7 +476,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -490,7 +490,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -504,7 +504,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -518,7 +518,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -532,7 +532,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -546,7 +546,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -560,7 +560,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -574,7 +574,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -588,7 +588,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -602,7 +602,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -616,7 +616,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -630,7 +630,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -644,7 +644,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -658,7 +658,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -672,7 +672,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -686,7 +686,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -700,7 +700,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -714,7 +714,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -728,7 +728,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -742,7 +742,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -756,7 +756,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -770,7 +770,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -784,7 +784,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -798,7 +798,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -812,7 +812,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -826,7 +826,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -840,7 +840,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -854,7 +854,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -868,7 +868,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -882,7 +882,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -896,7 +896,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -910,7 +910,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -924,7 +924,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -938,7 +938,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -952,7 +952,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -966,7 +966,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -980,7 +980,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -994,7 +994,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1008,7 +1008,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1022,7 +1022,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1036,7 +1036,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1050,7 +1050,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1064,7 +1064,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1078,7 +1078,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1092,7 +1092,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1106,7 +1106,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1120,7 +1120,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1134,7 +1134,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1148,7 +1148,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1162,7 +1162,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1176,7 +1176,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1190,7 +1190,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1204,7 +1204,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1218,7 +1218,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1232,7 +1232,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1246,7 +1246,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1260,7 +1260,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1274,7 +1274,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1288,7 +1288,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1302,7 +1302,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1316,7 +1316,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1330,7 +1330,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1344,7 +1344,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1358,7 +1358,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1372,7 +1372,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1386,7 +1386,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1400,7 +1400,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1414,7 +1414,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1428,7 +1428,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1442,7 +1442,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1456,7 +1456,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1470,7 +1470,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1484,7 +1484,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1498,7 +1498,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1512,7 +1512,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1526,7 +1526,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1540,7 +1540,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1554,7 +1554,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1568,7 +1568,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1582,7 +1582,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1596,7 +1596,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1610,7 +1610,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1624,7 +1624,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1638,7 +1638,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1652,7 +1652,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1666,7 +1666,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1680,7 +1680,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1694,7 +1694,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1708,7 +1708,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1722,7 +1722,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1736,7 +1736,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1750,7 +1750,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1764,7 +1764,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1778,7 +1778,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1792,7 +1792,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1806,7 +1806,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1820,7 +1820,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1834,7 +1834,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1848,7 +1848,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1862,7 +1862,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1876,7 +1876,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1890,7 +1890,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1904,7 +1904,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_reg_pipe
+  cgra0_reg_pipe
   #(
     .NUM_STAGES(PIPE_EXTRA + 1),
     .DATA_WIDTH(WIDTH)
@@ -1918,7 +1918,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -1936,7 +1936,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -1954,7 +1954,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -1972,7 +1972,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -1990,7 +1990,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2008,7 +2008,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2026,7 +2026,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2044,7 +2044,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2062,7 +2062,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2080,7 +2080,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2098,7 +2098,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2116,7 +2116,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2134,7 +2134,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2152,7 +2152,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2170,7 +2170,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2188,7 +2188,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2206,7 +2206,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2224,7 +2224,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2242,7 +2242,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2260,7 +2260,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2278,7 +2278,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2296,7 +2296,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2314,7 +2314,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )
@@ -2332,7 +2332,7 @@ module cgra_omega32x32_4 #
   );
 
 
-  cgra_switch_box4x4
+  cgra0_switch_box4x4
   #(
     .WIDTH(WIDTH)
   )

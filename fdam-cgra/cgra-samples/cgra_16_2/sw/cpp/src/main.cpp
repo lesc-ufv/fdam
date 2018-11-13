@@ -11,9 +11,10 @@ int main(int argc, char *argv[]) {
     short const_vet[4] = {1, 2, 3, 4};
 
     for (int i = 0; i < data_num; ++i) {
-        data_in[i] = static_cast<short>(i+1);
+        data_in[i] = static_cast<short>(i + 1);
         cpu_data_out[i] = 0;
         cgra_data_out[i] = 0;
+
 
     }
     fir4_cgra(data_in, cgra_data_out, data_num, const_vet);
@@ -54,7 +55,6 @@ void fir4_cgra(short *data_in, short *data_out, int n, const short *const_vet) {
     cgra->syncExecute(3000);
     delete cgra;
 }
-
 
 cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short *data_out, int data_out_size,
                                          const short *const_vet) {

@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_alu_out_decode(is_io):
-    name = 'cgra_alu_out_decode'
+def make_alu_out_decode(cgra_id,is_io):
+    name = 'cgra%d_alu_out_decode'%(cgra_id)
     n = 3
     if is_io:
         name = name + '_io'

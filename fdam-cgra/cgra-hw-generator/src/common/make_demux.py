@@ -3,8 +3,8 @@ from math import ceil, log
 from veriloggen import *
 
 
-def make_demux(n):
-    m = Module('cgra_demux1x%d' % n)
+def make_demux(cgra_id,n):
+    m = Module('cgra%d_demux1x%d' % (cgra_id,n))
     WIDTH = m.Parameter('WIDTH', 16)
     clk = m.Input('clk')
     s_bits = int(ceil(log(n, 2)))

@@ -1,5 +1,5 @@
 
-module cgra_inst_decode
+module cgra0_inst_decode
 (
   input [16-1:0] instruction,
   output [4-1:0] alu_op,

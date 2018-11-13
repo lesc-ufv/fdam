@@ -1,8 +1,8 @@
 from veriloggen import *
 
 
-def make_fecth_data():
-    m = Module('cgra_fecth_data')
+def make_fecth_data(cgra_id):
+    m = Module('cgra%d_fecth_data'%cgra_id)
     INPUT_DATA_WIDTH = m.Parameter('INPUT_DATA_WIDTH', 512)
     OUTPUT_DATA_WIDTH = m.Parameter('OUTPUT_DATA_WIDTH', 16)
 
