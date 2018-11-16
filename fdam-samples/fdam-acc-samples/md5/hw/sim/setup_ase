@@ -1,5 +1,0 @@
-#!/bin/sh
-
-rm -rf afu_sim
-python3 $FDAM_BASEDIR/fdam-hw-generator/src/update_sources.py
-afu_sim_setup --sources=sources.txt afu_sim

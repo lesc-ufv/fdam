@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf afu_synth
-python3 $FDAM_BASEDIR/fdam-hw-generator/src/update_sources.py
+python2 $FDAM_BASEDIR/fdam-hw-generator/src/common/update_sources.py
 afu_synth_setup  -s sources.txt --lib $SR_503_RELEASE_DIR/hw/lib afu_synth
 
 echo "#!/bin/sh" > afu_synth/clean.sh
