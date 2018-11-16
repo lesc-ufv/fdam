@@ -15,7 +15,6 @@ module cgra0_control_exec
   output reg [128-1:0] en_net,
   output reg [24-1:0] en_pc_net,
   output reg [2-1:0] en_fecth_data,
-  output reg [2-1:0] en_dispath_data,
   output reg done
 );
 
@@ -87,7 +86,6 @@ module cgra0_control_exec
     if(rst) begin
       fsm_state <= FSM_IDLE;
       en_fecth_data <= 2'h0;
-      en_dispath_data <= 2'h0;
       done <= 0;
     end else begin
       case(fsm_state)
@@ -95,7 +93,6 @@ module cgra0_control_exec
           if(start) begin
             fsm_state <= FSM_WAIT_DATA;
             en_fecth_data <= 2'h3;
-            en_dispath_data <= 2'h3;
           end 
         end
         FSM_WAIT_DATA: begin

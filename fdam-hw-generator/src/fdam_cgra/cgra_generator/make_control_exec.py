@@ -31,7 +31,6 @@ def make_control_exec(cgra_id, num_pe, num_pe_io, net_radix):
     en_pc_net = m.OutputReg('en_pc_net', en_pc_net_bits)
 
     en_fecth_data = m.OutputReg('en_fecth_data', num_pe_io)
-    en_dispath_data = m.OutputReg('en_dispath_data', num_pe_io)
 
     done = m.OutputReg('done')
 
@@ -102,7 +101,6 @@ def make_control_exec(cgra_id, num_pe, num_pe_io, net_radix):
         If(rst)(
             fsm_state(FSM_IDLE),
             en_fecth_data(Int(0, en_fecth_data.width, 16)),
-            en_dispath_data(Int(0, en_fecth_data.width, 16)),
             done(0)
         ).Else(
             Case(fsm_state)(
@@ -110,7 +108,6 @@ def make_control_exec(cgra_id, num_pe, num_pe_io, net_radix):
                     If(start)(
                         fsm_state(FSM_WAIT_DATA),
                         en_fecth_data(Int((1 << en_fecth_data.width) - 1, en_fecth_data.width, 16)),
-                        en_dispath_data(Int((1 << en_fecth_data.width) - 1, en_fecth_data.width, 16)),
                     )
                 ),
                 When(FSM_WAIT_DATA)(

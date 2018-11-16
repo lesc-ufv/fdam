@@ -38,26 +38,24 @@ def make_fecth_data():
             has_buffer(0)
         ).Else(
             request_read(0),
-            If(en)(
-                Case(fsm_read)(
-                    When(0)(
-                        If(available_read)(
-                            request_read(1),
-                            fsm_read(1)
-                        )
-                    ),
-                    When(1)(
-                        If(data_valid)(
-                            buffer(read_data),
-                            has_buffer(1),
-                            fsm_read(2)
-                        )
-                    ),
-                    When(2)(
-                        If(buffer_read)(
-                            has_buffer(0),
-                            fsm_read(0)
-                        )
+            Case(fsm_read)(
+                When(0)(
+                    If(available_read & en)(
+                        request_read(1),
+                        fsm_read(1)
+                    )
+                ),
+                When(1)(
+                    If(data_valid)(
+                        buffer(read_data),
+                        has_buffer(1),
+                        fsm_read(2)
+                    )
+                ),
+                When(2)(
+                    If(buffer_read)(
+                        has_buffer(0),
+                        fsm_read(0)
                     )
                 )
             )
@@ -72,33 +70,31 @@ def make_fecth_data():
             buffer_read(0)
         ).Else(
             buffer_read(0),
-            If(en)(
-                Case(fsm_control)(
-                    When(0)(
-                        If(has_buffer)(
-                            data(buffer),
-                            count(1),
-                            buffer_read(1),
-                            available_pop(1),
-                            fsm_control(1)
-                        )
+            Case(fsm_control)(
+                When(0)(
+                    If(has_buffer)(
+                        data(buffer),
+                        count(1),
+                        buffer_read(1),
+                        available_pop(1),
+                        fsm_control(1)
+                    )
+                ),
+                When(1)(
+                    If(pop_data & ~count[NUM - 1])(
+                        count(count << 1),
+                        data(data[OUTPUT_DATA_WIDTH:512])
                     ),
-                    When(1)(
-                        If(pop_data & ~count[NUM - 1])(
-                            count(count << 1),
-                            data(data[OUTPUT_DATA_WIDTH:512])
-                        ),
-                        If(pop_data & count[NUM - 1] & has_buffer)(
-                            count(1),
-                            data(buffer),
-                            buffer_read(1)
-                        ),
-                        If(count[NUM - 1] & pop_data & ~has_buffer)(
-                            count(count << 1),
-                            data(data[OUTPUT_DATA_WIDTH:511]),
-                            available_pop(0),
-                            fsm_control(0)
-                        )
+                    If(pop_data & count[NUM - 1] & has_buffer)(
+                        count(1),
+                        data(buffer),
+                        buffer_read(1)
+                    ),
+                    If(count[NUM - 1] & pop_data & ~has_buffer)(
+                        count(count << 1),
+                        data(data[OUTPUT_DATA_WIDTH:511]),
+                        available_pop(0),
+                        fsm_control(0)
                     )
                 )
             )

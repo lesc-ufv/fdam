@@ -42,7 +42,6 @@ def make_cgra_accelerator(cgra_id, num_pe, num_pe_io, data_width, net_radix, mem
     request_read = m.Wire('request_read', num_pe_io)
     conf_control_req_rd_data = m.Wire('conf_control_req_rd_data')
     en_fecth_data = m.Wire('en_fecth_data', num_pe_io)
-    en_dispath_data = m.Wire('en_dispath_data', num_pe_io)
     en_pe = m.Wire('en_pe', num_pe)
     en_net = m.Wire('en_net', en_net_bits)
     en_pc_net = m.Wire('en_pc_net', en_pc_net_bits)
@@ -76,7 +75,7 @@ def make_cgra_accelerator(cgra_id, num_pe, num_pe_io, data_width, net_radix, mem
     genInstFor1.Instance(fd, 'fecth_data', params, con)
 
     params = [('INPUT_DATA_WIDTH', data_width), ('OUTPUT_DATA_WIDTH', 512)]
-    con = [('clk', clk), ('rst', rst), ('en', en_dispath_data[genv]),
+    con = [('clk', clk), ('rst', rst),
            ('available_write', acc_user_available_write[genv]),
            ('request_write', acc_user_request_write[genv]),
            ('write_data', acc_user_write_data[Mul(genv, 512):Mul(genv + 1, 512)]), ('push_data', fifo_out_we[genv]),
@@ -102,7 +101,7 @@ def make_cgra_accelerator(cgra_id, num_pe, num_pe_io, data_width, net_radix, mem
            ('available_pop', available_pop), ('available_push', available_push),
            ('read_fifo_done', acc_user_done_rd_data),
            ('write_fifo_done', acc_user_done_wr_data), ('en_pe', en_pe), ('en_net', en_net), ('en_pc_net', en_pc_net),
-           ('en_fecth_data', en_fecth_data), ('en_dispath_data', en_dispath_data), ('done', acc_user_done)
+           ('en_fecth_data', en_fecth_data), ('done', acc_user_done)
            ]
     m.Instance(control_exec, 'control_exec', params, con)
 

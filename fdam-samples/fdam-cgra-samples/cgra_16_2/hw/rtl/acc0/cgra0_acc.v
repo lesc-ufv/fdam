@@ -18,7 +18,6 @@ module cgra0_acc
   wire [2-1:0] request_read;
   wire conf_control_req_rd_data;
   wire [2-1:0] en_fecth_data;
-  wire [2-1:0] en_dispath_data;
   wire [16-1:0] en_pe;
   wire [128-1:0] en_net;
   wire [24-1:0] en_pc_net;
@@ -72,7 +71,6 @@ module cgra0_acc
     (
       .clk(clk),
       .rst(rst),
-      .en(en_dispath_data[genv]),
       .available_write(acc_user_available_write[genv]),
       .request_write(acc_user_request_write[genv]),
       .write_data(acc_user_write_data[(genv+1)*512-1:genv*512]),
@@ -120,7 +118,6 @@ module cgra0_acc
     .en_net(en_net),
     .en_pc_net(en_pc_net),
     .en_fecth_data(en_fecth_data),
-    .en_dispath_data(en_dispath_data),
     .done(acc_user_done)
   );
 

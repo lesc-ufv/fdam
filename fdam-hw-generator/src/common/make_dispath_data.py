@@ -7,7 +7,6 @@ def make_dispath_data():
     OUTPUT_DATA_WIDTH = m.Parameter('OUTPUT_DATA_WIDTH', 512)
 
     clk = m.Input('clk')
-    en = m.Input('en')
     rst = m.Input('rst')
 
     available_write = m.Input('available_write')
@@ -38,12 +37,10 @@ def make_dispath_data():
             request_write11(request_write1),
             request_write22(request_write2),
             request_write(request_write11 | request_write22),
-            If(en)(
-                If(request_write11)(
-                    write_data(buffer1)
-                ).Elif(request_write22)(
-                    write_data(buffer2)
-                )
+            If(request_write11)(
+                write_data(buffer1)
+            ).Elif(request_write22)(
+                write_data(buffer2)
             )
         )
     )
@@ -58,69 +55,68 @@ def make_dispath_data():
         ).Else(
             request_write1(0),
             request_write2(0),
-            If(en)(
-                Case(fsm_control)(
-                    When(0)(
-                        If(push_data)(
-                            buffer1(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
-                                       buffer1 >> INPUT_DATA_WIDTH)),
-                            count1(count1 << 1)
-                        ),
-                        If(count1[NUM - 1] & push_data)(
-                            fsm_control(1)
-                        )
+
+            Case(fsm_control)(
+                When(0)(
+                    If(push_data)(
+                        buffer1(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
+                                   buffer1 >> INPUT_DATA_WIDTH)),
+                        count1(count1 << 1)
                     ),
-                    When(1)(
-                        If(available_write)(
-                            count1(1),
-                            request_write1(1),
-                            available_push(1)
-                        ),
-                        If(available_write & available_push)(
-                            fsm_control(2)
-                        ),
-                        If(available_write & ~available_push)(
-                            fsm_control(3)
-                        ),
-                        If(push_data)(
-                            buffer2(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
-                                       buffer2 >> INPUT_DATA_WIDTH)),
-                            count2(count2 << 1)
-                        ),
-                        If(count2[NUM - 2] & push_data & ~available_write)(
-                            available_push(0)
-                        )
+                    If(count1[NUM - 1] & push_data)(
+                        fsm_control(1)
+                    )
+                ),
+                When(1)(
+                    If(available_write)(
+                        count1(1),
+                        request_write1(1),
+                        available_push(1)
                     ),
-                    When(2)(
-                        If(push_data)(
-                            buffer2(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
-                                       buffer2 >> INPUT_DATA_WIDTH)),
-                            count2(count2 << 1)
-                        ),
-                        If(count2[NUM - 1] & push_data)(
-                            fsm_control(3)
-                        )
+                    If(available_write & available_push)(
+                        fsm_control(2)
                     ),
-                    When(3)(
-                        If(available_write)(
-                            request_write2(1),
-                            available_push(1),
-                            count2(1)
-                        ),
-                        If(available_write & available_push)(
-                            fsm_control(0)
-                        ),
-                        If(available_write & ~available_push)(
-                            fsm_control(1)
-                        ),
-                        If(push_data)(
-                            buffer1(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
-                                       buffer1 >> INPUT_DATA_WIDTH)),
-                            count1(count1 << 1)
-                        ),
-                        If(count1[NUM - 2] & push_data & ~available_write)(
-                            available_push(0)
-                        )
+                    If(available_write & ~available_push)(
+                        fsm_control(3)
+                    ),
+                    If(push_data)(
+                        buffer2(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
+                                   buffer2 >> INPUT_DATA_WIDTH)),
+                        count2(count2 << 1)
+                    ),
+                    If(count2[NUM - 2] & push_data & ~available_write)(
+                        available_push(0)
+                    )
+                ),
+                When(2)(
+                    If(push_data)(
+                        buffer2(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
+                                   buffer2 >> INPUT_DATA_WIDTH)),
+                        count2(count2 << 1)
+                    ),
+                    If(count2[NUM - 1] & push_data)(
+                        fsm_control(3)
+                    )
+                ),
+                When(3)(
+                    If(available_write)(
+                        request_write2(1),
+                        available_push(1),
+                        count2(1)
+                    ),
+                    If(available_write & available_push)(
+                        fsm_control(0)
+                    ),
+                    If(available_write & ~available_push)(
+                        fsm_control(1)
+                    ),
+                    If(push_data)(
+                        buffer1(Or(Cat(data_in, Repeat(Int(0, 1, 2), OUTPUT_DATA_WIDTH - INPUT_DATA_WIDTH)),
+                                   buffer1 >> INPUT_DATA_WIDTH)),
+                        count1(count1 << 1)
+                    ),
+                    If(count1[NUM - 2] & push_data & ~available_write)(
+                        available_push(0)
                     )
                 )
             )
