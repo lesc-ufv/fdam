@@ -4,10 +4,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 file(
     GLOB
-    HDR_CXX
-    ${PROJECT_SOURCE_DIR}/include/fdam/*.h
+    FDAM_ACC_HDR_CXX
+    ${PROJECT_SOURCE_DIR}/include/fdam/acc/*.h
     )
-
+file(
+    GLOB
+    FDAM_CGRA_HDR_CXX
+    ${PROJECT_SOURCE_DIR}/include/fdam/cgra/*.h
+    )
+    
 aux_source_directory(
     ${PROJECT_SOURCE_DIR}/src
     LIBFDAM
@@ -30,7 +35,8 @@ install(
     ARCHIVE DESTINATION ${LIB_DIR}
     )
 
-install(FILES ${HDR_CXX} DESTINATION include/fdam)
+install(FILES ${FDAM_ACC_HDR_CXX} DESTINATION include/fdam/acc)
+install(FILES ${FDAM_CGRA_HDR_CXX} DESTINATION include/fdam/cgra)
 
 ##
 ## Add pthreads to the generated library.  VTP uses a mutex to guarantee

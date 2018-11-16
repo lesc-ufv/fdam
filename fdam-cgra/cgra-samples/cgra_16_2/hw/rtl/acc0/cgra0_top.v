@@ -4,12 +4,9 @@ module cgra0_top
   input clk,
   input rst,
   input [16-1:0] pes_en,
-  input [60-1:0] conf_bus_in,
-  input [131-1:0] net_en,
-  input en_pc_net,
-  input net_conf_mem_we,
-  input [8-1:0] net_conf_mem_waddr,
-  input [192-1:0] net_conf_mem_data_in,
+  input [64-1:0] conf_bus_in,
+  input [128-1:0] net_en,
+  input [24-1:0] en_pc_net,
   output [2-1:0] fifo_in_re,
   input [32-1:0] fifo_in_data,
   output [2-1:0] fifo_out_we,
@@ -17,14 +14,7 @@ module cgra0_top
 );
 
 
-  wire net_conf_re;
-  wire [8-1:0] net_conf_mem_raddr;
-  wire [192-1:0] net_conf_mem_data_out;
-
-  wire [60-1:0] conf_bus [0:17-1];
-  wire [60-1:0] conf_bus_in_reg;
-  wire [8-1:0] net_pc_max;
-  wire [8-1:0] net_pc_loop;
+  wire [64-1:0] conf_bus [0:17-1];
 
   wire [16-1:0] pe2neta [0:16-1];
   wire [16-1:0] pe2netb [0:16-1];
@@ -34,28 +24,15 @@ module cgra0_top
   genvar genv;
 
 
-  cgra0_reg_pipe_
+  reg_pipe_
   #(
     .NUM_STAGES(1),
-    .DATA_WIDTH(60)
-  )
-  reg_conf_bus_in
-  (
-    .clk(clk),
-    .en(1'b1),
-    .in(conf_bus_in),
-    .out(conf_bus_in_reg)
-  );
-
-
-  cgra0_reg_pipe_
-  #(
-    .NUM_STAGES(1),
-    .DATA_WIDTH(60)
+    .DATA_WIDTH(64)
   )
   reg_conf_bus_in2
   (
     .clk(clk),
+    .rst(1'b0),
     .en(1'b1),
     .in(conf_bus_in),
     .out(conf_bus[0])
@@ -85,14 +62,15 @@ module cgra0_top
     );
 
 
-    cgra0_reg_pipe_
+    reg_pipe_
     #(
       .NUM_STAGES(1),
-      .DATA_WIDTH(60)
+      .DATA_WIDTH(64)
     )
     conf_bus_reg_pe_io
     (
       .clk(clk),
+      .rst(1'b0),
       .en(1'b1),
       .in(conf_bus[genv]),
       .out(conf_bus[genv + 1])
@@ -121,14 +99,15 @@ module cgra0_top
     );
 
 
-    cgra0_reg_pipe_
+    reg_pipe_
     #(
       .NUM_STAGES(1),
-      .DATA_WIDTH(60)
+      .DATA_WIDTH(64)
     )
     conf_bus_reg_pe
     (
       .clk(clk),
+      .rst(1'b0),
       .en(1'b1),
       .in(conf_bus[genv]),
       .out(conf_bus[genv + 1])
@@ -138,56 +117,7 @@ module cgra0_top
   endgenerate
 
 
-  cgra0_conf_reader_pc_net
-  #(
-    .PE_ID(17)
-  )
-  cgra0_conf_reader_pc_net
-  (
-    .clk(clk),
-    .rst(rst),
-    .conf_bus_in(conf_bus_in_reg),
-    .pc_max(net_pc_max),
-    .pc_loop(net_pc_loop)
-  );
-
-
-  cgra0_program_counter
-  pc
-  (
-    .clk(clk),
-    .rst(rst),
-    .en(en_pc_net),
-    .max(net_pc_max),
-    .loop(net_pc_loop),
-    .pc(net_conf_mem_raddr),
-    .pc_en(net_conf_re)
-  );
-
-
-  generate for(genv=0; genv<6; genv=genv+1) begin : inst_mem_conf
-
-    cgra0_memory
-    #(
-      .DATA_WIDTH(32),
-      .ADDR_WIDTH(8)
-    )
-    net_conf_mem
-    (
-      .clk(clk),
-      .we(net_conf_mem_we),
-      .re(net_conf_re),
-      .raddr(net_conf_mem_raddr),
-      .waddr(net_conf_mem_waddr),
-      .din(net_conf_mem_data_in[32*(genv+1)-1:32*genv]),
-      .dout(net_conf_mem_data_out[32*(genv+1)-1:32*genv])
-    );
-
-  end
-  endgenerate
-
-
-  cgra0_omega32x32_4
+  omega32x32_4_0_8
   #(
     .WIDTH(16),
     .PIPE_EXTRA(0)
@@ -195,8 +125,10 @@ module cgra0_top
   net
   (
     .clk(clk),
+    .rst(rst),
+    .en_pc_net(en_pc_net),
     .en(net_en),
-    .conf(net_conf_mem_data_out),
+    .net_conf_bus_in(conf_bus[16]),
     .in0(pe2neta[0]),
     .in1(pe2netb[0]),
     .in2(pe2neta[1]),

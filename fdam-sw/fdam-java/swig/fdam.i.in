@@ -1,7 +1,8 @@
 %module Fdam
 %{
-    #include "fdam/AccManagement.h"
-    #include "fdam/Accelerator.h"
+    #include "fdam/acc/acc_management.h"
+    #include "fdam/acc/accelerator.h"
+    #include "fdam/cgra/cgra.h"
 %}
 
 %include "typemaps.i"
@@ -17,8 +18,9 @@
 %apply long *INOUT{const long * data};
 %apply long long *INOUT{long long * data};
 
-%include <fdam/AccManagement.h>
-%include <fdam/Accelerator.h>
+%include <fdam/acc/acc_management.h>
+%include <fdam/acc/accelerator.h>
+%include <fdam/cgra/cgra.h>
 
 %pragma(java) jniclasscode=%{
     static { 

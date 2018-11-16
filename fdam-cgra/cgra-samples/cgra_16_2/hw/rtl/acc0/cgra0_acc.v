@@ -21,31 +21,25 @@ module cgra0_acc
   wire [2-1:0] en_fecth_data;
   wire [2-1:0] en_dispath_data;
   wire [16-1:0] en_pe;
-  wire [131-1:0] en_net;
-  wire en_pc_net;
+  wire [128-1:0] en_net;
+  wire [24-1:0] en_pc_net;
   wire [2-1:0] fifo_in_re;
   wire [32-1:0] fifo_in_data;
   wire [2-1:0] available_pop;
   wire [2-1:0] fifo_out_we;
   wire [32-1:0] fifo_out_data;
   wire [2-1:0] available_push;
-  wire [60-1:0] conf_pe_out_bus;
-  wire conf_net_we;
-  wire [8-1:0] conf_net_addr;
-  wire [192-1:0] conf_net_out;
+  wire [64-1:0] conf_out_bus;
   wire [2-1:0] read_fifo_mask;
   wire [2-1:0] write_fifo_mask;
-  wire [32-1:0] qtd_net_conf;
   wire conf_done;
-  wire net_conf_control_req_rd_data;
-  wire net_conf_done;
   genvar genv;
   assign acc_user_request_read[1:1] = request_read[1:1];
-  assign acc_user_request_read[0] = request_read[0] | conf_control_req_rd_data | net_conf_control_req_rd_data;
+  assign acc_user_request_read[0] = request_read[0] | conf_control_req_rd_data;
 
   generate for(genv=0; genv<2; genv=genv+1) begin : inst_fecth_data
 
-    cgra0_fecth_data
+    fecth_data
     #(
       .INPUT_DATA_WIDTH(512),
       .OUTPUT_DATA_WIDTH(16)
@@ -70,7 +64,7 @@ module cgra0_acc
 
   generate for(genv=0; genv<2; genv=genv+1) begin : inst_dispath_data
 
-    cgra0_dispath_data
+    dispath_data
     #(
       .INPUT_DATA_WIDTH(16),
       .OUTPUT_DATA_WIDTH(512)
@@ -92,12 +86,29 @@ module cgra0_acc
   endgenerate
 
 
+  cgra0_control_conf
+  control_conf
+  (
+    .clk(clk),
+    .rst(rst),
+    .start(start),
+    .available_read(acc_user_available_read[0]),
+    .req_rd_data(conf_control_req_rd_data),
+    .rd_data(acc_user_read_data[511:0]),
+    .rd_data_valid(acc_user_read_data_valid[0]),
+    .conf_out_bus(conf_out_bus),
+    .read_fifo_mask(read_fifo_mask),
+    .write_fifo_mask(write_fifo_mask),
+    .done(conf_done)
+  );
+
+
   cgra0_control_exec
   control_exec
   (
     .clk(clk),
     .rst(rst),
-    .start(net_conf_done),
+    .start(conf_done),
     .read_fifo_mask(read_fifo_mask),
     .write_fifo_mask(write_fifo_mask),
     .available_read(acc_user_available_read),
@@ -115,54 +126,15 @@ module cgra0_acc
   );
 
 
-  cgra0_pe_conf_control
-  control_pe_conf
-  (
-    .clk(clk),
-    .rst(rst),
-    .start(start),
-    .available_read(acc_user_available_read[0]),
-    .req_rd_data(conf_control_req_rd_data),
-    .rd_data(acc_user_read_data[511:0]),
-    .rd_data_valid(acc_user_read_data_valid[0]),
-    .conf_pe_out_bus(conf_pe_out_bus),
-    .qtd_net_conf(qtd_net_conf),
-    .read_fifo_mask(read_fifo_mask),
-    .write_fifo_mask(write_fifo_mask),
-    .done(conf_done)
-  );
-
-
-  cgra0_net_conf_control
-  control_net_conf
-  (
-    .clk(clk),
-    .rst(rst),
-    .start(conf_done),
-    .qtd_net_conf(qtd_net_conf),
-    .available_read(acc_user_available_read[0]),
-    .req_rd_data(net_conf_control_req_rd_data),
-    .rd_data(acc_user_read_data[511:0]),
-    .rd_data_valid(acc_user_read_data_valid[0]),
-    .conf_net_we(conf_net_we),
-    .conf_net_addr(conf_net_addr),
-    .conf_net_data_out(conf_net_out),
-    .done(net_conf_done)
-  );
-
-
   cgra0_top
   cgra
   (
     .clk(clk),
     .rst(rst),
     .pes_en(en_pe),
-    .conf_bus_in(conf_pe_out_bus),
     .net_en(en_net),
     .en_pc_net(en_pc_net),
-    .net_conf_mem_we(conf_net_we),
-    .net_conf_mem_waddr(conf_net_addr),
-    .net_conf_mem_data_in(conf_net_out),
+    .conf_bus_in(conf_out_bus),
     .fifo_in_re(fifo_in_re),
     .fifo_in_data(fifo_in_data),
     .fifo_out_we(fifo_out_we),

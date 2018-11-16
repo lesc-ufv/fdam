@@ -7,7 +7,7 @@ module cgra0_pe #
   input clk,
   input rst,
   input en,
-  input [60-1:0] conf_bus_in,
+  input [64-1:0] conf_bus_in,
   input [16-1:0] ina,
   input [16-1:0] inb,
   output [16-1:0] outa,
@@ -47,7 +47,6 @@ module cgra0_pe #
   wire [8-1:0] pc_max;
   wire [8-1:0] pc_loop;
   wire [8-1:0] pc_out;
-  wire mem_re;
   wire [8-1:0] ignore_until;
 
   wire [16-1:0] ina_reg;
@@ -58,7 +57,7 @@ module cgra0_pe #
   wire rf_rd_en;
   assign rf_rd_en = ((alu_ina_addr_reg == 2'd2) || (alu_inb_addr_reg == 2'd2)) && en;
 
-  cgra0_mux3x1
+  mux3x1
   #(
     .WIDTH(16)
   )
@@ -72,7 +71,7 @@ module cgra0_pe #
   );
 
 
-  cgra0_mux3x1
+  mux3x1
   #(
     .WIDTH(16)
   )
@@ -94,7 +93,7 @@ module cgra0_pe #
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -102,13 +101,14 @@ module cgra0_pe #
   ina_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en),
     .in(ina),
     .out(ina_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -116,13 +116,14 @@ module cgra0_pe #
   inb_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en),
     .in(inb),
     .out(inb_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -130,13 +131,14 @@ module cgra0_pe #
   outa_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en & alu_out_decode_out[0]),
     .in(alu_out),
     .out(outa)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -144,13 +146,14 @@ module cgra0_pe #
   outb_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en & alu_out_decode_out[1]),
     .in(alu_out),
     .out(outb)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -164,7 +167,7 @@ module cgra0_pe #
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(2)
@@ -172,13 +175,14 @@ module cgra0_pe #
   alu_ina_addr_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(alu_ina_addr),
     .out(alu_ina_addr_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -186,13 +190,14 @@ module cgra0_pe #
   alu_inb_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en),
     .in(alu_inb),
     .out(alu_inb_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(2)
@@ -200,27 +205,29 @@ module cgra0_pe #
   alu_inb_addr_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(alu_inb_addr),
     .out(alu_inb_addr_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
-    .NUM_STAGES(4),
+    .NUM_STAGES(8),
     .DATA_WIDTH(2)
   )
   alu_out_addr_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(alu_out_addr),
     .out(alu_out_addr_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -228,13 +235,14 @@ module cgra0_pe #
   rf_data_in_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en & alu_out_decode_out[2]),
     .in(alu_out),
     .out(rf_data_in)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(1)
@@ -242,13 +250,14 @@ module cgra0_pe #
   rf_we_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(alu_out_decode_out[2]),
     .out(rf_we)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(16)
@@ -256,27 +265,29 @@ module cgra0_pe #
   rf_data_out_reg_inst
   (
     .clk(clk),
+    .rst(1'b0),
     .en(en),
     .in(rf_data_out),
     .out(rf_data_out_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
-    .NUM_STAGES(2),
+    .NUM_STAGES(6),
     .DATA_WIDTH(4)
   )
   alu_op_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(alu_op),
     .out(alu_op_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
     .NUM_STAGES(1),
     .DATA_WIDTH(3)
@@ -284,27 +295,29 @@ module cgra0_pe #
   rf_raddr_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(rf_raddr),
     .out(rf_raddr_reg)
   );
 
 
-  cgra0_reg_pipe
+  reg_pipe
   #(
-    .NUM_STAGES(5),
+    .NUM_STAGES(8),
     .DATA_WIDTH(3)
   )
   rf_waddr_reg_inst
   (
     .clk(clk),
+    .rst(rst),
     .en(en),
     .in(rf_waddr),
     .out(rf_waddr_reg)
   );
 
 
-  cgra0_mux2x1
+  mux2x1
   #(
     .WIDTH(16)
   )
@@ -317,7 +330,7 @@ module cgra0_pe #
   );
 
 
-  cgra0_mux2x1
+  mux2x1
   #(
     .WIDTH(3)
   )
@@ -330,7 +343,7 @@ module cgra0_pe #
   );
 
 
-  cgra0_memory
+  memory
   #(
     .DATA_WIDTH(16),
     .ADDR_WIDTH(3)
@@ -361,7 +374,7 @@ module cgra0_pe #
   );
 
 
-  cgra0_memory
+  memory
   #(
     .DATA_WIDTH(16),
     .ADDR_WIDTH(8)
@@ -370,7 +383,7 @@ module cgra0_pe #
   (
     .clk(clk),
     .we(conf_wr_en),
-    .re(mem_re),
+    .re(1'b1),
     .raddr(pc_out),
     .waddr(conf_wr_addr),
     .din(conf_wr_data),
@@ -382,24 +395,24 @@ module cgra0_pe #
   #(
     .PE_ID(PE_ID)
   )
-  cgra0_conf_reader_pe
+  conf_reader_pe
   (
     .clk(clk),
     .rst(rst),
     .conf_bus_in(conf_bus_in),
-    .conf_wr_en(conf_wr_en),
-    .conf_wr_addr(conf_wr_addr),
-    .conf_wr_data(conf_wr_data),
-    .init_const_we(init_const_we),
-    .init_const_waddr(init_conf_const_waddr),
-    .init_const(init_conf_const),
+    .instruction_we(conf_wr_en),
+    .instruction_addr(conf_wr_addr),
+    .instruction_data(conf_wr_data),
+    .const_we(init_const_we),
+    .const_waddr(init_conf_const_waddr),
+    .const_data(init_conf_const),
     .pc_max(pc_max),
     .pc_loop(pc_loop),
-    .ignore_until(ignore_until)
+    .store_ignore(ignore_until)
   );
 
 
-  cgra0_program_counter
+  program_counter_8
   pc
   (
     .clk(clk),
@@ -407,8 +420,7 @@ module cgra0_pe #
     .en(en),
     .max(pc_max),
     .loop(pc_loop),
-    .pc(pc_out),
-    .pc_en(mem_re)
+    .pc(pc_out)
   );
 
 

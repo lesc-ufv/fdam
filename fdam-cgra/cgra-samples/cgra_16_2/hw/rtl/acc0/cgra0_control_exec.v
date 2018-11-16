@@ -13,8 +13,8 @@ module cgra0_control_exec
   input [2-1:0] read_fifo_done,
   input [2-1:0] write_fifo_done,
   output reg [16-1:0] en_pe,
-  output reg [131-1:0] en_net,
-  output reg [1-1:0] en_pc_net,
+  output reg [128-1:0] en_net,
+  output reg [24-1:0] en_pc_net,
   output reg [2-1:0] en_fecth_data,
   output reg [2-1:0] en_dispath_data,
   output reg done
@@ -30,8 +30,8 @@ module cgra0_control_exec
   reg [2-1:0] en_write;
   reg [2-1:0] en_read1;
   reg [2-1:0] en_write1;
-  reg [148-1:0] en_process;
-  reg [148-1:0] en_process1;
+  reg [168-1:0] en_process;
+  reg [168-1:0] en_process1;
   reg [2-1:0] available_pop_masked;
   reg [2-1:0] available_push_masked;
   reg available_queues;
@@ -67,17 +67,19 @@ module cgra0_control_exec
       en_write <= available_write | write_fifo_done;
       en_read1 <= en_read & read_fifo_mask;
       en_write1 <= en_write & write_fifo_mask;
-      for(i=0; i<148; i=i+1) begin
+      for(i=0; i<168; i=i+1) begin
         en_process[i] <= |en_read1 & |en_write1;
         en_process1[i] <= en_process[i] & fsm_state[0];
       end
       for(i=0; i<16; i=i+1) begin
         en_pe[i] <= en_process1[i];
       end
-      for(i=0; i<131; i=i+1) begin
+      for(i=0; i<128; i=i+1) begin
         en_net[i] <= en_process1[i + 16];
       end
-      en_pc_net <= en_process1[147];
+      for(i=0; i<24; i=i+1) begin
+        en_pc_net[i] <= en_process1[i + 16 + 128];
+      end
     end
   end
 

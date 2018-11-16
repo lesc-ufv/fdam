@@ -129,15 +129,4 @@ $SUDO make install
 echo "end of installing fdam-java"
 echo ""
 
-echo "installing fdam-cgra..."
-echo ""
-mkdir $MYPATH/fdam-cgra/cgra-sw/mybuild
-cd $MYPATH/fdam-cgra/cgra-sw/mybuild
-cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-make $JOBS
-$SUDO make install 
-echo "end of installing fdam-cgra"
-echo ""
-
-
 cd $CALLPATH
