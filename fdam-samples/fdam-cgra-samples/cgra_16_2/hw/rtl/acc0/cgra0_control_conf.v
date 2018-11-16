@@ -1,3 +1,4 @@
+
 module cgra0_control_conf
 (
   input clk,
@@ -114,5 +115,6 @@ module cgra0_control_conf
       end
     end
   end
+
 
 endmodule

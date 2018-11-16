@@ -65,7 +65,7 @@ def create_fdam_project_cli():
                 pass
         while True:
             try:
-                num_pe_io = int(raw_input('Number of PE-IO for CGRA %d[ > 0]: ' % i))
+                num_pe_io = int(raw_input('Number of PE-IO for CGRA %d[1 .. 32]: ' % i))
                 if num_pe_io > 0:
                     break
             except:
@@ -79,7 +79,7 @@ def create_fdam_project_cli():
                 pass
         while True:
             try:
-                mem_conf_depth = int(raw_input('Instruction Memory Depth for CGRA %d[ > 0]: ' % i))
+                mem_conf_depth = int(raw_input('Instruction Memory Depth for CGRA %d[1 .. 16]: ' % i))
                 if mem_conf_depth > 0:
                     break
             except:

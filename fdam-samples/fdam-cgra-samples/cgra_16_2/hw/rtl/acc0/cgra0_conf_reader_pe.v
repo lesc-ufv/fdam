@@ -1,3 +1,4 @@
+
 module cgra0_conf_reader_pe #
 (
   parameter PE_ID = 0
@@ -144,5 +145,6 @@ module cgra0_conf_reader_pe #
     const_waddr <= const_waddr_p;
     const_data <= const_data_p;
   end
+
 
 endmodule
