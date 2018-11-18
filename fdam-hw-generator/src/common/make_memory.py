@@ -15,6 +15,7 @@ def make_memory():
 
     mem = m.Reg('mem', data_width, Power(2, addr_width))
 
+    m.EmbeddedCode('//synthesis translate_off')
     i = m.Integer('i')
     m.Initial(
         dout(0),
@@ -22,6 +23,7 @@ def make_memory():
             mem[i](0)
         )
     )
+    m.EmbeddedCode('//synthesis translate_on')
 
     m.Always(Posedge(clk))(
         If(we)(
