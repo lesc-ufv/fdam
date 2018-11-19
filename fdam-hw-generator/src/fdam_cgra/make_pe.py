@@ -1,12 +1,13 @@
 from veriloggen import *
 
+from common.make_cgra_counter import make_cgra_counter
 from common.make_mux import make_mux
 from common.make_reg_pipe import make_reg_pipe
-from common.make_cgra_counter import make_cgra_counter
-from make_alu_out_decode import make_alu_out_decode
 from make_alu import make_alu
+from make_alu_out_decode import make_alu_out_decode
 from make_conf_reader_pe import make_conf_reader_pe
 from make_inst_decode import make_inst_decode
+
 
 def make_pe(cgra_id, is_io, pc, memory, data_width, conf_depth):
     name = 'cgra%d_pe' % cgra_id
@@ -157,7 +158,7 @@ def make_pe(cgra_id, is_io, pc, memory, data_width, conf_depth):
     m.Instance(reg, 'outb_reg_inst', param, con)
 
     param = [('NUM_STAGES', 1), ('DATA_WIDTH', data_width)]
-    con = [('clk', clk),('rst', Int(0, 1, 2)), ('en', en), ('in', alu_ina), ('out', alu_ina_reg)]
+    con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en), ('in', alu_ina), ('out', alu_ina_reg)]
     m.Instance(reg, 'alu_ina_reg_inst', param, con)
 
     param = [('NUM_STAGES', 1), ('DATA_WIDTH', alu_ina_addr_reg.width)]

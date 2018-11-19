@@ -1,4 +1,3 @@
-
 module cgra0_alu_out_decode
 (
   input [2-1:0] sel,

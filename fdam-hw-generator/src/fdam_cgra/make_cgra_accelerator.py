@@ -2,7 +2,7 @@ from veriloggen import *
 
 from common.make_dispath_data import make_dispath_data
 from common.make_fecth_data import make_fecth_data
-from fdam_cgra.omega_generator.make_omega import make_omega
+from fdam_cgra.make_omega import make_omega
 from make_cgra import make_cgra
 from make_control_conf import make_control_conf
 from make_control_exec import make_control_exec
@@ -115,6 +115,3 @@ def make_cgra_accelerator(cgra_id, num_pe, num_pe_io, data_width, net_radix, mem
 
     return m
 
-
-make_cgra_accelerator(0, 16, 2, 16, 4, 8).to_verilog(
-    '/home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/hw/rtl/acc0')

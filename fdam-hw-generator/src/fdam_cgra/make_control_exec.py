@@ -1,6 +1,6 @@
 from veriloggen import *
 
-from fdam_cgra.omega_generator.make_omega import make_omega
+from fdam_cgra.make_omega import make_omega
 
 
 def make_control_exec(cgra_id, num_pe, num_pe_io, net_radix):

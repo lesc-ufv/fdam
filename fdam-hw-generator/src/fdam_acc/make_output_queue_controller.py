@@ -179,7 +179,7 @@ def make_output_queue_controller(conf_receiver):
             request_write(Int(0, 1, 2)),
         ).Else(
             request_write(Int(0, 1, 2)),
-            If(fifo_dout_valid|align_write_data)(
+            If(fifo_dout_valid | align_write_data)(
                 request_write(Int(1, 1, 2))
             )
         )

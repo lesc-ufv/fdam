@@ -240,5 +240,3 @@ def make_dsm_controller(conf_receiver):
     )
 
     return m
-
-# make_dsm_controller().to_verilog('dsm_controller_test')

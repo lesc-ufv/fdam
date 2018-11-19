@@ -4,7 +4,7 @@ from veriloggen import *
 
 
 def make_demux(n):
-    m = Module('demux1x%d' %n)
+    m = Module('demux1x%d' % n)
     WIDTH = m.Parameter('WIDTH', 16)
     clk = m.Input('clk')
     s_bits = int(ceil(log(n, 2)))

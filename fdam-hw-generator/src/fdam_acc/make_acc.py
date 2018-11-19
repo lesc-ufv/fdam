@@ -3,6 +3,7 @@ from veriloggen import *
 from common.make_reg_tree_pipeline import make_reg_tree_pipeline
 from make_acc_user import make_acc_user
 
+
 def make_acc(acc_param, input_queue_controller, output_queue_controller, dsm_controller, accelerator_module=None):
     acc_id = acc_param['acc_id']
     addr_width = acc_param['addr_width']

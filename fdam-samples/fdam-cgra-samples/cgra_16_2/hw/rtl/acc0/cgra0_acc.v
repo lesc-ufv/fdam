@@ -1,4 +1,3 @@
-
 module cgra0_acc
 (
   input clk,
@@ -137,6 +136,5 @@ module cgra0_acc
     .fifo_out_we(fifo_out_we),
     .fifo_out_data(fifo_out_data)
   );
-
 
 endmodule

@@ -43,5 +43,3 @@ def make_conf_receiver():
     )
 
     return m
-
-# make_conf_receiver().to_verilog('make_conf_receiver_test')

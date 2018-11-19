@@ -14,6 +14,7 @@ module memory #
 );
 
   reg [DATA_WIDTH-1:0] mem [0:2**ADDR_WIDTH-1];
+  //synthesis translate_off
   integer i;
 
   initial begin
@@ -23,6 +24,7 @@ module memory #
     end
   end
 
+  //synthesis translate_on
 
   always @(posedge clk) begin
     if(we) begin

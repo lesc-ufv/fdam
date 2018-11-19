@@ -1,10 +1,11 @@
 from veriloggen import *
 
-from common.make_program_counter import make_program_counter
-from fdam_cgra.omega_generator.make_omega import make_omega
-from make_pe import make_pe
 from common.make_memory import make_memory
+from common.make_program_counter import make_program_counter
 from common.make_reg_pipe import make_reg_pipe
+from fdam_cgra.make_omega import make_omega
+from make_pe import make_pe
+
 
 def make_cgra(cgra_id, num_pe, num_pe_io, data_width, net_radix, conf_depth):
     m = Module('cgra%d_top' % cgra_id)

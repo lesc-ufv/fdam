@@ -1,4 +1,3 @@
-
 module cgra0_inst_decode
 (
   input [16-1:0] instruction,

@@ -2,7 +2,7 @@ from veriloggen import *
 
 
 def make_program_counter(pc_depth):
-    m = Module('program_counter_%d'%pc_depth)
+    m = Module('program_counter_%d' % pc_depth)
     clk = m.Input('clk')
     rst = m.Input('rst')
     en = m.Input('en')

@@ -206,5 +206,3 @@ def make_input_queue_controller(conf_receiver):
     )
 
     return m
-
-# make_input_queue_controller(make_conf_receiver()).to_verilog('../input_queue_controller_test')

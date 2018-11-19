@@ -130,4 +130,3 @@ def make_select_tree_array(radix, num_input, array):
     else:
         return make_select_tree_array(radix, len(m_array), array)
 
-# make_select_tree(4,17).to_verilog('../select_tree_test')

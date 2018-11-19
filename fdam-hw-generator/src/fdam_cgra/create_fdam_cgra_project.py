@@ -4,7 +4,7 @@ import traceback
 
 from common.utils import *
 from fdam_acc.make_acc_management import make_acc_management
-from fdam_cgra.cgra_generator.make_cgra_accelerator import make_cgra_accelerator
+from fdam_cgra.make_cgra_accelerator import make_cgra_accelerator
 
 try:
     FDAM_BASEDIR = os.environ['FDAM_BASEDIR']

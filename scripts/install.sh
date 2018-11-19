@@ -85,7 +85,6 @@ rm -rf $MYPATH/opae-sdk/mybuild
 rm -rf $MYPATH/intel-fpga-bbb/mybuild
 rm -rf $MYPATH/fdam-sw/fdam-cpp/mybuild
 rm -rf $MYPATH/fdam-sw/fdam-java/mybuild
-rm -rf $MYPATH/fdam-cgra/cgra-sw/mybuild
 echo "end of cleaning up!"
 echo ""
 
