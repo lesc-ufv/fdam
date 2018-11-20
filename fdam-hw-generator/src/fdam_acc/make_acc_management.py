@@ -38,6 +38,7 @@ def make_acc_management(accs):
 
         RADIX = 8
         MAX_AFUS = 64
+        FIFO_DEPTH_BITS = 10
 
         m = Module('fdam_acc_management')
 
@@ -150,7 +151,8 @@ def make_acc_management(accs):
             con_out_wire = con_out_wire + (num_out_queue + 1)
 
         ac_in = make_arbiter_controller_rd_req_tree(RADIX, qtd_in_queue)
-        params = [('DATA_WIDTH', addr_width + tag_width), ('INPUT_FIFO_DEPTH_BITS', 10), ('OUTPUT_FIFO_DEPTH_BITS', 10)]
+        params = [('DATA_WIDTH', addr_width + tag_width), ('INPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
+                  ('OUTPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS)]
         con = [('clk', clk), ('rst', rst_reg[num_accs]), ('req_wr_en_in', req_rd_en_in),
                ('req_wr_data_in', req_rd_data_in),
                ('req_wr_available_in', req_rd_available_in), ('req_wr_available_out', req_rd_available_out),
@@ -159,8 +161,8 @@ def make_acc_management(accs):
 
         ac_out = make_arbiter_controller_wr_req_tree(RADIX, (qtd_out_queue + acc_count))
 
-        params = [('DATA_WIDTH', data_width + addr_width + tag_width), ('INPUT_FIFO_DEPTH_BITS', 10),
-                  ('OUTPUT_FIFO_DEPTH_BITS', 10)]
+        params = [('DATA_WIDTH', data_width + addr_width + tag_width), ('INPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS),
+                  ('OUTPUT_FIFO_DEPTH_BITS', FIFO_DEPTH_BITS)]
         con = [('clk', clk), ('rst', rst_reg[num_accs + 1]), ('req_wr_en_in', req_wr_en_in),
                ('req_wr_data_in', req_wr_data_in),
                ('req_wr_available_in', req_wr_available_in), ('req_wr_available_out', req_wr_available_out),

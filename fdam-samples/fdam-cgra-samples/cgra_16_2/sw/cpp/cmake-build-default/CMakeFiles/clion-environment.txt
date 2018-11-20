@@ -1,3 +1,0 @@
-Options: 
-
-Options:-DCMAKE_PREFIX_PATH=/home/lucas/Documentos/ufv-projects/fdam/installation

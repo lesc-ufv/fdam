@@ -114,4 +114,3 @@ def make_cgra_accelerator(cgra_id, num_pe, num_pe_io, data_width, net_radix, mem
     m.Instance(cgra, 'cgra', params, con)
 
     return m
-

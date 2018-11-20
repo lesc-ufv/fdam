@@ -1,13 +1,13 @@
 from veriloggen import *
 
 from common.make_memory import make_memory
-from common.make_reg_pipe import make_reg_pipe
 from common.make_program_counter import make_program_counter
+from common.make_reg_pipe import make_reg_pipe
 from make_swicth_conf_reader import make_swicth_conf_reader
 
 
 def make_swicth_conf_control(swicth_conf_width, conf_net_depth):
-    m = Module('swicth_conf_control_%d_%d' %(swicth_conf_width,conf_net_depth) )
+    m = Module('swicth_conf_control_%d_%d' % (swicth_conf_width, conf_net_depth))
     SWICTH_NUMBER = m.Parameter('SWICTH_NUMBER', 0)
     STAGE = m.Parameter('STAGE', 1)
 

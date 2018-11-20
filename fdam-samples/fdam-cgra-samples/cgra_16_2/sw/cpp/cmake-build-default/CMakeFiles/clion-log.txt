@@ -1,4 +1,0 @@
-/opt/jetbrains/clion-2017.3.1/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE= -DCMAKE_PREFIX_PATH=/home/lucas/Documentos/ufv-projects/fdam/installation -G "CodeBlocks - Unix Makefiles" /home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/sw/cpp
--- Configuring done
--- Generating done
--- Build files have been written to: /home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/sw/cpp/cmake-build-default

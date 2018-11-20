@@ -45,4 +45,3 @@ def make_reg_tree_pipeline(radix, num_output, extra_pipeline):
     for i in range(r - num_output, r):
         outputs[i - r].assign(regs[i])
     return m
-

@@ -2,7 +2,7 @@ from veriloggen import *
 
 
 def make_swicth_conf_reader(swicth_conf_width, conf_net_depth):
-    m = Module('swicth_conf_reader_%d_%d' %(swicth_conf_width,conf_net_depth) )
+    m = Module('swicth_conf_reader_%d_%d' % (swicth_conf_width, conf_net_depth))
     SWICTH_NUMBER = m.Parameter('SWICTH_NUMBER', 1)
 
     clk = m.Input('clk')
