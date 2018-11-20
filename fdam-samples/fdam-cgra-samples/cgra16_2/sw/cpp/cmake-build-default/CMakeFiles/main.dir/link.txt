@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/main.dir/src/main.cpp.o  -o main -Wl,-rpath,/home/lucas/Documentos/ufv-projects/fdam/installation/lib64 /home/lucas/Documentos/ufv-projects/fdam/installation/lib64/libfdam.so /home/lucas/Documentos/ufv-projects/fdam/installation/lib64/libopae-c.so -luuid /home/lucas/Documentos/ufv-projects/fdam/installation/lib64/libMPF.so 

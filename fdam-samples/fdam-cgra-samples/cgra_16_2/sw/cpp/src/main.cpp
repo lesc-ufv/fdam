@@ -13,27 +13,52 @@ int main(int argc, char *argv[]) {
         cpu_data_out[i] = 0;
         cgra_data_out[i] = 0;
     }
-    fir4_cgra(data_in, cgra_data_out, data_num, const_vet);
+    
+    high_resolution_clock::time_point s;
+    duration<double> diff{};
+    s = high_resolution_clock::now();  
+    
     fir4_cpu(data_in, cpu_data_out, data_num, const_vet);
-
+    
+    diff = high_resolution_clock::now() - s;
+    double timeExecSw  = diff.count();
+    
+    s = high_resolution_clock::now(); 
+    
+    fir4_cgra(data_in, cgra_data_out, data_num, const_vet);
+    
+    diff = high_resolution_clock::now() - s;
+    double timeExecHw  = diff.count();
+    
+    bool error_found = false;
+    for (int i = 0; i < data_num; ++i) {
+        if(cpu_data_out[i] != cgra_data_out[i]){
+            error_found = true;
+            break;
+        }
+    }
+    printf("Time execute fir4 cpu: %f\n",timeExecSw);
+    printf("Time execute fir4 cgra-harp: %f\n",timeExecHw);
+    printf("%s",error_found?"Error!\n":"Success!\n");
+    
+/*
     printf("FIR4 DATA IN:\n");
     for (int i = 0; i < data_num; ++i) {
         printf("%d ", data_in[i]);
     }
     printf("\n");
-
     printf("FIR4 CGRA DATA OUT:\n");
     for (int i = 0; i < data_num; ++i) {
         printf("%d ", cgra_data_out[i]);
-    }
+    }  
     printf("\n");
-
     printf("FIR4 CPU DATA OUT:\n");
     for (int i = 0; i < data_num; ++i) {
         printf("%d ", cpu_data_out[i]);
     }
     printf("\n");
-
+*/
+    
 }
 
 void fir4_cpu(const short *data_in, short *data_out, int n, const short *const_vet) {
