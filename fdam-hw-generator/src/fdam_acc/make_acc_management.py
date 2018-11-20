@@ -38,7 +38,7 @@ def make_acc_management(accs):
 
         RADIX = 8
         MAX_AFUS = 64
-        FIFO_DEPTH_BITS = 10
+        FIFO_DEPTH_BITS = 5
 
         m = Module('fdam_acc_management')
 
