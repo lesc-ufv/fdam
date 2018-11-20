@@ -1,0 +1,4 @@
+/home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/sw/cpp/cmake-build-default/CMakeFiles/rebuild_cache.dir
+/home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/sw/cpp/cmake-build-default/CMakeFiles/edit_cache.dir
+/home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/sw/cpp/cmake-build-default/CMakeFiles/main.dir
+/home/lucas/Documentos/ufv-projects/fdam/fdam-samples/fdam-cgra-samples/cgra_16_2/sw/cpp/cmake-build-default/CMakeFiles/main_ase.dir
