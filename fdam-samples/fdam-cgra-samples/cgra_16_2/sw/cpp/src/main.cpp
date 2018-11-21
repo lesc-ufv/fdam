@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
         cpu_data_out[i] = 0;
         cgra_data_out[i] = 0;
     }
-    
+
     high_resolution_clock::time_point s;
     duration<double> diff{};
     s = high_resolution_clock::now();  
@@ -30,18 +30,23 @@ int main(int argc, char *argv[]) {
     diff = high_resolution_clock::now() - s;
     double timeExecHw  = diff.count();
     
-    bool error_found = false;
+    int index_error = -1;
     for (int i = 0; i < data_num; ++i) {
         if(cpu_data_out[i] != cgra_data_out[i]){
-            error_found = true;
+            index_error = i;
             break;
         }
     }
     printf("Time execute fir4 cpu: %f\n",timeExecSw);
     printf("Time execute fir4 cgra-harp: %f\n",timeExecHw);
-    printf("%s",error_found?"Error!\n":"Success!\n");
+    if(index_error >= 0){
+        printf("Error found at %d  expected %d found %d!\n",index_error,cpu_data_out[index_error],cgra_data_out[index_error]);
+    } else{
+        printf("Success!\n");
+    }
+
     
-/*
+
     printf("FIR4 DATA IN:\n");
     for (int i = 0; i < data_num; ++i) {
         printf("%d ", data_in[i]);
@@ -57,7 +62,7 @@ int main(int argc, char *argv[]) {
         printf("%d ", cpu_data_out[i]);
     }
     printf("\n");
-*/
+
     
 }
 
@@ -280,126 +285,126 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
 
 
         // stage 1:
-        cgra_prog->initial_conf[21].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[21].net_swicth_conf.swicth_number = 1;
-        cgra_prog->initial_conf[21].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[21].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 3, 2);
+        cgra_prog->initial_conf[21].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[21].net_switch_conf.switch_number = 1;
+        cgra_prog->initial_conf[21].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[21].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 3, 2);
 
-        cgra_prog->initial_conf[22].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[22].net_swicth_conf.swicth_number = 2;
-        cgra_prog->initial_conf[22].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[22].net_swicth_conf.swicth_conf = swicth_conf_radix4(1, 0, 0, 0);
+        cgra_prog->initial_conf[22].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[22].net_switch_conf.switch_number = 2;
+        cgra_prog->initial_conf[22].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[22].net_switch_conf.switch_conf = switch_conf_radix4(1, 0, 0, 0);
 
-        cgra_prog->initial_conf[23].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[23].net_swicth_conf.swicth_number = 3;
-        cgra_prog->initial_conf[23].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[23].net_swicth_conf.swicth_conf = swicth_conf_radix4(1, 0, 0, 0);
+        cgra_prog->initial_conf[23].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[23].net_switch_conf.switch_number = 3;
+        cgra_prog->initial_conf[23].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[23].net_switch_conf.switch_conf = switch_conf_radix4(1, 0, 0, 0);
 
-        cgra_prog->initial_conf[24].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[24].net_swicth_conf.swicth_number = 4;
-        cgra_prog->initial_conf[24].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[24].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 2);
+        cgra_prog->initial_conf[24].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[24].net_switch_conf.switch_number = 4;
+        cgra_prog->initial_conf[24].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[24].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 2);
 
-        cgra_prog->initial_conf[25].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[25].net_swicth_conf.swicth_number = 5;
-        cgra_prog->initial_conf[25].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[25].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 1, 0, 2);
+        cgra_prog->initial_conf[25].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[25].net_switch_conf.switch_number = 5;
+        cgra_prog->initial_conf[25].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[25].net_switch_conf.switch_conf = switch_conf_radix4(0, 1, 0, 2);
 
-        cgra_prog->initial_conf[26].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[26].net_swicth_conf.swicth_number = 6;
-        cgra_prog->initial_conf[26].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[26].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 0);
+        cgra_prog->initial_conf[26].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[26].net_switch_conf.switch_number = 6;
+        cgra_prog->initial_conf[26].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[26].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 0);
 
-        cgra_prog->initial_conf[27].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[27].net_swicth_conf.swicth_number = 7;
-        cgra_prog->initial_conf[27].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[27].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 1, 0, 0);
+        cgra_prog->initial_conf[27].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[27].net_switch_conf.switch_number = 7;
+        cgra_prog->initial_conf[27].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[27].net_switch_conf.switch_conf = switch_conf_radix4(0, 1, 0, 0);
 
-        cgra_prog->initial_conf[28].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[28].net_swicth_conf.swicth_number = 8;
-        cgra_prog->initial_conf[28].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[28].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 2, 0, 0);
+        cgra_prog->initial_conf[28].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[28].net_switch_conf.switch_number = 8;
+        cgra_prog->initial_conf[28].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[28].net_switch_conf.switch_conf = switch_conf_radix4(0, 2, 0, 0);
 
         // stage 2:
-        cgra_prog->initial_conf[29].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[29].net_swicth_conf.swicth_number = 9;
-        cgra_prog->initial_conf[29].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[29].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 2, 1);
+        cgra_prog->initial_conf[29].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[29].net_switch_conf.switch_number = 9;
+        cgra_prog->initial_conf[29].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[29].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 2, 1);
 
-        cgra_prog->initial_conf[30].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[30].net_swicth_conf.swicth_number = 10;
-        cgra_prog->initial_conf[30].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[30].net_swicth_conf.swicth_conf = swicth_conf_radix4(2, 3, 0, 0);
+        cgra_prog->initial_conf[30].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[30].net_switch_conf.switch_number = 10;
+        cgra_prog->initial_conf[30].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[30].net_switch_conf.switch_conf = switch_conf_radix4(2, 3, 0, 0);
 
-        cgra_prog->initial_conf[31].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[31].net_swicth_conf.swicth_number = 11;
-        cgra_prog->initial_conf[31].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[31].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 3, 3);
+        cgra_prog->initial_conf[31].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[31].net_switch_conf.switch_number = 11;
+        cgra_prog->initial_conf[31].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[31].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 3, 3);
 
-        cgra_prog->initial_conf[32].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[32].net_swicth_conf.swicth_number = 12;
-        cgra_prog->initial_conf[32].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[32].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 2, 0);
+        cgra_prog->initial_conf[32].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[32].net_switch_conf.switch_number = 12;
+        cgra_prog->initial_conf[32].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[32].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 2, 0);
 
-        cgra_prog->initial_conf[33].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[33].net_swicth_conf.swicth_number = 13;
-        cgra_prog->initial_conf[33].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[33].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 0);
+        cgra_prog->initial_conf[33].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[33].net_switch_conf.switch_number = 13;
+        cgra_prog->initial_conf[33].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[33].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 0);
 
-        cgra_prog->initial_conf[34].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[34].net_swicth_conf.swicth_number = 14;
-        cgra_prog->initial_conf[34].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[34].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 3, 0);
+        cgra_prog->initial_conf[34].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[34].net_switch_conf.switch_number = 14;
+        cgra_prog->initial_conf[34].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[34].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 3, 0);
 
-        cgra_prog->initial_conf[35].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[35].net_swicth_conf.swicth_number = 15;
-        cgra_prog->initial_conf[35].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[35].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 2);
+        cgra_prog->initial_conf[35].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[35].net_switch_conf.switch_number = 15;
+        cgra_prog->initial_conf[35].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[35].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 2);
 
-        cgra_prog->initial_conf[36].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[36].net_swicth_conf.swicth_number = 16;
-        cgra_prog->initial_conf[36].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[36].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 1, 0, 0);
+        cgra_prog->initial_conf[36].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[36].net_switch_conf.switch_number = 16;
+        cgra_prog->initial_conf[36].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[36].net_switch_conf.switch_conf = switch_conf_radix4(0, 1, 0, 0);
         // stage 3:
-        cgra_prog->initial_conf[37].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[37].net_swicth_conf.swicth_number = 17;
-        cgra_prog->initial_conf[37].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[37].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 1, 0);
+        cgra_prog->initial_conf[37].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[37].net_switch_conf.switch_number = 17;
+        cgra_prog->initial_conf[37].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[37].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 1, 0);
 
-        cgra_prog->initial_conf[38].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[38].net_swicth_conf.swicth_number = 18;
-        cgra_prog->initial_conf[38].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[38].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 0);
+        cgra_prog->initial_conf[38].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[38].net_switch_conf.switch_number = 18;
+        cgra_prog->initial_conf[38].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[38].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 0);
 
-        cgra_prog->initial_conf[39].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[39].net_swicth_conf.swicth_number = 19;
-        cgra_prog->initial_conf[39].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[39].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 1, 0);
+        cgra_prog->initial_conf[39].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[39].net_switch_conf.switch_number = 19;
+        cgra_prog->initial_conf[39].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[39].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 1, 0);
 
-        cgra_prog->initial_conf[40].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[40].net_swicth_conf.swicth_number = 20;
-        cgra_prog->initial_conf[40].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[40].net_swicth_conf.swicth_conf = swicth_conf_radix4(1, 0, 2, 0);
+        cgra_prog->initial_conf[40].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[40].net_switch_conf.switch_number = 20;
+        cgra_prog->initial_conf[40].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[40].net_switch_conf.switch_conf = switch_conf_radix4(1, 0, 2, 0);
 
-        cgra_prog->initial_conf[41].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[41].net_swicth_conf.swicth_number = 21;
-        cgra_prog->initial_conf[41].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[41].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 0);
+        cgra_prog->initial_conf[41].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[41].net_switch_conf.switch_number = 21;
+        cgra_prog->initial_conf[41].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[41].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 0);
 
-        cgra_prog->initial_conf[42].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[42].net_swicth_conf.swicth_number = 22;
-        cgra_prog->initial_conf[42].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[42].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 1, 3, 0);
+        cgra_prog->initial_conf[42].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[42].net_switch_conf.switch_number = 22;
+        cgra_prog->initial_conf[42].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[42].net_switch_conf.switch_conf = switch_conf_radix4(0, 1, 3, 0);
 
-        cgra_prog->initial_conf[43].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[43].net_swicth_conf.swicth_number = 23;
-        cgra_prog->initial_conf[43].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[43].net_swicth_conf.swicth_conf = swicth_conf_radix4(1, 2, 0, 0);
+        cgra_prog->initial_conf[43].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[43].net_switch_conf.switch_number = 23;
+        cgra_prog->initial_conf[43].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[43].net_switch_conf.switch_conf = switch_conf_radix4(1, 2, 0, 0);
 
-        cgra_prog->initial_conf[44].net_swicth_conf.conf_type = CGRA_CONF_NET_SWITCH;
-        cgra_prog->initial_conf[44].net_swicth_conf.swicth_number = 24;
-        cgra_prog->initial_conf[44].net_swicth_conf.inst_addr = 0;
-        cgra_prog->initial_conf[44].net_swicth_conf.swicth_conf = swicth_conf_radix4(0, 0, 0, 0);
+        cgra_prog->initial_conf[44].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
+        cgra_prog->initial_conf[44].net_switch_conf.switch_number = 24;
+        cgra_prog->initial_conf[44].net_switch_conf.inst_addr = 0;
+        cgra_prog->initial_conf[44].net_switch_conf.switch_conf = switch_conf_radix4(0, 0, 0, 0);
     }
 
     auto input_queues = (queue_t *) malloc(sizeof(queue_t) * 2);
