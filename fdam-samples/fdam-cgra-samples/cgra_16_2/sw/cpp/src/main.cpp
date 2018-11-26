@@ -93,7 +93,6 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
 
     cgra_prog->cgra_intial_conf.read_fifo_mask = 0x1;
     cgra_prog->cgra_intial_conf.write_fifo_mask = 0x2;
-
     {
         cgra_prog->cgra_intial_conf.qtd_conf = 44;
         size_t len = 44 * sizeof(initial_conf_t);
@@ -261,7 +260,7 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
 
         cgra_prog->initial_conf[16].pe_store_ignore_conf.conf_type = CGRA_CONF_SET_PE_STORE_IGNORE;
         cgra_prog->initial_conf[16].pe_store_ignore_conf.pe_id = 2;
-        cgra_prog->initial_conf[16].pe_store_ignore_conf.store_ignore = 73;
+        cgra_prog->initial_conf[16].pe_store_ignore_conf.store_ignore = 6;
 
         cgra_prog->initial_conf[17].pe_constant_conf.conf_type = CGRA_CONF_SET_PE_CONST;
         cgra_prog->initial_conf[17].pe_constant_conf.pe_id = 3;

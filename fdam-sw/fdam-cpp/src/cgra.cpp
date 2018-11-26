@@ -27,6 +27,7 @@ void Cgra::prepareProgram(cgra_program_t *program) {
     Cgra::cgra_program = program;
     Accelerator &acc = Cgra::accManagement->getAccelerator(Cgra::cgra_program->cgra_id);
 
+    auto num_stagies = static_cast<int>(ceil(intlog(Cgra::num_pe * 2, Cgra::net_radix)));
     auto mask_in_queue = Cgra::cgra_program->cgra_intial_conf.read_fifo_mask;
     auto mask_out_queue = Cgra::cgra_program->cgra_intial_conf.write_fifo_mask;
     auto num_bytes = Cgra::cgra_program->input_queues[0].length * sizeof(unsigned short);
@@ -44,7 +45,15 @@ void Cgra::prepareProgram(cgra_program_t *program) {
 
     acc.createInputQueue(static_cast<unsigned char>(0), total_bytes);
     auto queue_data_ptr = (unsigned char *) acc.getInputQueue(0);
+    
 
+    for (int i = 1; i < Cgra::cgra_program->cgra_intial_conf.qtd_conf; ++i){
+         if(Cgra::cgra_program->initial_conf[i].pe_store_ignore_conf.conf_type == CGRA_CONF_SET_PE_STORE_IGNORE){
+             int store_ignore = (Cgra::cgra_program->initial_conf[i].pe_store_ignore_conf.store_ignore * (num_stagies + 1 + 8)) + 1; 
+             Cgra::cgra_program->initial_conf[i].pe_store_ignore_conf.store_ignore = store_ignore;
+        }
+    }
+    
     memcpy(queue_data_ptr, &Cgra::cgra_program->cgra_intial_conf, cgra_intial_conf_bytes);
     queue_data_ptr = queue_data_ptr + cgra_intial_conf_bytes_align;
     memcpy(queue_data_ptr, Cgra::cgra_program->initial_conf, conf_bytes);
