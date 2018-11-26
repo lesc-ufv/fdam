@@ -2270,7 +2270,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[97]),
     .in(in_reg_wire_5[1]),
-    .out(out1)
+    .out(out4)
   );
 
 
@@ -2285,7 +2285,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[98]),
     .in(in_reg_wire_5[2]),
-    .out(out2)
+    .out(out8)
   );
 
 
@@ -2300,7 +2300,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[99]),
     .in(in_reg_wire_5[3]),
-    .out(out3)
+    .out(out12)
   );
 
 
@@ -2315,7 +2315,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[100]),
     .in(in_reg_wire_5[4]),
-    .out(out4)
+    .out(out16)
   );
 
 
@@ -2330,7 +2330,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[101]),
     .in(in_reg_wire_5[5]),
-    .out(out5)
+    .out(out20)
   );
 
 
@@ -2345,7 +2345,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[102]),
     .in(in_reg_wire_5[6]),
-    .out(out6)
+    .out(out24)
   );
 
 
@@ -2360,7 +2360,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[103]),
     .in(in_reg_wire_5[7]),
-    .out(out7)
+    .out(out28)
   );
 
 
@@ -2375,7 +2375,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[104]),
     .in(in_reg_wire_5[8]),
-    .out(out8)
+    .out(out1)
   );
 
 
@@ -2390,7 +2390,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[105]),
     .in(in_reg_wire_5[9]),
-    .out(out9)
+    .out(out5)
   );
 
 
@@ -2405,7 +2405,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[106]),
     .in(in_reg_wire_5[10]),
-    .out(out10)
+    .out(out9)
   );
 
 
@@ -2420,7 +2420,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[107]),
     .in(in_reg_wire_5[11]),
-    .out(out11)
+    .out(out13)
   );
 
 
@@ -2435,7 +2435,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[108]),
     .in(in_reg_wire_5[12]),
-    .out(out12)
+    .out(out17)
   );
 
 
@@ -2450,7 +2450,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[109]),
     .in(in_reg_wire_5[13]),
-    .out(out13)
+    .out(out21)
   );
 
 
@@ -2465,7 +2465,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[110]),
     .in(in_reg_wire_5[14]),
-    .out(out14)
+    .out(out25)
   );
 
 
@@ -2480,7 +2480,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[111]),
     .in(in_reg_wire_5[15]),
-    .out(out15)
+    .out(out29)
   );
 
 
@@ -2495,7 +2495,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[112]),
     .in(in_reg_wire_5[16]),
-    .out(out16)
+    .out(out2)
   );
 
 
@@ -2510,7 +2510,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[113]),
     .in(in_reg_wire_5[17]),
-    .out(out17)
+    .out(out6)
   );
 
 
@@ -2525,7 +2525,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[114]),
     .in(in_reg_wire_5[18]),
-    .out(out18)
+    .out(out10)
   );
 
 
@@ -2540,7 +2540,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[115]),
     .in(in_reg_wire_5[19]),
-    .out(out19)
+    .out(out14)
   );
 
 
@@ -2555,7 +2555,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[116]),
     .in(in_reg_wire_5[20]),
-    .out(out20)
+    .out(out18)
   );
 
 
@@ -2570,7 +2570,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[117]),
     .in(in_reg_wire_5[21]),
-    .out(out21)
+    .out(out22)
   );
 
 
@@ -2585,7 +2585,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[118]),
     .in(in_reg_wire_5[22]),
-    .out(out22)
+    .out(out26)
   );
 
 
@@ -2600,7 +2600,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[119]),
     .in(in_reg_wire_5[23]),
-    .out(out23)
+    .out(out30)
   );
 
 
@@ -2615,7 +2615,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[120]),
     .in(in_reg_wire_5[24]),
-    .out(out24)
+    .out(out3)
   );
 
 
@@ -2630,7 +2630,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[121]),
     .in(in_reg_wire_5[25]),
-    .out(out25)
+    .out(out7)
   );
 
 
@@ -2645,7 +2645,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[122]),
     .in(in_reg_wire_5[26]),
-    .out(out26)
+    .out(out11)
   );
 
 
@@ -2660,7 +2660,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[123]),
     .in(in_reg_wire_5[27]),
-    .out(out27)
+    .out(out15)
   );
 
 
@@ -2675,7 +2675,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[124]),
     .in(in_reg_wire_5[28]),
-    .out(out28)
+    .out(out19)
   );
 
 
@@ -2690,7 +2690,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[125]),
     .in(in_reg_wire_5[29]),
-    .out(out29)
+    .out(out23)
   );
 
 
@@ -2705,7 +2705,7 @@ module omega32x32_4_0_8 #
     .rst(1'b0),
     .en(en[126]),
     .in(in_reg_wire_5[30]),
-    .out(out30)
+    .out(out27)
   );
 
 

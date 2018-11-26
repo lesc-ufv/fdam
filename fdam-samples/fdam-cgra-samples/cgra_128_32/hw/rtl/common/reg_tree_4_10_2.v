@@ -1,4 +1,4 @@
-module reg_tree_4_11_2 #
+module reg_tree_4_10_2 #
 (
   parameter DATA_WIDTH = 16
 )
@@ -14,8 +14,7 @@ module reg_tree_4_11_2 #
   output [DATA_WIDTH-1:0] out_6,
   output [DATA_WIDTH-1:0] out_7,
   output [DATA_WIDTH-1:0] out_8,
-  output [DATA_WIDTH-1:0] out_9,
-  output [DATA_WIDTH-1:0] out_10
+  output [DATA_WIDTH-1:0] out_9
 );
 
   reg [DATA_WIDTH-1:0] r0;
@@ -52,9 +51,6 @@ module reg_tree_4_11_2 #
   reg [DATA_WIDTH-1:0] r31;
   reg [DATA_WIDTH-1:0] r32;
   reg [DATA_WIDTH-1:0] r33;
-  reg [DATA_WIDTH-1:0] r34;
-  reg [DATA_WIDTH-1:0] r35;
-  reg [DATA_WIDTH-1:0] r36;
 
   initial begin
     r0 = 0;
@@ -91,9 +87,6 @@ module reg_tree_4_11_2 #
     r31 = 0;
     r32 = 0;
     r33 = 0;
-    r34 = 0;
-    r35 = 0;
-    r36 = 0;
 
   end
 
@@ -114,42 +107,38 @@ module reg_tree_4_11_2 #
     r11 <= r2;
     r12 <= r3;
     r13 <= r3;
-    r14 <= r3;
-    r15 <= r4;
-    r16 <= r5;
-    r17 <= r6;
-    r18 <= r7;
-    r19 <= r8;
-    r20 <= r9;
-    r21 <= r10;
-    r22 <= r11;
-    r23 <= r12;
-    r24 <= r13;
-    r25 <= r14;
-    r26 <= r15;
-    r27 <= r16;
-    r28 <= r17;
-    r29 <= r18;
-    r30 <= r19;
-    r31 <= r20;
-    r32 <= r21;
-    r33 <= r22;
-    r34 <= r23;
-    r35 <= r24;
-    r36 <= r25;
+    r14 <= r4;
+    r15 <= r5;
+    r16 <= r6;
+    r17 <= r7;
+    r18 <= r8;
+    r19 <= r9;
+    r20 <= r10;
+    r21 <= r11;
+    r22 <= r12;
+    r23 <= r13;
+    r24 <= r14;
+    r25 <= r15;
+    r26 <= r16;
+    r27 <= r17;
+    r28 <= r18;
+    r29 <= r19;
+    r30 <= r20;
+    r31 <= r21;
+    r32 <= r22;
+    r33 <= r23;
 
   end
 
-  assign out_0 = r26;
-  assign out_1 = r27;
-  assign out_2 = r28;
-  assign out_3 = r29;
-  assign out_4 = r30;
-  assign out_5 = r31;
-  assign out_6 = r32;
-  assign out_7 = r33;
-  assign out_8 = r34;
-  assign out_9 = r35;
-  assign out_10 = r36;
+  assign out_0 = r24;
+  assign out_1 = r25;
+  assign out_2 = r26;
+  assign out_3 = r27;
+  assign out_4 = r28;
+  assign out_5 = r29;
+  assign out_6 = r30;
+  assign out_7 = r31;
+  assign out_8 = r32;
+  assign out_9 = r33;
 
 endmodule

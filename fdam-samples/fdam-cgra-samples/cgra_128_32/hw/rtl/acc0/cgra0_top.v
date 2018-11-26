@@ -6,10 +6,10 @@ module cgra0_top
   input [64-1:0] conf_bus_in,
   input [1280-1:0] net_en,
   input [256-1:0] en_pc_net,
-  output [16-1:0] fifo_in_re,
-  input [256-1:0] fifo_in_data,
-  output [16-1:0] fifo_out_we,
-  output [256-1:0] fifo_out_data
+  output [32-1:0] fifo_in_re,
+  input [512-1:0] fifo_in_data,
+  output [32-1:0] fifo_out_we,
+  output [512-1:0] fifo_out_data
 );
 
 
@@ -38,7 +38,7 @@ module cgra0_top
   );
 
 
-  generate for(genv=0; genv<16; genv=genv+1) begin : inst_pe_io
+  generate for(genv=0; genv<32; genv=genv+1) begin : inst_pe_io
 
     cgra0_pe_io
     #(
@@ -79,7 +79,7 @@ module cgra0_top
   endgenerate
 
 
-  generate for(genv=16; genv<128; genv=genv+1) begin : inst_pe
+  generate for(genv=32; genv<128; genv=genv+1) begin : inst_pe
 
     cgra0_pe
     #(

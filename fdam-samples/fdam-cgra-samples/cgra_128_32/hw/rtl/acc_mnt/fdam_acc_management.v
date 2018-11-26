@@ -24,17 +24,17 @@ module fdam_acc_management
 );
 
 
-  wire [17-1:0] req_wr_en_in;
-  wire [9792-1:0] req_wr_data_in;
-  wire [17-1:0] req_wr_available_in;
+  wire [33-1:0] req_wr_en_in;
+  wire [19008-1:0] req_wr_data_in;
+  wire [33-1:0] req_wr_available_in;
 
   wire req_wr_available_out;
   wire req_wr_en_out;
   wire [576-1:0] req_wr_data_out;
 
-  wire [16-1:0] req_rd_en_in;
-  wire [1024-1:0] req_rd_data_in;
-  wire [16-1:0] req_rd_available_in;
+  wire [32-1:0] req_rd_en_in;
+  wire [2048-1:0] req_rd_data_in;
+  wire [32-1:0] req_rd_available_in;
 
   wire req_rd_available_out;
   wire req_rd_en_out;
@@ -60,28 +60,28 @@ module fdam_acc_management
 
 
   fdam_accelerator_0
-  acc_0_16x16
+  acc_0_32x32
   (
     .clk(clk),
     .rst(rst_reg[0] | rst_accs[0]),
     .start(start_accs[0]),
     .conf_valid(conf_valid),
     .conf(conf[111:0]),
-    .available_read(req_rd_available_in[15:0]),
-    .request_read(req_rd_en_in[15:0]),
-    .request_data(req_rd_data_in[1023:0]),
+    .available_read(req_rd_available_in[31:0]),
+    .request_read(req_rd_en_in[31:0]),
+    .request_data(req_rd_data_in[2047:0]),
     .read_data_valid(resp_rd_valid),
     .read_queue_id(resp_rd_mdata),
     .read_data(resp_rd_data),
-    .available_write(req_wr_available_in[16:0]),
-    .request_write(req_wr_en_in[16:0]),
-    .write_data(req_wr_data_in[9791:0]),
+    .available_write(req_wr_available_in[32:0]),
+    .request_write(req_wr_en_in[32:0]),
+    .write_data(req_wr_data_in[19007:0]),
     .write_data_valid(resp_wr_valid),
     .write_queue_id(resp_wr_mdata)
   );
 
 
-  fdam_arbiter_controller_rd_req_tree_16
+  fdam_arbiter_controller_rd_req_tree_32
   #(
     .DATA_WIDTH(64),
     .INPUT_FIFO_DEPTH_BITS(5),
@@ -100,7 +100,7 @@ module fdam_acc_management
   );
 
 
-  fdam_arbiter_controller_wr_req_tree_17
+  fdam_arbiter_controller_wr_req_tree_33
   #(
     .DATA_WIDTH(576),
     .INPUT_FIFO_DEPTH_BITS(5),
@@ -148,7 +148,7 @@ module fdam_acc_management
     if(rst_reg[5]) begin
       info <= 512'd0;
     end else begin
-      info[15:0] <= {8'd16, 8'd16};
+      info[15:0] <= {8'd32, 8'd32};
 
     end
   end

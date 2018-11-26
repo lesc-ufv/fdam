@@ -84,8 +84,8 @@ module fdam_acc_management
   fdam_arbiter_controller_rd_req_tree_2
   #(
     .DATA_WIDTH(64),
-    .INPUT_FIFO_DEPTH_BITS(10),
-    .OUTPUT_FIFO_DEPTH_BITS(10)
+    .INPUT_FIFO_DEPTH_BITS(5),
+    .OUTPUT_FIFO_DEPTH_BITS(5)
   )
   arbiter_controller_rd_req_tree
   (
@@ -103,8 +103,8 @@ module fdam_acc_management
   fdam_arbiter_controller_wr_req_tree_3
   #(
     .DATA_WIDTH(576),
-    .INPUT_FIFO_DEPTH_BITS(10),
-    .OUTPUT_FIFO_DEPTH_BITS(10)
+    .INPUT_FIFO_DEPTH_BITS(5),
+    .OUTPUT_FIFO_DEPTH_BITS(5)
   )
   arbiter_controller_wr_req_tree
   (

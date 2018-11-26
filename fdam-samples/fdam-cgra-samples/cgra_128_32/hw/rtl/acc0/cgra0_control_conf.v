@@ -8,8 +8,8 @@ module cgra0_control_conf
   input [512-1:0] rd_data,
   input rd_data_valid,
   output reg [64-1:0] conf_out_bus,
-  output reg [16-1:0] read_fifo_mask,
-  output reg [16-1:0] write_fifo_mask,
+  output reg [32-1:0] read_fifo_mask,
+  output reg [32-1:0] write_fifo_mask,
   output reg done
 );
 
@@ -58,8 +58,8 @@ module cgra0_control_conf
         end
         FSM_INIT_CTRL_INIT: begin
           qtd_conf <= conf_cl[31:0];
-          read_fifo_mask <= conf_cl[47:32];
-          write_fifo_mask <= conf_cl[79:64];
+          read_fifo_mask <= conf_cl[63:32];
+          write_fifo_mask <= conf_cl[95:64];
           fsm_conf_ctrl <= FSM_SEND_INIT_CONF_PE;
         end
         FSM_SEND_INIT_CONF_PE: begin

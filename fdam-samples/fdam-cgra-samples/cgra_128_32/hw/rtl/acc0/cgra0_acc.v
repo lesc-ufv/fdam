@@ -3,39 +3,39 @@ module cgra0_acc
   input clk,
   input rst,
   input start,
-  input [16-1:0] acc_user_done_rd_data,
-  input [16-1:0] acc_user_done_wr_data,
-  input [16-1:0] acc_user_available_read,
-  output [16-1:0] acc_user_request_read,
-  input [16-1:0] acc_user_read_data_valid,
-  input [8192-1:0] acc_user_read_data,
-  input [16-1:0] acc_user_available_write,
-  output [16-1:0] acc_user_request_write,
-  output [8192-1:0] acc_user_write_data,
+  input [32-1:0] acc_user_done_rd_data,
+  input [32-1:0] acc_user_done_wr_data,
+  input [32-1:0] acc_user_available_read,
+  output [32-1:0] acc_user_request_read,
+  input [32-1:0] acc_user_read_data_valid,
+  input [16384-1:0] acc_user_read_data,
+  input [32-1:0] acc_user_available_write,
+  output [32-1:0] acc_user_request_write,
+  output [16384-1:0] acc_user_write_data,
   output acc_user_done
 );
 
-  wire [16-1:0] request_read;
+  wire [32-1:0] request_read;
   wire conf_control_req_rd_data;
-  wire [16-1:0] en_fecth_data;
+  wire [32-1:0] en_fecth_data;
   wire [128-1:0] en_pe;
   wire [1280-1:0] en_net;
   wire [256-1:0] en_pc_net;
-  wire [16-1:0] fifo_in_re;
-  wire [256-1:0] fifo_in_data;
-  wire [16-1:0] available_pop;
-  wire [16-1:0] fifo_out_we;
-  wire [256-1:0] fifo_out_data;
-  wire [16-1:0] available_push;
+  wire [32-1:0] fifo_in_re;
+  wire [512-1:0] fifo_in_data;
+  wire [32-1:0] available_pop;
+  wire [32-1:0] fifo_out_we;
+  wire [512-1:0] fifo_out_data;
+  wire [32-1:0] available_push;
   wire [64-1:0] conf_out_bus;
-  wire [16-1:0] read_fifo_mask;
-  wire [16-1:0] write_fifo_mask;
+  wire [32-1:0] read_fifo_mask;
+  wire [32-1:0] write_fifo_mask;
   wire conf_done;
   genvar genv;
-  assign acc_user_request_read[15:1] = request_read[15:1];
+  assign acc_user_request_read[31:1] = request_read[31:1];
   assign acc_user_request_read[0] = request_read[0] | conf_control_req_rd_data;
 
-  generate for(genv=0; genv<16; genv=genv+1) begin : inst_fecth_data
+  generate for(genv=0; genv<32; genv=genv+1) begin : inst_fecth_data
 
     fecth_data
     #(
@@ -60,7 +60,7 @@ module cgra0_acc
   endgenerate
 
 
-  generate for(genv=0; genv<16; genv=genv+1) begin : inst_dispath_data
+  generate for(genv=0; genv<32; genv=genv+1) begin : inst_dispath_data
 
     dispath_data
     #(

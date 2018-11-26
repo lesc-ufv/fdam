@@ -1,4 +1,4 @@
-module fdam_arbiter_controller_rd_req_2 #
+module fdam_arbiter_controller_rd_req_4 #
 (
   parameter DATA_WIDTH = 32,
   parameter INPUT_FIFO_DEPTH_BITS = 4,
@@ -7,9 +7,9 @@ module fdam_arbiter_controller_rd_req_2 #
 (
   input clk,
   input rst,
-  input [2-1:0] req_wr_en_in,
-  input [DATA_WIDTH*2-1:0] req_wr_data_in,
-  output reg [2-1:0] req_wr_available_in,
+  input [4-1:0] req_wr_en_in,
+  input [DATA_WIDTH*4-1:0] req_wr_data_in,
+  output reg [4-1:0] req_wr_available_in,
   input req_wr_available_out,
   output reg req_wr_en_out,
   output reg [DATA_WIDTH-1:0] req_wr_data_out
@@ -21,21 +21,21 @@ module fdam_arbiter_controller_rd_req_2 #
   localparam OUT_FIFO_ALMOSTFULL_THRESHOLD = 2 ** OUTPUT_FIFO_DEPTH_BITS - 6;
   localparam OUT_FIFO_ALMOSTEMPTY_THRESHOLD = 2;
 
-  wire [2-1:0] in_fifo_empty;
-  wire [(INPUT_FIFO_DEPTH_BITS+1)*2-1:0] in_fifo_count;
-  wire [2-1:0] in_fifo_full;
-  wire [2-1:0] in_fifo_almostfull;
-  wire [2-1:0] in_fifo_almostempty;
+  wire [4-1:0] in_fifo_empty;
+  wire [(INPUT_FIFO_DEPTH_BITS+1)*4-1:0] in_fifo_count;
+  wire [4-1:0] in_fifo_full;
+  wire [4-1:0] in_fifo_almostfull;
+  wire [4-1:0] in_fifo_almostempty;
 
-  reg [8-1:0] rst_reg;
+  reg [10-1:0] rst_reg;
 
-  reg [2-1:0] in_fifo_we;
-  reg [DATA_WIDTH*2-1:0] in_fifo_din;
+  reg [4-1:0] in_fifo_we;
+  reg [DATA_WIDTH*4-1:0] in_fifo_din;
   reg [2-1:0] in_fifo_re_flag;
 
-  reg [2-1:0] in_fifo_re;
-  wire [2-1:0] in_fifo_dout_valid;
-  wire [DATA_WIDTH*2-1:0] in_fifo_dout;
+  reg [4-1:0] in_fifo_re;
+  wire [4-1:0] in_fifo_dout_valid;
+  wire [DATA_WIDTH*4-1:0] in_fifo_dout;
 
   wire out_fifo_empty;
   wire [OUTPUT_FIFO_DEPTH_BITS+1-1:0] out_fifo_count;
@@ -50,14 +50,14 @@ module fdam_arbiter_controller_rd_req_2 #
   wire out_fifo_dout_valid;
   wire [DATA_WIDTH-1:0] out_fifo_dout;
 
-  wire [2-1:0] arbiter_request;
-  wire [2-1:0] arbiter_grant;
+  wire [4-1:0] arbiter_request;
+  wire [4-1:0] arbiter_grant;
   wire arbiter_grant_valid;
-  wire [1-1:0] arbiter_grant_encoded;
-  wire [2-1:0] arbiter_request_tt;
-  wire [2-1:0] arbiter_grant_tt;
+  wire [2-1:0] arbiter_grant_encoded;
+  wire [4-1:0] arbiter_request_tt;
+  wire [4-1:0] arbiter_grant_tt;
   wire arbiter_grant_valid_tt;
-  wire [1-1:0] arbiter_grant_encoded_tt;
+  wire [2-1:0] arbiter_grant_encoded_tt;
 
   wire select_dout_valid;
   wire [DATA_WIDTH-1:0] select_dout;
@@ -65,11 +65,11 @@ module fdam_arbiter_controller_rd_req_2 #
   integer it;
   genvar idx;
 
-  reg_tree_4_8_2
+  reg_tree_4_10_2
   #(
     .DATA_WIDTH(1)
   )
-  reg_tree_4_8_2
+  reg_tree_4_10_2
   (
     .clk(clk),
     .in(rst),
@@ -80,11 +80,13 @@ module fdam_arbiter_controller_rd_req_2 #
     .out_4(rst_reg[4]),
     .out_5(rst_reg[5]),
     .out_6(rst_reg[6]),
-    .out_7(rst_reg[7])
+    .out_7(rst_reg[7]),
+    .out_8(rst_reg[8]),
+    .out_9(rst_reg[9])
   );
 
 
-  generate for(idx=0; idx<2; idx=idx+1) begin : gen_in_fifos
+  generate for(idx=0; idx<4; idx=idx+1) begin : gen_in_fifos
 
     fifo
     #(
@@ -113,17 +115,19 @@ module fdam_arbiter_controller_rd_req_2 #
   endgenerate
 
 
-  select_top_2
+  select_top_4
   #(
     .DATA_WIDTH(DATA_WIDTH)
   )
   select
   (
     .clk(clk),
-    .rst(rst_reg[2]),
+    .rst(rst_reg[4]),
     .data_in_valid(in_fifo_dout_valid),
     .data_in_0(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*0)-1:DATA_WIDTH*0]),
     .data_in_1(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*1)-1:DATA_WIDTH*1]),
+    .data_in_2(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*2)-1:DATA_WIDTH*2]),
+    .data_in_3(in_fifo_dout[(DATA_WIDTH+DATA_WIDTH*3)-1:DATA_WIDTH*3]),
     .data_out_valid(select_dout_valid),
     .data_out(select_dout)
   );
@@ -139,7 +143,7 @@ module fdam_arbiter_controller_rd_req_2 #
   out_fifo
   (
     .clk(clk),
-    .rst(rst_reg[3]),
+    .rst(rst_reg[5]),
     .we(out_fifo_we),
     .din(out_fifo_din),
     .re(out_fifo_re),
@@ -155,7 +159,7 @@ module fdam_arbiter_controller_rd_req_2 #
 
   arbiter
   #(
-    .PORTS(2),
+    .PORTS(4),
     .TYPE("ROUND_ROBIN"),
     .BLOCK("NONE"),
     .LSB_PRIORITY("LOW")
@@ -163,9 +167,9 @@ module fdam_arbiter_controller_rd_req_2 #
   arbiter
   (
     .clk(clk),
-    .rst(rst_reg[4]),
+    .rst(rst_reg[6]),
     .request(arbiter_request),
-    .acknowledge({ 2{ 1'b0 } }),
+    .acknowledge({ 4{ 1'b0 } }),
     .grant(arbiter_grant),
     .grant_valid(arbiter_grant_valid),
     .grant_encoded(arbiter_grant_encoded)
@@ -174,7 +178,7 @@ module fdam_arbiter_controller_rd_req_2 #
 
   arbiter
   #(
-    .PORTS(2),
+    .PORTS(4),
     .TYPE("ROUND_ROBIN"),
     .BLOCK("NONE"),
     .LSB_PRIORITY("LOW")
@@ -182,16 +186,16 @@ module fdam_arbiter_controller_rd_req_2 #
   arbiter_tt
   (
     .clk(clk),
-    .rst(rst_reg[5]),
+    .rst(rst_reg[7]),
     .request(arbiter_request_tt),
-    .acknowledge({ 2{ 1'b0 } }),
+    .acknowledge({ 4{ 1'b0 } }),
     .grant(arbiter_grant_tt),
     .grant_valid(arbiter_grant_valid_tt),
     .grant_encoded(arbiter_grant_encoded_tt)
   );
 
 
-  generate for(idx=0; idx<2; idx=idx+1) begin : gen_req
+  generate for(idx=0; idx<4; idx=idx+1) begin : gen_req
     assign arbiter_request[idx] = ~in_fifo_empty[idx] & ~out_fifo_almostfull;
     assign arbiter_request_tt[idx] = ~in_fifo_almostempty[idx] & ~out_fifo_almostfull;
   end
@@ -199,10 +203,10 @@ module fdam_arbiter_controller_rd_req_2 #
 
 
   always @(posedge clk) begin
-    if(rst_reg[6]) begin
-      req_wr_available_in <= 2'd0;
+    if(rst_reg[8]) begin
+      req_wr_available_in <= 4'd0;
     end else begin
-      for(it=0; it<2; it=it+1) begin
+      for(it=0; it<4; it=it+1) begin
         req_wr_available_in[it] <= ~in_fifo_almostfull[it];
       end
     end
@@ -210,9 +214,9 @@ module fdam_arbiter_controller_rd_req_2 #
 
 
   always @(posedge clk) begin
-    if(rst_reg[7]) begin
-      in_fifo_we <= 2'd0;
-      in_fifo_re <= 2'd0;
+    if(rst_reg[9]) begin
+      in_fifo_we <= 4'd0;
+      in_fifo_re <= 4'd0;
       out_fifo_we <= 1'b0;
       out_fifo_re <= 1'b0;
       req_wr_en_out <= 1'b0;
@@ -225,7 +229,7 @@ module fdam_arbiter_controller_rd_req_2 #
       out_fifo_re <= (out_fifo_almostempty)? req_wr_available_out & ~out_fifo_empty & ~out_fifo_re : req_wr_available_out;
       req_wr_en_out <= out_fifo_dout_valid;
       req_wr_data_out <= out_fifo_dout;
-      in_fifo_re <= 2'd0;
+      in_fifo_re <= 4'd0;
       if(arbiter_grant_valid_tt) begin
         in_fifo_re <= arbiter_grant_tt;
       end 
