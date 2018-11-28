@@ -16,36 +16,36 @@ int main(int argc, char *argv[]) {
 
     high_resolution_clock::time_point s;
     duration<double> diff{};
-    s = high_resolution_clock::now();  
-    
+    s = high_resolution_clock::now();
+
     fir4_cpu(data_in, cpu_data_out, data_num, const_vet);
-    
+
     diff = high_resolution_clock::now() - s;
-    double timeExecSw  = diff.count();
-    
-    s = high_resolution_clock::now(); 
-    
-    fir4_cgra(data_in, cgra_data_out, data_num, const_vet);
-    
+    double timeExecSw = diff.count();
+
+    s = high_resolution_clock::now();
+
+    //fir4_cgra(data_in, cgra_data_out, data_num, const_vet);
+    fir4_cgra_from_file(data_in, cgra_data_out, data_num);
+
     diff = high_resolution_clock::now() - s;
-    double timeExecHw  = diff.count();
-    
+    double timeExecHw = diff.count();
+
     int index_error = -1;
     for (int i = 0; i < data_num; ++i) {
-        if(cpu_data_out[i] != cgra_data_out[i]){
+        if (cpu_data_out[i] != cgra_data_out[i]) {
             index_error = i;
             break;
         }
     }
-    printf("Time execute fir4 cpu: %f\n",timeExecSw);
-    printf("Time execute fir4 cgra-harp: %f\n",timeExecHw);
-    if(index_error >= 0){
-        printf("Error found at %d  expected %d found %d!\n",index_error,cpu_data_out[index_error],cgra_data_out[index_error]);
-    } else{
+    printf("Time execute fir4 cpu: %f\n", timeExecSw);
+    printf("Time execute fir4 cgra-harp: %f\n", timeExecHw);
+    if (index_error >= 0) {
+        printf("Error found at %d  expected %d found %d!\n", index_error, cpu_data_out[index_error],
+               cgra_data_out[index_error]);
+    } else {
         printf("Success!\n");
     }
-
-    
 
     printf("FIR4 DATA IN:\n");
     for (int i = 0; i < data_num; ++i) {
@@ -55,15 +55,13 @@ int main(int argc, char *argv[]) {
     printf("FIR4 CGRA DATA OUT:\n");
     for (int i = 0; i < data_num; ++i) {
         printf("%d ", cgra_data_out[i]);
-    }  
+    }
     printf("\n");
     printf("FIR4 CPU DATA OUT:\n");
     for (int i = 0; i < data_num; ++i) {
         printf("%d ", cpu_data_out[i]);
     }
     printf("\n");
-
-    
 }
 
 void fir4_cpu(const short *data_in, short *data_out, int n, const short *const_vet) {
@@ -81,6 +79,112 @@ void fir4_cgra(short *data_in, short *data_out, int n, const short *const_vet) {
     delete cgra;
 }
 
+void fir4_cgra_from_file(short *data_in, short *data_out, int n) {
+    cgra_program_t *cgra_program = create_fir4_cgra_program_from_file("../src/fir4.cgra", data_in, n, data_out, n - 4);
+    auto cgra = new Cgra(16, 2, 4);
+    cgra->prepareProgram(cgra_program);
+    cgra->syncExecute(3000);
+    delete cgra;
+}
+
+void print_program(cgra_program_t *cgra_program) {
+
+    printf("CGAR ID: %d\n", cgra_program->cgra_id);
+    printf("QUANTIDADE CONF: %d\n", cgra_program->cgra_intial_conf.qtd_conf);
+    printf("FIFO READ MASK: %x\n", cgra_program->cgra_intial_conf.read_fifo_mask);
+    printf("FIFO WRITE MASK: %x\n", cgra_program->cgra_intial_conf.write_fifo_mask);
+    for (int i = 0; i < cgra_program->cgra_intial_conf.qtd_conf; ++i) {
+        switch (cgra_program->initial_conf[i].pe_instruction_conf.conf_type) {
+            case CGRA_CONF_SET_PE_INSTRUCTION:
+                printf("CGRA_CONF_SET_PE_INSTRUCTION: PE_ID: %lu, INST_ADDR: %lu, ALU_OP: %lu, ALU_INA: %lu, ALU_INB: %lu,"
+                               " ALU_OUT: %lu, RF_RADDR: %lu RF_WADDR: %lu \n",
+                       cgra_program->initial_conf[i].pe_instruction_conf.pe_id,
+                       cgra_program->initial_conf[i].pe_instruction_conf.inst_addr,
+                       cgra_program->initial_conf[i].pe_instruction_conf.alu_op,
+                       cgra_program->initial_conf[i].pe_instruction_conf.alu_in_a,
+                       cgra_program->initial_conf[i].pe_instruction_conf.alu_in_b,
+                       cgra_program->initial_conf[i].pe_instruction_conf.alu_out,
+                       cgra_program->initial_conf[i].pe_instruction_conf.rf_raddr,
+                       cgra_program->initial_conf[i].pe_instruction_conf.rf_waddr);
+                break;
+            case CGRA_CONF_SET_PE_CONST:
+                printf("CGRA_CONF_SET_PE_CONST: PE_ID: %lu, CONST_ADDR: %lu, CONST: %lu\n",
+                       cgra_program->initial_conf[i].pe_constant_conf.pe_id,
+                       cgra_program->initial_conf[i].pe_constant_conf.const_addr,
+                       cgra_program->initial_conf[i].pe_constant_conf.constant);
+                break;
+            case CGRA_CONF_SET_PE_PC_MAX:
+                printf("CGRA_CONF_SET_PE_PC_MAX: PE_ID: %lu, PC_MAX: %lu\n",
+                       cgra_program->initial_conf[i].pe_pc_max_conf.pe_id,
+                       cgra_program->initial_conf[i].pe_pc_max_conf.pc_max);
+                break;
+            case CGRA_CONF_SET_PE_PC_LOOP:
+                printf("CGRA_CONF_SET_PE_PC_LOOP: PE_ID: %lu, PC_LOOP: %lu\n",
+                       cgra_program->initial_conf[i].pe_pc_loop_conf.pe_id,
+                       cgra_program->initial_conf[i].pe_pc_loop_conf.pc_loop);
+                break;
+            case CGRA_CONF_SET_PE_STORE_IGNORE:
+                printf("CGRA_CONF_SET_PE_STORE_IGNORE: PE_ID: %lu, STORE_IGNORE: %lu\n",
+                       cgra_program->initial_conf[i].pe_store_ignore_conf.pe_id,
+                       cgra_program->initial_conf[i].pe_store_ignore_conf.store_ignore);
+                break;
+            case CGRA_CONF_SET_NET_PC_MAX:
+                printf("CGRA_CONF_SET_NET_PC_MAX: SWITCH_NUMBER: %lu, PC_MAX: %lu\n",
+                       cgra_program->initial_conf[i].net_pc_max_conf.switch_number,
+                       cgra_program->initial_conf[i].net_pc_max_conf.pc_max);
+                break;
+            case CGRA_CONF_SET_NET_PC_LOOP:
+                printf("CGRA_CONF_SET_NET_PC_LOOP: SWITCH_NUMBER: %lu, PC_LOOP: %lu\n",
+                       cgra_program->initial_conf[i].net_pc_loop_conf.switch_number,
+                       cgra_program->initial_conf[i].net_pc_loop_conf.pc_loop);
+                break;
+            case CGRA_CONF_NET_SWITCH:
+                printf("CGRA_CONF_NET_SWITCH: SWITCH_NUMBER: %lu, INST_ADDR: %lu, SWITCH_CONF: %lx\n",
+                       cgra_program->initial_conf[i].net_switch_conf.switch_number,
+                       cgra_program->initial_conf[i].net_switch_conf.inst_addr,
+                       cgra_program->initial_conf[i].net_switch_conf.switch_conf);
+                break;
+            default:
+                break;
+        }
+    }
+
+}
+
+cgra_program_t *
+create_fir4_cgra_program_from_file(const char *file_path, short *data_in, int data_in_size, short *data_out,
+                                   int data_out_size) {
+    auto *cgra_prog = (cgra_program_t *) malloc(sizeof(cgra_program_t));
+    FILE *fp = fopen(file_path, "rb");
+    if (fp != nullptr) {
+        fread(&cgra_prog->cgra_id, sizeof(short), 1, fp);
+        fseek(fp, sizeof(short), SEEK_SET);
+        fread(&cgra_prog->cgra_intial_conf, sizeof(int), 16, fp);
+        fseek(fp, 66, SEEK_SET);
+        size_t len = cgra_prog->cgra_intial_conf.qtd_conf * sizeof(initial_conf_t);
+        cgra_prog->initial_conf = (initial_conf_t *) malloc(len);
+        fread(cgra_prog->initial_conf, sizeof(initial_conf_t), cgra_prog->cgra_intial_conf.qtd_conf, fp);
+        fclose(fp);
+
+        auto input_queues = (queue_t *) malloc(sizeof(queue_t) * 2);
+        auto output_queues = (queue_t *) malloc(sizeof(queue_t) * 2);
+
+        input_queues[0].data = data_in;
+        input_queues[0].length = data_in_size;
+
+        output_queues[1].data = data_out;
+        output_queues[1].length = data_out_size;
+
+        cgra_prog->input_queues = input_queues;
+        cgra_prog->output_queues = output_queues;
+
+        return cgra_prog;
+
+    } else {
+        printf("Error opening file: %s", file_path);
+    }
+    return nullptr;
+}
 
 cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short *data_out, int data_out_size,
                                          const short *const_vet) {
@@ -88,11 +192,10 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
     auto *cgra_prog = (cgra_program_t *) malloc(sizeof(cgra_program_t));
 
     cgra_prog->cgra_id = 0;
-
     memset(&cgra_prog->cgra_intial_conf, 0, sizeof(cgra_intial_conf_t));
-
     cgra_prog->cgra_intial_conf.read_fifo_mask = 0x1;
     cgra_prog->cgra_intial_conf.write_fifo_mask = 0x2;
+
     {
         cgra_prog->cgra_intial_conf.qtd_conf = 44;
         size_t len = 44 * sizeof(initial_conf_t);
@@ -282,7 +385,6 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
         cgra_prog->initial_conf[20].pe_constant_conf.const_addr = 0;
         cgra_prog->initial_conf[20].pe_constant_conf.constant = (unsigned int) const_vet[0];
 
-
         // stage 1:
         cgra_prog->initial_conf[21].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
         cgra_prog->initial_conf[21].net_switch_conf.switch_number = 1;
@@ -364,6 +466,7 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
         cgra_prog->initial_conf[36].net_switch_conf.switch_number = 16;
         cgra_prog->initial_conf[36].net_switch_conf.inst_addr = 0;
         cgra_prog->initial_conf[36].net_switch_conf.switch_conf = switch_conf_radix4(0, 1, 0, 0);
+
         // stage 3:
         cgra_prog->initial_conf[37].net_switch_conf.conf_type = CGRA_CONF_NET_SWITCH;
         cgra_prog->initial_conf[37].net_switch_conf.switch_number = 17;
