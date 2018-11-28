@@ -2,7 +2,15 @@
 
 int main(int argc, char *argv[]) {
 
-    int data_num = 1024;
+    int data_num = 32;
+    if(argc > 1 ){
+       data_num = atoi(argv[1]);
+    } 
+    else{
+        cout << "invalid args!!!"<<endl;
+        cout << "usage: <input size>" << endl;
+        exit(255);
+    }
     auto data_in = (short *) malloc(sizeof(short) * data_num);
     auto cpu_data_out = (short *) malloc(sizeof(short) * data_num);
     auto cgra_data_out = (short *) malloc(sizeof(short) * data_num);
