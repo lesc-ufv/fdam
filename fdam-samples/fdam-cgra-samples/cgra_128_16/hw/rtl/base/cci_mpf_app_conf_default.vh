@@ -33,7 +33,7 @@
 
 
 `ifndef AFU_CLOCK_FREQ
-  `define AFU_CLOCK_FREQ 400
+  `define AFU_CLOCK_FREQ 200
 `endif
 
 //
