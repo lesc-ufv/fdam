@@ -76,15 +76,15 @@ typedef struct pe_store_ignore_conf_t {
 } pe_store_ignore_conf_t;
 
 typedef struct net_pc_max_conf_t {
-    unsigned char conf_type:8;
-    unsigned short switch_number:16;
-    unsigned int pc_max:32;
+    unsigned long conf_type:8;
+    unsigned long switch_number:16;
+    unsigned long pc_max:32;
 } net_pc_max_conf_t;
 
 typedef struct net_pc_loop_conf_t {
-    unsigned char conf_type:8;
-    unsigned short switch_number:16;
-    unsigned int pc_loop:32;
+    unsigned long conf_type:8;
+    unsigned long switch_number:16;
+    unsigned long pc_loop:32;
 } net_pc_loop_conf_t;
 
 typedef struct net_switch_conf_t {
