@@ -2,10 +2,14 @@
 
 # TODO
 export VCS_HOME="/opt/synopsys/vcs"
+
 export QUARTUS_HOME="/opt/intelFPGA/17.1/quartus"
+export MTI_HOME="/opt/intelFPGA/18.1/modelsim_ae"
+
 export SNPSLMD_LICENSE_FILE="27000@fedora"
 export LM_LICENSE_FILE="27000@fedora"
 
 export VCS_ARCH_OVERRIDE=linux
 export PATH=$PATH:$VCS_HOME/bin
 export PATH=$PATH:$QUARTUS_HOME/bin
+export PATH=$PATH:$MTI_HOME/bin

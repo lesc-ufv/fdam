@@ -118,6 +118,9 @@ typedef struct queue_t {
 typedef struct cgra_program_t {
 
     unsigned short cgra_id;
+    unsigned short num_pe;
+    unsigned short num_pe_io;
+    unsigned short net_stagies;
     cgra_intial_conf_t cgra_intial_conf;
     initial_conf_t *initial_conf;
     queue_t *input_queues;

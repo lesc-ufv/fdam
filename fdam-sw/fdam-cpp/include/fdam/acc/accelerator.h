@@ -64,14 +64,14 @@ public:
     void stop();
 
     void reset();
-    
+
     void *getInputQueue(unsigned char idQueue);
 
     void *getOutputQueue(unsigned char idQueue);
 
-    void setInputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
+    void setInputQueue(unsigned char idQueue, void *ptrQueue, long long numBytes);
 
-    void setOutputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes);
+    void setOutputQueue(unsigned char idQueue, void *ptrQueue, long long numBytes);
 
     bool createInputQueue(unsigned char idQueue, long long nBytes);
 
@@ -109,9 +109,9 @@ public:
 
     bool copyFromOutputQueue(unsigned char idQueue, long long *data, long long ndata);
 
-    bool setNumBytesRead(unsigned char idQueue, long long  nBytes);
+    bool setNumBytesRead(unsigned char idQueue, long long nBytes);
 
-    bool setNumBytesWrite(unsigned char idQueue, long long  nBytes);
+    bool setNumBytesWrite(unsigned char idQueue, long long nBytes);
 
     long long getSizeOfInputQueue(unsigned char idQueue) const;
 
@@ -134,9 +134,9 @@ public:
     bool isDone() const;
 
     unsigned short getId() const;
-    
+
     long getInputQueueBytesRead(unsigned char idQueue);
-    
+
     long getOutputQueueWrittenBytes(unsigned char idQueue);
 
     void printHwInfo();

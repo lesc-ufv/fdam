@@ -81,15 +81,15 @@ public:
     bool isAccDone(unsigned long accelerators);
 
     long getTotalClocks();
-    
+
     long getTotalWrittenCacheLine();
-    
+
     long getTotalCacheLineRead();
 
     long getClockSpeed();
-    
+
     bool IsSimulated();
-    
+
     void printHwInfo();
 };
 

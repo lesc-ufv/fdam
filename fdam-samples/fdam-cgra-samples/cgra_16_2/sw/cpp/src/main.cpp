@@ -2,12 +2,11 @@
 
 int main(int argc, char *argv[]) {
 
-    int data_num = 32;
-    if(argc > 1 ){
-       data_num = atoi(argv[1]);
-    } 
-    else{
-        cout << "invalid args!!!"<<endl;
+    int data_num = 1024;
+    if (argc > 1) {
+        data_num = atoi(argv[1]);
+    } else {
+        cout << "invalid args!!!" << endl;
         cout << "usage: <input size>" << endl;
         exit(255);
     }
@@ -81,23 +80,29 @@ void fir4_cpu(const short *data_in, short *data_out, int n, const short *const_v
 
 void fir4_cgra(short *data_in, short *data_out, int n, const short *const_vet) {
     cgra_program_t *cgra_program = create_fir4_cgra_program(data_in, n, data_out, n - 4, const_vet);
-    auto cgra = new Cgra(16, 2, 4);
+    auto cgra = new Cgra();
     cgra->prepareProgram(cgra_program);
-    cgra->syncExecute(3000);
+    cgra->syncExecute(0);
     delete cgra;
 }
 
 void fir4_cgra_from_file(short *data_in, short *data_out, int n) {
     cgra_program_t *cgra_program = create_fir4_cgra_program_from_file("../src/fir4.cgra", data_in, n, data_out, n - 4);
-    auto cgra = new Cgra(16, 2, 4);
+    auto cgra = new Cgra();
     cgra->prepareProgram(cgra_program);
-    cgra->syncExecute(3000);
+    cgra->syncExecute(0);
+    cgra_program->cgra_intial_conf.qtd_conf = 0;
+    cgra->prepareProgram(cgra_program);
+    cgra->syncExecute(0);
     delete cgra;
 }
 
 void print_program(cgra_program_t *cgra_program) {
 
     printf("CGAR ID: %d\n", cgra_program->cgra_id);
+    printf("CGAR NUM PE: %d\n", cgra_program->num_pe);
+    printf("CGAR IO: %d\n", cgra_program->num_pe_io);
+    printf("CGAR NET STAGIES: %d\n", cgra_program->net_stagies);
     printf("QUANTIDADE CONF: %d\n", cgra_program->cgra_intial_conf.qtd_conf);
     printf("FIFO READ MASK: %x\n", cgra_program->cgra_intial_conf.read_fifo_mask);
     printf("FIFO WRITE MASK: %x\n", cgra_program->cgra_intial_conf.write_fifo_mask);
@@ -147,7 +152,7 @@ void print_program(cgra_program_t *cgra_program) {
                        cgra_program->initial_conf[i].net_pc_loop_conf.pc_loop);
                 break;
             case CGRA_CONF_NET_SWITCH:
-                printf("CGRA_CONF_NET_SWITCH: SWITCH_NUMBER: %lu, INST_ADDR: %lu, SWITCH_CONF: %lx\n",
+                printf("CGRA_CONF_NET_SWITCH: SWITCH_NUMBER: %lu, INST_ADDR: %lu, SWITCH_CONF: %08lX\n",
                        cgra_program->initial_conf[i].net_switch_conf.switch_number,
                        cgra_program->initial_conf[i].net_switch_conf.inst_addr,
                        cgra_program->initial_conf[i].net_switch_conf.switch_conf);
@@ -156,7 +161,6 @@ void print_program(cgra_program_t *cgra_program) {
                 break;
         }
     }
-
 }
 
 cgra_program_t *
@@ -167,21 +171,32 @@ create_fir4_cgra_program_from_file(const char *file_path, short *data_in, int da
     if (fp != nullptr) {
         fread(&cgra_prog->cgra_id, sizeof(short), 1, fp);
         fseek(fp, sizeof(short), SEEK_SET);
+        fread(&cgra_prog->num_pe, sizeof(short), 1, fp);
+        fseek(fp, sizeof(short) * 2, SEEK_SET);
+        fread(&cgra_prog->num_pe_io, sizeof(short), 1, fp);
+        fseek(fp, sizeof(short) * 3, SEEK_SET);
+        fread(&cgra_prog->net_stagies, sizeof(short), 1, fp);
+        fseek(fp, sizeof(short) * 4, SEEK_SET);
         fread(&cgra_prog->cgra_intial_conf, sizeof(int), 16, fp);
-        fseek(fp, 66, SEEK_SET);
+        fseek(fp, 72, SEEK_SET);
         size_t len = cgra_prog->cgra_intial_conf.qtd_conf * sizeof(initial_conf_t);
         cgra_prog->initial_conf = (initial_conf_t *) malloc(len);
         fread(cgra_prog->initial_conf, sizeof(initial_conf_t), cgra_prog->cgra_intial_conf.qtd_conf, fp);
         fclose(fp);
 
-        auto input_queues = (queue_t *) malloc(sizeof(queue_t) * 2);
-        auto output_queues = (queue_t *) malloc(sizeof(queue_t) * 2);
+        auto input_queues = (queue_t *) malloc(sizeof(queue_t) * cgra_prog->num_pe_io);
+        auto output_queues = (queue_t *) malloc(sizeof(queue_t) * cgra_prog->num_pe_io);
 
-        input_queues[0].data = data_in;
-        input_queues[0].length = data_in_size;
-
-        output_queues[1].data = data_out;
-        output_queues[1].length = data_out_size;
+        for (int i = 0; i < cgra_prog->num_pe_io; ++i) {
+            if (cgra_prog->cgra_intial_conf.read_fifo_mask & (1 << i)) {
+                input_queues[i].data = data_in;
+                input_queues[i].length = data_in_size;
+            }
+            if (cgra_prog->cgra_intial_conf.write_fifo_mask & (1 << i)) {
+                output_queues[i].data = data_out;
+                output_queues[i].length = data_out_size;
+            }
+        }
 
         cgra_prog->input_queues = input_queues;
         cgra_prog->output_queues = output_queues;
@@ -205,8 +220,8 @@ cgra_program_t *create_fir4_cgra_program(short *data_in, int data_in_size, short
     cgra_prog->cgra_intial_conf.write_fifo_mask = 0x2;
 
     {
-        cgra_prog->cgra_intial_conf.qtd_conf = 44;
-        size_t len = 44 * sizeof(initial_conf_t);
+        cgra_prog->cgra_intial_conf.qtd_conf = 45;
+        size_t len = 45 * sizeof(initial_conf_t);
         cgra_prog->initial_conf = (initial_conf_t *) malloc(len);
 
         cgra_prog->initial_conf[0].pe_instruction_conf.conf_type = CGRA_CONF_SET_PE_INSTRUCTION;

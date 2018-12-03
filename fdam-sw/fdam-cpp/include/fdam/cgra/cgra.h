@@ -9,22 +9,17 @@
 
 using namespace std;
 
-class Cgra{
+class Cgra {
 
 private:
     cgra_program_t *cgra_program;
     AccManagement *accManagement;
 
-    unsigned int num_pe;
-    unsigned int num_pe_io;
-    unsigned int net_radix;
-    unsigned int net_conf_bytes;
-
 private:
-    int intlog(double x,double base);
+    int intlog(double x, double base);
 
 public:
-    explicit Cgra(unsigned num_pe, unsigned int num_pe_io, unsigned int net_radix);
+    explicit Cgra();
 
     ~Cgra();
 

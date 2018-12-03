@@ -2,4 +2,4 @@
 
 rm -rf afu_sim
 python2 $FDAM_BASEDIR/fdam-hw-generator/src/common/update_sources.py
-afu_sim_setup --sources=sources.txt afu_sim
+afu_sim_setup --sources=sources.txt afu_sim -t MODELSIM

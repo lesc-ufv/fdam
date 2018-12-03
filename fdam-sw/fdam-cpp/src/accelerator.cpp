@@ -102,14 +102,14 @@ void *Accelerator::getOutputQueue(unsigned char idQueue) {
     return nullptr;
 }
 
-void Accelerator::setInputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes) {
+void Accelerator::setInputQueue(unsigned char idQueue, void *ptrQueue, long long numBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
         Accelerator::inputQueue[idQueue] = ptrQueue;
         Accelerator::sizeOfInputQueues[idQueue] = numBytes;
     }
 }
 
-void Accelerator::setOutputQueue(unsigned char idQueue, void *ptrQueue, long long  numBytes) {
+void Accelerator::setOutputQueue(unsigned char idQueue, void *ptrQueue, long long numBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
         Accelerator::outputQueue[idQueue] = ptrQueue;
         Accelerator::sizeOfOutputQueues[idQueue] = numBytes;
@@ -248,7 +248,7 @@ bool Accelerator::copyFromInputQueue(unsigned char idQueue, int *data, long long
     return false;
 }
 
-bool Accelerator::copyFromInputQueue(unsigned char idQueue,long long *data, long long ndata) {
+bool Accelerator::copyFromInputQueue(unsigned char idQueue, long long *data, long long ndata) {
     long long ndataQueue = Accelerator::getSizeOfInputQueue(idQueue) * sizeof(long long);
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue() && (ndata <= ndataQueue)) {
         auto *accData = static_cast<long *>(Accelerator::getInputQueue(idQueue));
@@ -417,21 +417,21 @@ bool Accelerator::isDoneInputQueue(unsigned char idQueue) const {
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
-    
+
     return (doneDword & (1UL << bit));
 }
 
 bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
-    
+
     auto dsmNumCL = Accelerator::getDsmSize() / 64;
     auto *doneVet = (unsigned long *) (Accelerator::getDsm());
-    
+
     idQueue += Accelerator::getNumInputQueue();
     int col = idQueue >> 6;
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
-    
+
     return (doneDword & (1UL << bit));
 }
 
@@ -455,13 +455,13 @@ void Accelerator::waitDone(long long timeWaitMax) {
 bool Accelerator::isDone() const {
     auto dsmNumCL = Accelerator::getDsmSize() / 64;
     auto *done = (int *) Accelerator::getDsm();
-    
-    for(int i = 0; i < dsmNumCL; i++){
-        if(!(done[GET_INDEX(i,16-1, 16)] & 0x80000000UL)){
+
+    for (int i = 0; i < dsmNumCL; i++) {
+        if (!(done[GET_INDEX(i, 16 - 1, 16)] & 0x80000000UL)) {
             return false;
         }
-    }    
-    
+    }
+
     return true;
 }
 
@@ -469,16 +469,16 @@ unsigned short Accelerator::getId() const {
     return Accelerator::id;
 }
 
-long Accelerator::getInputQueueBytesRead(unsigned char idQueue){
+long Accelerator::getInputQueueBytesRead(unsigned char idQueue) {
     auto *dsm = static_cast<unsigned int *>(Accelerator::getDsm());
     return dsm[idQueue] * 64;
 }
 
-long Accelerator::getOutputQueueWrittenBytes(unsigned char idQueue){
+long Accelerator::getOutputQueueWrittenBytes(unsigned char idQueue) {
     auto dsm = static_cast<unsigned int *>(Accelerator::getDsm());
     int numIn = Accelerator::getNumInputQueue();
     auto offset = static_cast<int>(std::ceil(numIn / 16.0)) * 16;
-    
+
     return dsm[idQueue + offset] * 64;
 }
 
@@ -509,9 +509,11 @@ void Accelerator::printHwInfo() {
     MSG("INFO Output Queues:");
     for (unsigned char i = 0; i < numOut; i++) {
         if (Accelerator::isDoneOutputQueue(i)) {
-            MSG("Queue ID: " << static_cast<int >(i) << " State: Done, Written bytes: " << getOutputQueueWrittenBytes(i));
+            MSG("Queue ID: " << static_cast<int >(i) << " State: Done, Written bytes: "
+                             << getOutputQueueWrittenBytes(i));
         } else {
-            MSG("Queue ID: " << static_cast<int >(i) << " State: Not done, Written bytes: " << getOutputQueueWrittenBytes(i));
+            MSG("Queue ID: " << static_cast<int >(i) << " State: Not done, Written bytes: "
+                             << getOutputQueueWrittenBytes(i));
         }
     }
 }
