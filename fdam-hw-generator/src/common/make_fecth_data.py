@@ -31,6 +31,18 @@ def make_fecth_data():
     m.EmbeddedCode('')
     data_out.assign(data[0:OUTPUT_DATA_WIDTH])
 
+    m.Initial(
+        request_read(0),
+        available_pop(0),
+        fsm_read(0),
+        fsm_control(0),
+        data(0),
+        buffer(0),
+        count(0),
+        has_buffer(0),
+        buffer_read(0)
+    )
+
     m.Always(Posedge(clk))(
         If(rst)(
             fsm_read(0),

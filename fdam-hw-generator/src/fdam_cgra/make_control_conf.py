@@ -6,7 +6,7 @@ from veriloggen.types.util import log2
 
 # pe_conf  packt = {op_conf,id_pe,conf_data}
 
-def make_control_conf(cgra_id, num_pe_io, num_cicle_wait_conf_finish):
+def make_control_conf(cgra_id, num_pe_io_in, num_pe_io_out, num_cicle_wait_conf_finish):
     m = Module('cgra%d_control_conf' % cgra_id)
 
     clk = m.Input('clk')
@@ -20,8 +20,8 @@ def make_control_conf(cgra_id, num_pe_io, num_cicle_wait_conf_finish):
 
     conf_out_bus = m.OutputReg('conf_out_bus', 64)
 
-    read_fifo_mask = m.OutputReg('read_fifo_mask', num_pe_io)
-    write_fifo_mask = m.OutputReg('write_fifo_mask', num_pe_io)
+    read_fifo_mask = m.OutputReg('read_fifo_mask', num_pe_io_in)
+    write_fifo_mask = m.OutputReg('write_fifo_mask', num_pe_io_out)
 
     done = m.OutputReg('done')
 
@@ -46,6 +46,22 @@ def make_control_conf(cgra_id, num_pe_io, num_cicle_wait_conf_finish):
     wait_counter = m.Reg('wait_counter', int(ceil(log2(num_cicle_wait_conf_finish))) + 1)
 
     m.EmbeddedCode('')
+
+    m.Initial(
+        fsm_conf_ctrl(FSM_INIT_CTRL_IDLE),
+        fsm_conf_ctrl_next(FSM_INIT_CTRL_IDLE),
+        conf_req_data(0),
+        send_conf(0),
+        conf_counter(0),
+        conf_counter_cl(Int(8, conf_counter_cl.width, 10)),
+        done(0),
+        read_fifo_mask(0),
+        write_fifo_mask(0),
+        wait_counter(0),
+        conf_out_bus(0)
+
+    )
+
     req_rd_data.assign(conf_req_data)
 
     m.Always(Posedge(clk))(
@@ -72,8 +88,8 @@ def make_control_conf(cgra_id, num_pe_io, num_cicle_wait_conf_finish):
                 ),
                 When(FSM_INIT_CTRL_INIT)(
                     qtd_conf(conf_cl[0:32]),
-                    read_fifo_mask(conf_cl[32:32 + num_pe_io]),
-                    write_fifo_mask(conf_cl[64:64 + num_pe_io]),
+                    read_fifo_mask(conf_cl[32:32 + num_pe_io_in]),
+                    write_fifo_mask(conf_cl[64:64 + num_pe_io_out]),
                     fsm_conf_ctrl(FSM_SEND_INIT_CONF_PE),
                 ),
                 When(FSM_SEND_INIT_CONF_PE)(

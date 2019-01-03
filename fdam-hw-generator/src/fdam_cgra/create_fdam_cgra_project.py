@@ -65,8 +65,15 @@ def create_fdam_project_cli():
                 pass
         while True:
             try:
-                num_pe_io = int(raw_input('Number of PE-IO for CGRA %d[1 .. 32]: ' % i))
-                if num_pe_io > 0:
+                num_pe_io_in = int(raw_input('Number of PE-IN for CGRA %d[1 .. %d]: ' % (i, num_pe - 1)))
+                if num_pe_io_in > 0 and num_pe_io_in <= num_pe - 1:
+                    break
+            except:
+                pass
+        while True:
+            try:
+                num_pe_io_out = int(raw_input('Number of PE-OUT for CGRA %d[1 .. %d]: ' % (i, num_pe - num_pe_io_in)))
+                if num_pe_io_out > 0 and num_pe_io_out <= (num_pe - num_pe_io_in):
                     break
             except:
                 pass
@@ -79,8 +86,8 @@ def create_fdam_project_cli():
                 pass
         while True:
             try:
-                mem_conf_depth = int(raw_input('Instruction Memory Depth for CGRA %d[1 .. 16]: ' % i))
-                if mem_conf_depth > 0:
+                mem_conf_depth = int(raw_input('Instruction Memory Depth for CGRA %d[1 .. 12]: ' % i))
+                if mem_conf_depth > 0 and mem_conf_depth < 12:
                     break
             except:
                 pass
@@ -92,7 +99,7 @@ def create_fdam_project_cli():
             except:
                 pass
 
-        cgra_array.append((num_pe, num_pe_io, radix, mem_conf_depth, data_width))
+        cgra_array.append((num_pe, num_pe_io_in, num_pe_io_out, radix, mem_conf_depth, data_width))
 
     return [prj_name, prj_path, isDebug, cgra_array]
 
@@ -130,12 +137,13 @@ def create_fdam_project(prj_name, prj_path, cgra_array):
         acc_array = []
         for i in range(len(cgra_array)):
             num_pe = cgra_array[i][0]
-            num_pe_io = cgra_array[i][1]
-            radix = cgra_array[i][2]
-            mem_conf_depth = cgra_array[i][3]
-            data_width = cgra_array[i][4]
-            cgra_acc = make_cgra_accelerator(i, num_pe, num_pe_io, data_width, radix, mem_conf_depth)
-            acc_array.append((cgra_array[i][1], cgra_array[i][1], cgra_acc))
+            num_pe_io_in = cgra_array[i][1]
+            num_pe_io_out = cgra_array[i][2]
+            radix = cgra_array[i][3]
+            mem_conf_depth = cgra_array[i][4]
+            data_width = cgra_array[i][5]
+            cgra_acc = make_cgra_accelerator(i, num_pe, num_pe_io_in, num_pe_io_out, data_width, radix, mem_conf_depth)
+            acc_array.append((cgra_array[i][1], cgra_array[i][2], cgra_acc))
         acc_management = make_acc_management(acc_array)
         code = acc_management.to_verilog()
         split_modules(code, path_for_rtl)
@@ -143,7 +151,7 @@ def create_fdam_project(prj_name, prj_path, cgra_array):
         files.sort()
         for f in files:
             name = f.split('_')
-            if (name[0] != 'fdam'):
+            if name[0] != 'fdam':
                 src = path_for_rtl + '/' + f
                 dst = path_for_project + '/hw/rtl/common/' + f
                 shutil.move(src, dst)
@@ -154,7 +162,7 @@ def create_fdam_project(prj_name, prj_path, cgra_array):
         for i in range(len(cgra_array)):
             for f in files:
                 name = f.split('_')
-                if (name[0] == 'cgra%d' % i):
+                if name[0] == 'cgra%d' % i:
                     src = path_for_rtl + f
                     dst = path_for_project + '/hw/rtl/acc%d/' % i + f
                     shutil.move(src, dst)
@@ -186,6 +194,6 @@ def main():
         commands_getoutput(cmd)
         exit(1)
 
-
 if __name__ == '__main__':
     main()
+

@@ -16,8 +16,8 @@ void Cgra::prepareProgram(cgra_program_t *program) {
     Cgra::cgra_program = program;
     Accelerator &acc = Cgra::accManagement->getAccelerator(Cgra::cgra_program->cgra_id);
 
-    auto mask_in_queue = Cgra::cgra_program->cgra_intial_conf.read_fifo_mask;
-    auto mask_out_queue = Cgra::cgra_program->cgra_intial_conf.write_fifo_mask;
+    auto mask_in_queue = Cgra::cgra_program->cgra_intial_conf.mask_input_fifo;
+    auto mask_out_queue = Cgra::cgra_program->cgra_intial_conf.mask_output_fifo;
 
     long long int num_bytes = 0;
     if (mask_in_queue & 1) {
@@ -38,15 +38,6 @@ void Cgra::prepareProgram(cgra_program_t *program) {
     acc.createInputQueue(static_cast<unsigned char>(0), total_bytes);
     auto queue_data_ptr = (unsigned char *) acc.getInputQueue(0);
 
-    for (int i = 1; i < Cgra::cgra_program->cgra_intial_conf.qtd_conf; ++i) {
-        if (Cgra::cgra_program->initial_conf[i].pe_store_ignore_conf.conf_type == CGRA_CONF_SET_PE_STORE_IGNORE) {
-            auto store_ignore =
-                    (Cgra::cgra_program->initial_conf[i].pe_store_ignore_conf.store_ignore *
-                     (Cgra::cgra_program->net_stagies + 1 + 8)) + 1;
-            Cgra::cgra_program->initial_conf[i].pe_store_ignore_conf.store_ignore = store_ignore;
-        }
-    }
-
     memcpy(queue_data_ptr, &Cgra::cgra_program->cgra_intial_conf, cgra_intial_conf_bytes);
     queue_data_ptr = queue_data_ptr + cgra_intial_conf_bytes_align;
     memcpy(queue_data_ptr, Cgra::cgra_program->initial_conf, conf_bytes);
@@ -56,7 +47,7 @@ void Cgra::prepareProgram(cgra_program_t *program) {
         memcpy(queue_data_ptr, Cgra::cgra_program->input_queues[0].data, static_cast<size_t>(num_bytes));
     }
 
-    for (int i = 1; i < Cgra::cgra_program->num_pe_io; ++i) {
+    for (int i = 1; i < Cgra::cgra_program->num_pe_io_in; ++i) {
         if (mask_in_queue & (1 << i)) {
             num_bytes = Cgra::cgra_program->input_queues[i].length * sizeof(short);
             auto id_queue = static_cast<unsigned char>(i);
@@ -65,7 +56,7 @@ void Cgra::prepareProgram(cgra_program_t *program) {
                                  Cgra::cgra_program->input_queues[i].length);
         }
     }
-    for (int i = 0; i < Cgra::cgra_program->num_pe_io; ++i) {
+    for (int i = 0; i < Cgra::cgra_program->num_pe_io_out; ++i) {
         if (mask_out_queue & (1 << i)) {
             auto id_queue = static_cast<unsigned char>(i);
             num_bytes = Cgra::cgra_program->output_queues[i].length * sizeof(short);
@@ -78,8 +69,8 @@ void Cgra::syncExecute(long waitTime) {
     Accelerator &acc = Cgra::accManagement->getAccelerator((Cgra::cgra_program->cgra_id));
     acc.start();
     acc.waitDone(waitTime);
-    for (int i = 0; i < Cgra::cgra_program->num_pe_io; ++i) {
-        if (Cgra::cgra_program->cgra_intial_conf.write_fifo_mask & (1 << i)) {
+    for (int i = 0; i < Cgra::cgra_program->num_pe_io_out; ++i) {
+        if (Cgra::cgra_program->cgra_intial_conf.mask_output_fifo & (1 << i)) {
             auto id_queue = static_cast<unsigned char>(i);
             acc.copyFromOutputQueue(id_queue, Cgra::cgra_program->output_queues[i].data,
                                     Cgra::cgra_program->output_queues[i].length);
@@ -95,8 +86,8 @@ void Cgra::asyncExecute() {
 void Cgra::waitExecute(long waitTime) {
     Accelerator &acc = Cgra::accManagement->getAccelerator((Cgra::cgra_program->cgra_id));
     acc.waitDone(waitTime);
-    for (int i = 0; i < Cgra::cgra_program->num_pe_io; ++i) {
-        if (Cgra::cgra_program->cgra_intial_conf.write_fifo_mask & (1 << i)) {
+    for (int i = 0; i < Cgra::cgra_program->num_pe_io_out; ++i) {
+        if (Cgra::cgra_program->cgra_intial_conf.mask_output_fifo & (1 << i)) {
             auto id_queue = static_cast<unsigned char>(i);
             acc.copyFromOutputQueue(id_queue, Cgra::cgra_program->output_queues[i].data,
                                     Cgra::cgra_program->output_queues[i].length);

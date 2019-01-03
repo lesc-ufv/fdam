@@ -14,9 +14,8 @@ class Cgra {
 private:
     cgra_program_t *cgra_program;
     AccManagement *accManagement;
-
-private:
     int intlog(double x, double base);
+    
 
 public:
     explicit Cgra();
@@ -32,6 +31,5 @@ public:
     void waitExecute(long waitTime);
 
 };
-
 
 #endif //CGRA_H

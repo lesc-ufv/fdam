@@ -28,6 +28,21 @@ def make_dispath_data():
     request_write11 = m.Reg('request_write11')
     request_write22 = m.Reg('request_write22')
 
+    m.Initial(
+        request_write(0),
+        write_data(0),
+        available_push(0),
+        fsm_control(0),
+        buffer1(0),
+        buffer2(0),
+        count1(0),
+        count2(0),
+        request_write1(0),
+        request_write2(0),
+        request_write11(0),
+        request_write22(0)
+    )
+
     m.Always(Posedge(clk))(
         If(rst)(
             request_write(0),
