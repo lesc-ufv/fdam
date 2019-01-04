@@ -26,7 +26,7 @@ module fdam_output_queue_controller #
   output reg done
 );
 
-  localparam FIFO_DEPTH_BITS = 10;
+  localparam FIFO_DEPTH_BITS = 8;
   localparam FIFO_FULL = 2 ** FIFO_DEPTH_BITS;
   localparam CONF_TYPE_OUT_DATA = 2;
   reg conf_ready;

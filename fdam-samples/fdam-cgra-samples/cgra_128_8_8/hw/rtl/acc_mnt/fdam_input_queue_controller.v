@@ -27,7 +27,7 @@ module fdam_input_queue_controller #
   output reg done
 );
 
-  localparam FIFO_DEPTH_BITS = 10;
+  localparam FIFO_DEPTH_BITS = 8;
   localparam FIFO_FULL = 2 ** FIFO_DEPTH_BITS;
   localparam CONF_TYPE_IN = 1;
   reg conf_ready;
@@ -104,7 +104,7 @@ module fdam_input_queue_controller #
   assign end_req_rd_data = count_req_cl < qtd_data_cl;
   assign end_req_rd_data_next = count_req_cl_next + 12 < qtd_data_cl;
   assign acc_user_available_read = (fifo_almostempty)? ~fifo_empty & ~acc_user_request_read : 1'b1;
-  assign fifo_fit = read_peding < FIFO_FULL - 12;
+  assign fifo_fit = read_peding < FIFO_FULL - 16;
   assign read_data_valid_queue = read_data_valid && (read_queue_id == ID_QUEUE);
 
   always @(posedge clk) begin

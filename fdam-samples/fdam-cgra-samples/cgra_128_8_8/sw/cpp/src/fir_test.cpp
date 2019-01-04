@@ -4,7 +4,7 @@ int fir_test(int argc, char *argv[]) {
 
 
     int num_threads = 1;
-    int data_num = 64;
+    int data_num = 32;
     int fir_size = 4;
     /*
     if (argc > 1) {
@@ -43,7 +43,7 @@ int fir_test(int argc, char *argv[]) {
 
     s = high_resolution_clock::now();
 
-    fir_cgra(data_in, cgra_data_out, num_threads * data_num, fir_size);
+    fir_cgra(num_threads, data_in, cgra_data_out, num_threads * data_num, fir_size);
 
     diff = high_resolution_clock::now() - s;
     double timeExecHw = diff.count();
@@ -103,10 +103,10 @@ void fir_cpu(int num_threads, const short *data_in, short *data_out, int n, cons
     }
 }
 
-void fir_cgra(short *data_in, short *data_out, int n, int fir_size) {
+void fir_cgra(int num_thread, short *data_in, short *data_out, int n, int fir_size) {
     char path[20] = "";
     sprintf(path, "../cgra_programs/fir%d.cgra", fir_size);
-    cgra_program_t *cgra_program = create_fir_cgra_program_from_file(path, data_in, n, data_out, n - fir_size);
+    cgra_program_t *cgra_program = create_fir_cgra_program_from_file(num_thread,path, data_in, n, data_out, n - fir_size);
     //print_program(cgra_program);
     auto cgra = new Cgra();
     cgra->prepareProgram(cgra_program);
@@ -115,7 +115,7 @@ void fir_cgra(short *data_in, short *data_out, int n, int fir_size) {
 }
 
 cgra_program_t *
-create_fir_cgra_program_from_file(const char *file_path, short *data_in, int data_in_size, short *data_out,
+create_fir_cgra_program_from_file(int num_thread, const char *file_path, short *data_in, int data_in_size, short *data_out,
                                   int data_out_size) {
     auto *cgra_prog = (cgra_program_t *) malloc(sizeof(cgra_program_t));
     FILE *fp = fopen(file_path, "rb");
@@ -126,9 +126,20 @@ create_fir_cgra_program_from_file(const char *file_path, short *data_in, int dat
         fread(&cgra_prog->num_pe_io_out, sizeof(short), 1, fp);
         fread(&cgra_prog->cgra_intial_conf, sizeof(int), 16, fp);
         size_t len = cgra_prog->cgra_intial_conf.qtd_conf * sizeof(initial_conf_t);
-        cgra_prog->initial_conf = (initial_conf_t *) malloc(len);
+        cgra_prog->initial_conf = (initial_conf_t *) malloc(len*num_thread);
         fread(cgra_prog->initial_conf, sizeof(initial_conf_t), cgra_prog->cgra_intial_conf.qtd_conf, fp);
         fclose(fp);
+
+        for (int k = 1; k < num_thread; ++k) {
+            for (int j = 0; j < cgra_prog->cgra_intial_conf.qtd_conf; ++j) {
+                cgra_prog->initial_conf[(k * cgra_prog->cgra_intial_conf.qtd_conf) +
+                                        j].pad = cgra_prog->initial_conf[j].pad;
+                cgra_prog->initial_conf[(k * cgra_prog->cgra_intial_conf.qtd_conf) +
+                                        j].pe_instruction_conf.thread_id = (unsigned long) k;
+            }
+        }
+
+        cgra_prog->cgra_intial_conf.qtd_conf = cgra_prog->cgra_intial_conf.qtd_conf * num_thread;
 
         auto input_queues = (queue_t *) malloc(sizeof(queue_t) * cgra_prog->num_pe_io_in);
         auto output_queues = (queue_t *) malloc(sizeof(queue_t) * cgra_prog->num_pe_io_out);

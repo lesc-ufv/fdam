@@ -34,7 +34,7 @@ def make_input_queue_controller(conf_receiver):
     acc_user_read_data_valid = m.OutputReg('acc_user_read_data_valid')
     done = m.OutputReg('done')
 
-    FIFO_DEPTH_BITS = m.Localparam('FIFO_DEPTH_BITS', 10)
+    FIFO_DEPTH_BITS = m.Localparam('FIFO_DEPTH_BITS', 8)
     FIFO_FULL = m.Localparam('FIFO_FULL', EmbeddedCode('2 ** FIFO_DEPTH_BITS'))
     CONF_TYPE_IN = m.Localparam('CONF_TYPE_IN', 1)
 
@@ -85,7 +85,7 @@ def make_input_queue_controller(conf_receiver):
     end_req_rd_data.assign((count_req_cl < qtd_data_cl))
     end_req_rd_data_next.assign(((count_req_cl_next + 12) < qtd_data_cl))
     acc_user_available_read.assign(Mux(fifo_almostempty, ~fifo_empty & ~acc_user_request_read, Int(1, 1, 2))),
-    fifo_fit.assign(read_peding < FIFO_FULL - 12)
+    fifo_fit.assign(read_peding < FIFO_FULL - 16)
     read_data_valid_queue.assign(AndList(read_data_valid, read_queue_id == ID_QUEUE))
 
     m.Always(Posedge(clk))(
