@@ -2,19 +2,23 @@
 
 int fir_test(int argc, char *argv[]) {
 
+    int num_threads;
+    int data_num;
+    int fir_size = 48;
 
-    int num_threads = 1;
-    int data_num = 32;
-    int fir_size = 4;
-    /*
     if (argc > 1) {
         data_num = atoi(argv[1]);
+        num_threads = atoi(argv[2]);
+        if(num_threads > 8){
+            cout << "Maximum number of threads are 8!" << endl;
+            exit(255);
+        }
     } else {
         cout << "invalid args!!!" << endl;
-        cout << "usage: <input size>" << endl;
+        cout << "usage:<number of threads> <input size>" << endl;
         exit(255);
     }
-    */
+
     auto data_in = (short *) malloc(sizeof(short) * num_threads * data_num);
     auto cpu_data_out = (short *) malloc(sizeof(short) * num_threads * data_num);
     auto cgra_data_out = (short *) malloc(sizeof(short) * num_threads * data_num);
@@ -49,7 +53,7 @@ int fir_test(int argc, char *argv[]) {
     double timeExecHw = diff.count();
 
     int index_error = -1;
-    for (int i = 0; i < data_num; ++i) {
+    for (int i = 0; i < num_threads * data_num; ++i) {
         if (cpu_data_out[i] != cgra_data_out[i]) {
             index_error = i;
             break;
@@ -88,10 +92,11 @@ int fir_test(int argc, char *argv[]) {
         }
         printf("\n");
     }
-
+    return 0;
 }
 
 void fir_cpu(int num_threads, const short *data_in, short *data_out, int n, const short *const_vet, int fir_size) {
+    
     for (int j = 0; j < num_threads; j++) {
         for (int i = 0; i < n - fir_size; ++i) {
             short temp = 0;
@@ -104,7 +109,7 @@ void fir_cpu(int num_threads, const short *data_in, short *data_out, int n, cons
 }
 
 void fir_cgra(int num_thread, short *data_in, short *data_out, int n, int fir_size) {
-    char path[20] = "";
+    char path[100] = "";
     sprintf(path, "../cgra_programs/fir%d.cgra", fir_size);
     cgra_program_t *cgra_program = create_fir_cgra_program_from_file(num_thread,path, data_in, n, data_out, n - fir_size);
     //print_program(cgra_program);
@@ -167,5 +172,4 @@ create_fir_cgra_program_from_file(int num_thread, const char *file_path, short *
         printf("Error opening file: %s", file_path);
         exit(1);
     }
-    return nullptr;
 }

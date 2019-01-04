@@ -1,0 +1,24 @@
+digraph fir{
+ 0 [ label = IN0 ]
+ 1 [ label = OUT1 ]
+ 2 [ label = MULT, VALUE = 4]
+ 3 [ label = REG]
+ 4 [ label = MULT, VALUE = 3]
+ 5 [ label = ADD]
+ 6 [ label = MULT, VALUE = 2]
+ 7 [ label = ADD]
+ 8 [ label = MULT, VALUE = 1]
+ 9 [ label = ADD]
+ 0 -> 2
+ 0 -> 4
+ 0 -> 6
+ 0 -> 8
+ 2 -> 3
+ 3 -> 5
+ 4 -> 5
+ 5 -> 7
+ 6 -> 7
+ 7 -> 9
+ 8 -> 9
+ 9 -> 1
+}

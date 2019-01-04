@@ -5,7 +5,7 @@
 
 int vet_mult_scalar_test(int argc, char *argv[]) {
 
-    int num_threads = 8;
+    int num_threads = 1;
     int data_num = 32;
 
     /*if (argc > 1) {
@@ -45,7 +45,7 @@ int vet_mult_scalar_test(int argc, char *argv[]) {
     double timeExecHw = diff.count();
 
     int index_error = -1;
-    for (int i = 0; i < data_num; ++i) {
+    for (int i = 0; i < num_threads * data_num; ++i) {
         if (cpu_data_out[i] != cgra_data_out[i]) {
             index_error = i;
             break;

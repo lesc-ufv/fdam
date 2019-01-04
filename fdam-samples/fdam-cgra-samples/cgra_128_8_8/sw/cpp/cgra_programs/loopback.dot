@@ -1,0 +1,9 @@
+digraph {
+ 0 [ label = IN0 ]
+ 1 [ label = OUT1 ]
+ 2 [ label = REG]
+ 3 [ label = REG]
+ 0 -> 2
+ 2 -> 3
+ 3 -> 1
+}
