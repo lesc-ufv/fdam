@@ -41,8 +41,8 @@ def make_inst_decode(cgra_id):
     out_b_en = m.Output('out_b_en', 1)
     rf_raddr = m.Output('rf_raddr', 4)
     rf_waddr = m.Output('rf_waddr', 4)
-    branch_in_en = m.Output('branch_in_en', 1)
-    branch_out_en = m.Output('branch_out_en', 1)
+    # branch_in_en = m.Output('branch_in_en', 1)
+    # branch_out_en = m.Output('branch_out_en', 1)
 
     control = m.Wire('control', 4)
     A = 3
@@ -67,7 +67,7 @@ def make_inst_decode(cgra_id):
     rf_we.assign(control[A] & ~control[B]),
     fifo_we.assign(control[A] & control[B]),
 
-    branch_in_en.assign(alu_op[A] & alu_op[B] & ~alu_op[C]),
-    branch_out_en.assign(alu_op[A] & alu_op[B] & alu_op[C] & alu_op[D])
+    # branch_in_en.assign(alu_op[A] & alu_op[B] & ~alu_op[C]),
+    # branch_out_en.assign(alu_op[A] & alu_op[B] & alu_op[C] & alu_op[D])
 
     return m

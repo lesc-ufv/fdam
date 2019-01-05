@@ -3,10 +3,13 @@ from math import ceil, log
 from veriloggen import *
 
 
-def make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth):
-    m = Module('swicth_conf_reader_%d_%d' % (swicth_conf_width, conf_net_depth))
-    SWICTH_NUMBER = m.Parameter('SWICTH_NUMBER', 1)
+def make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth, is_net_branch):
+    name = 'swicth_conf_reader_%d_%d' % (swicth_conf_width, conf_net_depth)
+    if(is_net_branch):
+        name = 'swicth_conf_reader_branch_%d_%d' % (swicth_conf_width, conf_net_depth)
 
+    m = Module(name)
+    SWICTH_NUMBER = m.Parameter('SWICTH_NUMBER', 1)
     clk = m.Input('clk')
     rst = m.Input('rst')
     conf_bus_in = m.Input('conf_bus_in', 64)
@@ -21,15 +24,14 @@ def make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth):
     net_mem_waddr = m.OutputReg('net_mem_waddr', conf_net_depth)
     net_mem_data = m.OutputReg('net_mem_data', swicth_conf_width)
 
-    CGRA_NOT_CONF = m.Localparam('CGRA_NOT_CONF', 0)
-    CGRA_CONF_SET_PE_INSTRUCTION = m.Localparam('CGRA_CONF_SET_PE_INSTRUCTION', 1)
-    CGRA_CONF_SET_PE_CONST = m.Localparam('CGRA_CONF_SET_PE_CONST', 2)
-    CGRA_CONF_SET_PE_PC_MAX = m.Localparam('CGRA_CONF_SET_PE_PC_MAX', 3)
-    CGRA_CONF_SET_PE_PC_LOOP = m.Localparam('CGRA_CONF_SET_PE_PC_LOOP', 4)
-    CGRA_CONF_SET_PE_STORE_IGNORE = m.Localparam('CGRA_CONF_SET_PE_STORE_IGNORE', 5)
-    CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_PC_MAX', 6)
-    CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_PC_LOOP', 7)
-    CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_SWITCH', 8)
+    if is_net_branch:
+        CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_BRANCH_PC_MAX', 9)
+        CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_BRANCH_PC_LOOP', 10)
+        CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_BRANCH_SWITCH', 11)
+    else:
+        CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_PC_MAX', 6)
+        CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_PC_LOOP', 7)
+        CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_SWITCH', 8)
 
     net_conf_type = m.Reg('net_conf_type', 8)
     net_swicth_number = m.Reg('net_swicth_number', 16)
@@ -82,12 +84,6 @@ def make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth):
             pc_loop_we(0),
             If(net_swicth_number == SWICTH_NUMBER)(
                 Case(net_conf_type)(
-                    When(CGRA_NOT_CONF)(),
-                    When(CGRA_CONF_SET_PE_INSTRUCTION)(),
-                    When(CGRA_CONF_SET_PE_CONST)(),
-                    When(CGRA_CONF_SET_PE_PC_MAX)(),
-                    When(CGRA_CONF_SET_PE_PC_LOOP)(),
-                    When(CGRA_CONF_SET_PE_STORE_IGNORE)(),
                     When(CGRA_CONF_SET_NET_PC_MAX)(
                         pc_max_we(1),
                     ),

@@ -29,10 +29,10 @@ def make_reg_tree_pipeline(radix, num_output, extra_pipeline):
         name = 'out_%d' % i
         outputs.append(m.Output(name, DATA_WIDTH))
 
-    regs = m.Reg('r', DATA_WIDTH,r)
+    regs = m.Reg('r', DATA_WIDTH, r)
     i = m.Integer('i')
     m.Initial(
-        For(i(0),i < r,i.inc())(
+        For(i(0), i < r, i.inc())(
             regs[i](0)
         )
     )
@@ -43,4 +43,3 @@ def make_reg_tree_pipeline(radix, num_output, extra_pipeline):
     for i in range(r - num_output, r):
         outputs[i - r].assign(regs[i])
     return m
-

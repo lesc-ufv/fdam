@@ -10,8 +10,12 @@ from common.make_reg_pipe import make_reg_pipe
 from make_swicth_conf_reader import make_swicth_conf_reader
 
 
-def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth):
-    m = Module('swicth_conf_control_%d_%d' % (swicth_conf_width, conf_net_depth))
+def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth, is_net_branch):
+    name = 'swicth_conf_control_%d_%d' % (swicth_conf_width, conf_net_depth)
+    if(is_net_branch):
+        name = 'swicth_conf_control_branch_%d_%d' % (swicth_conf_width, conf_net_depth)
+
+    m = Module(name)
     SWICTH_NUMBER = m.Parameter('SWICTH_NUMBER', 0)
     STAGE = m.Parameter('STAGE', 1)
     PE_LATENCY = 3
@@ -30,7 +34,7 @@ def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth):
     net_pc_loop_mem = m.Wire('net_pc_loop_mem', conf_net_depth)
     net_pc_loop_we = m.Wire('net_pc_loop_we')
 
-    net_pc_out =  m.Wire('net_pc_out', conf_net_depth, num_thread)
+    net_pc_out = m.Wire('net_pc_out', conf_net_depth, num_thread)
     net_conf_mem_raddr = m.Wire('net_conf_mem_raddr', conf_net_depth)
     net_mem_we = m.Wire('net_mem_we')
     net_mem_waddr = m.Wire('net_mem_waddr', conf_net_depth)
@@ -47,7 +51,7 @@ def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth):
 
     reg_pipe = make_reg_pipe()
 
-    swicth_conf_reader = make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth)
+    swicth_conf_reader = make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth, is_net_branch)
     param = [('SWICTH_NUMBER', SWICTH_NUMBER)]
     con = [('clk', clk), ('rst', rst), ('conf_bus_in', conf_bus_in), ('pc_max', net_pc_max_mem),
            ('pc_max_we', net_pc_max_we), ('pc_loop', net_pc_loop_mem), ('pc_loop_we', net_pc_loop_we),
@@ -64,12 +68,12 @@ def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth):
     mux_thread = make_mux(num_thread)
     param = [('WIDTH', net_pc_out.width)]
     con1 = [('in%d' % i, net_pc_out[i]) for i in range(num_thread)]
-    con = [('sel', thread_idx),('out', net_conf_mem_raddr)]
-    m.Instance(mux_thread, 'mux_pc', param, con+con1)
+    con = [('sel', thread_idx), ('out', net_conf_mem_raddr)]
+    m.Instance(mux_thread, 'mux_pc', param, con + con1)
 
     memory = make_memory()
     param = [('DATA_WIDTH', swicth_conf_width), ('ADDR_WIDTH', conf_net_depth + int(ceil(log(num_thread, 2))))]
-    con = [('clk', clk), ('we', net_mem_we),('re',en_pc_net),('raddr', Cat(thread_idx, net_conf_mem_raddr)),
+    con = [('clk', clk), ('we', net_mem_we), ('re', en_pc_net), ('raddr', Cat(thread_idx, net_conf_mem_raddr)),
            ('waddr', Cat(thread_id, net_mem_waddr)), ('din', net_mem_din), ('dout', net_mem_dout)]
     m.Instance(memory, 'mem_conf', param, con)
 
@@ -88,7 +92,7 @@ def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth):
     con = [('clk', clk), ('rst', rst), ('en', en_pc_net), ('out', thread_idx)]
     m.Instance(thread_counter, 'thread_counter', param, con)
 
-    param = [('NUM_STAGES', STAGE+PE_LATENCY), ('DATA_WIDTH', swicth_conf_width)]
+    param = [('NUM_STAGES', STAGE + PE_LATENCY), ('DATA_WIDTH', swicth_conf_width)]
     con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en_pc_net), ('in', net_mem_dout),
            ('out', swicth_conf_out)]
     m.Instance(reg_pipe, 'reg_net_conf_out', param, con)

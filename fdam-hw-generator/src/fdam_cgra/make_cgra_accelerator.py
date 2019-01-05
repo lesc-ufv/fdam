@@ -9,7 +9,7 @@ from make_control_exec import make_control_exec
 
 
 def make_cgra_accelerator(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, data_width, net_radix, mem_conf_depth):
-    net = make_omega(8, num_pe * 2, 0, net_radix, mem_conf_depth)
+    net = make_omega(8, num_pe * 2, 0, net_radix, mem_conf_depth, False)
     en_net_bits = net.get_ports().get('en').width
     en_pc_net_bits = net.get_ports().get('en_pc_net').width
     num_cicle_wait_conf_finish = num_pe + en_pc_net_bits + 2

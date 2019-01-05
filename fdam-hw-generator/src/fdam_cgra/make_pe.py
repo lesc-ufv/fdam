@@ -2,7 +2,6 @@ from math import ceil, log
 
 from veriloggen import *
 
-from common.make_branch_control import make_branch_control
 from common.make_cgra_counter import make_thread_counter, make_ignore_counter
 from common.make_mux import make_mux
 from fdam_cgra.make_alu import make_alu
@@ -10,7 +9,7 @@ from fdam_cgra.make_inst_decode import make_inst_decode
 from make_conf_reader_pe import make_conf_reader_pe
 
 
-def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe, data_width, conf_depth):
+def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_depth):
     rf_depth = 4
     op_width = 4
     mux2 = make_mux(2)
@@ -32,6 +31,8 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
     clk = m.Input('clk')
     rst = m.Input('rst')
     en = m.Input('en')
+    branch_in = m.Input('branch_in')
+    branch_out = m.Output('branch_out')
     conf_bus_in = m.Input('conf_bus_in', 64)
 
     ina = m.Input('ina', data_width)
@@ -60,12 +61,6 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
     out_a_en = m.Wire('out_a_en')
     out_b_en_inst_dec = m.Wire('out_b_en_inst_dec')
     out_b_en = m.Wire('out_b_en')
-    branch_in_en_inst_dec = m.Wire('branch_in_en_inst_dec')
-    branch_out_en_inst_dec = m.Wire('branch_out_en_inst_dec')
-    branch_in_en = m.Wire('branch_in_en')
-    branch_out_en = m.Wire('branch_out_en')
-    branch_in = m.Wire('branch_in')
-    branch_out = m.Wire('branch_out')
     pc_max_mem = m.Wire('pc_max_mem', conf_depth)
     pc_max_we = m.Wire('pc_max_we')
     pc_loop_mem = m.Wire('pc_loop_mem', conf_depth)
@@ -86,6 +81,8 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
     init_conf_const_waddr = m.Wire('init_conf_const_waddr', rf_depth)
     init_conf_const = m.Wire('init_conf_const', data_width)
     inst_mem_out = m.Wire('inst_mem_out', 16)
+    branch_in_alu = m.Wire('branch_in_alu')
+    branch_out_alu = m.Wire('branch_out_alu')
     pc_max = m.Wire('pc_max', conf_depth, num_thread)
     pc_loop = m.Wire('pc_loop', conf_depth, num_thread)
     ignore = m.Wire('ignore', conf_depth, num_thread)
@@ -237,15 +234,6 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
     con = [('sel', init_const_we), ('in0', rf_data_in), ('in1', init_conf_const), ('out', mux_rf_const_out)]
     m.Instance(mux2, 'mux_rf_const', param, con)
 
-    branch_control = make_branch_control(branch_stack_depth, num_thread)
-    param = []
-    con = [
-        ('clk', clk), ('rst', rst), ('thread_id', thread_idx_pp), ('branch_in', branch_in),
-        ('branch_in_en', branch_in_en & en), ('branch_out', branch_out),
-        ('branch_out_en', branch_out_en & en)
-    ]
-    m.Instance(branch_control, 'branch_control', param, con)
-
     param = [('NUM_STAGES', 1), ('DATA_WIDTH', 1)]
     con = [('clk', clk), ('rst', rst), ('en', en), ('in', mux_b_sel_inst_dec), ('out', mux_b_sel)]
     m.Instance(reg_pipe, 'reg_mux_b_sel', param, con)
@@ -267,12 +255,12 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
     m.Instance(reg_pipe, 'reg_alu_op', param, con)
 
     param = [('NUM_STAGES', 1), ('DATA_WIDTH', 1)]
-    con = [('clk', clk), ('rst', rst), ('en', en), ('in', branch_in_en_inst_dec), ('out', branch_in_en)]
-    m.Instance(reg_pipe, 'reg_branch_in_en', param, con)
+    con = [('clk', clk), ('rst', rst), ('en', en), ('in', branch_in), ('out', branch_in_alu)]
+    m.Instance(reg_pipe, 'reg_branch_in', param, con)
 
-    param = [('NUM_STAGES', 2), ('DATA_WIDTH', 1)]
-    con = [('clk', clk), ('rst', rst), ('en', en), ('in', branch_out_en_inst_dec), ('out', branch_out_en)]
-    m.Instance(reg_pipe, 'reg_branch_out_en', param, con)
+    param = [('NUM_STAGES', 1), ('DATA_WIDTH', 1)]
+    con = [('clk', clk), ('rst', rst), ('en', en), ('in', branch_out_alu), ('out', branch_out)]
+    m.Instance(reg_pipe, 'reg_branch_out', param, con)
 
     param = [('NUM_STAGES', 1), ('DATA_WIDTH', thread_idx.width)]
     con = [('clk', clk), ('rst', rst), ('en', en), ('in', thread_idx_p), ('out', thread_idx_pp)]
@@ -289,7 +277,7 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
     alu = make_alu(cgra_id)
     param = [('DATA_WIDTH', data_width)]
     con = [
-        ('clk', clk), ('op', alu_op), ('branch_in', branch_out), ('branch_out', branch_in),
+        ('clk', clk), ('op', alu_op), ('branch_in', branch_in_alu), ('branch_out', branch_out_alu),
         ('ina', reg_alu_in_a_out), ('inb', reg_alu_in_b_out), ('out', alu_out)
     ]
     m.Instance(alu, 'alu', param, con)
@@ -345,8 +333,7 @@ def make_pe(cgra_id, type, num_thread, branch_stack_depth, pc, memory, reg_pipe,
         ('mux_a', mux_a_sel_inst_dec), ('mux_b', mux_b_sel_inst_dec), ('rf_re', rf_re_inst_dec),
         ('rf_we', rf_we_inst_dec), ('fifo_re', fifo_re_inst_dec), ('fifo_we', fifo_we_inst_dec),
         ('out_a_en', out_a_en_inst_dec), ('out_b_en', out_b_en_inst_dec), ('rf_raddr', rf_raddr_inst_dec),
-        ('rf_waddr', rf_waddr_inst_dec), ('branch_in_en', branch_in_en_inst_dec),
-        ('branch_out_en', branch_out_en_inst_dec)
+        ('rf_waddr', rf_waddr_inst_dec)
     ]
     m.Instance(inst_decode, 'inst_decode', param, con_inst_decode)
 

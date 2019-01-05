@@ -2,22 +2,22 @@
 
 int fir_test(int argc, char *argv[]) {
 
-    int num_threads;
-    int data_num;
-    int fir_size = 48;
+    int num_threads = 1;
+    int data_num = 32;
+    int fir_size = 4;
 
-    if (argc > 1) {
-        data_num = atoi(argv[1]);
-        num_threads = atoi(argv[2]);
-        if(num_threads > 8){
-            cout << "Maximum number of threads are 8!" << endl;
-            exit(255);
-        }
-    } else {
-        cout << "invalid args!!!" << endl;
-        cout << "usage:<number of threads> <input size>" << endl;
-        exit(255);
-    }
+//    if (argc > 1) {
+//        data_num = atoi(argv[2]);
+//        num_threads = atoi(argv[1]);
+//        if(num_threads > 8){
+//            cout << "Maximum number of threads are 8!" << endl;
+//            exit(255);
+//        }
+//    } else {
+//        cout << "invalid args!!!" << endl;
+//        cout << "usage:<number of threads> <input size>" << endl;
+//        exit(255);
+//    }
 
     auto data_in = (short *) malloc(sizeof(short) * num_threads * data_num);
     auto cpu_data_out = (short *) malloc(sizeof(short) * num_threads * data_num);
@@ -53,7 +53,7 @@ int fir_test(int argc, char *argv[]) {
     double timeExecHw = diff.count();
 
     int index_error = -1;
-    for (int i = 0; i < num_threads * data_num; ++i) {
+    for (int i = 0; i < (num_threads * data_num) - num_threads*fir_size; ++i) {
         if (cpu_data_out[i] != cgra_data_out[i]) {
             index_error = i;
             break;
@@ -96,7 +96,8 @@ int fir_test(int argc, char *argv[]) {
 }
 
 void fir_cpu(int num_threads, const short *data_in, short *data_out, int n, const short *const_vet, int fir_size) {
-    
+#pragma omp parallel
+#pragma omp for
     for (int j = 0; j < num_threads; j++) {
         for (int i = 0; i < n - fir_size; ++i) {
             short temp = 0;

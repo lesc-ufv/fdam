@@ -194,6 +194,6 @@ def main():
         commands_getoutput(cmd)
         exit(1)
 
+
 if __name__ == '__main__':
     main()
-

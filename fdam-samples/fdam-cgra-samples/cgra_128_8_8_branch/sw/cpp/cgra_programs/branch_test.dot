@@ -1,0 +1,21 @@
+digraph branch_test{
+ 0 [ label = IN0 ]
+ 1 [ label = SLTi, VALUE = 16]
+ 1.16 [ label = 16 ]
+ 2 [ label = MULTi, VALUE = 2]
+ 2.2 [ label = 2 ]
+ 3 [ label = MULTi, VALUE = 3]
+ 3.3 [ label = 3 ]
+ 4 [ label = MERGE]
+ 5 [ label = OUT5 ]
+ 0 -> 1
+ 0 -> 2
+ 0 -> 3
+ 1.16 -> 1
+ 1 -> 4
+ 2.2 -> 2
+ 2 -> 4
+ 3.3 -> 3
+ 3 -> 4
+ 4 -> 5
+}

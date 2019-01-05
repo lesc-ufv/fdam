@@ -5,7 +5,7 @@
 
 int vet_mult_scalar_test(int argc, char *argv[]) {
 
-    int num_threads = 1;
+    int num_threads = 8;
     int data_num = 32;
 
     /*if (argc > 1) {

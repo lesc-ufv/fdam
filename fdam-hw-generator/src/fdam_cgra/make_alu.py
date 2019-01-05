@@ -126,7 +126,7 @@ def make_alu(cgra_id):
     MERGE = m.Localparam('MERGE', 15)
 
     result = m.Reg('result', width, Power(2, op.width))
-    op_reg = m.Reg('op_reg',op.width)
+    op_reg = m.Reg('op_reg', op.width)
     out.assign(result[op_reg])
     branch_out.assign(out[0])
 

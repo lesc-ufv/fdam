@@ -10,7 +10,8 @@ from make_switch_box import make_swicth_box
 
 # net conf pack = {id }
 
-def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, print_status=False):
+def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net_branch, print_status=False):
+
     swicth_conf_width = int(ceil(log(radix, 2)) * radix)
     num_stages = int(ceil(log(size, radix)) + num_extra_stages)
     num_swicth_stages = int(ceil(size / radix))
@@ -18,7 +19,11 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, print_
     bits_conf = int(num_stages * num_swicth_stages * swicth_conf_width)
     max_bits = int(ceil(log(size, 2)))
 
-    m = Module('omega%dx%d_%d_%d_%d' % (size, size, radix, num_extra_stages, conf_net_depth))
+    name = 'omega%dx%d_%d_%d_%d' % (size, size, radix, num_extra_stages, conf_net_depth)
+    if(is_net_branch):
+        name = 'omega_branch%dx%d_%d_%d_%d' % (size, size, radix, num_extra_stages, conf_net_depth)
+
+    m = Module(name)
 
     WIDTH = m.Parameter('WIDTH', 16)
     PIPE_EXTRA = m.Parameter('PIPE_EXTRA', 0)
@@ -37,7 +42,7 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, print_
 
     switch_box = make_swicth_box(radix, radix)
     reg_pipe = make_reg_pipe()
-    swicth_conf_control = make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth)
+    swicth_conf_control = make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth, is_net_branch)
 
     conf_out = m.Wire('conf_out', bits_conf)
     in_reg_wire = [m.Wire('in_reg_wire_%d' % i, WIDTH, size) for i in range(num_stages * 2)]

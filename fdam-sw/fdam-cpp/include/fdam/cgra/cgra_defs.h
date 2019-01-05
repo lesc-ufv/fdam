@@ -20,7 +20,10 @@ typedef enum cgra_conf_type_t {
     CGRA_CONF_SET_PE_IGNORE,
     CGRA_CONF_SET_NET_PC_MAX,
     CGRA_CONF_SET_NET_PC_LOOP,
-    CGRA_CONF_NET_SWITCH
+    CGRA_CONF_NET_SWITCH,
+    CGRA_CONF_SET_NET_BRANCH_PC_MAX,
+    CGRA_CONF_SET_NET_BRANCH_PC_LOOP,
+    CGRA_CONF_NET_BRANCH_SWITCH
 } cgra_conf_type_t;
 
 typedef struct cl_t {

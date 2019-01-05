@@ -4,7 +4,7 @@ from fdam_cgra.make_omega import make_omega
 
 
 def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix):
-    net = make_omega(8, num_pe * 2, 0, net_radix, 8)
+    net = make_omega(8, num_pe * 2, 0, net_radix, 8, False)
     en_net_bits = net.get_ports().get('en').width
     en_pc_net_bits = net.get_ports().get('en_pc_net').width
 
