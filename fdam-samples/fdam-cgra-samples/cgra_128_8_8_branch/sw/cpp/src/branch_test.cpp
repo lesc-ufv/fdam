@@ -8,21 +8,26 @@ int branch_test(int argc, char *argv[]) {
     int num_threads = 1;
     int data_num = 32;
 
-    /*if (argc > 1) {
-        data_num = atoi(argv[1]);
+    if (argc > 2) {
+        data_num = atoi(argv[2]);
+        num_threads = atoi(argv[1]);
+        if(num_threads > 8){
+            cout << "Maximum number of threads are 8!" << endl;
+            exit(255);
+        }
     } else {
         cout << "invalid args!!!" << endl;
-        cout << "usage: <input size>" << endl;
-        exit(0);
+        cout << "usage:<number of threads> <input size>" << endl;
+        exit(255);
     }
-     */
+
     auto data_in = (short *) malloc(sizeof(short) * num_threads * data_num);
     auto cpu_data_out = (short *) malloc(sizeof(short) * num_threads * data_num);
     auto cgra_data_out = (short *) malloc(sizeof(short) * num_threads * data_num);
 
     for (int j = 0; j < data_num; ++j) {
         for (int i = 0; i < num_threads; i++) {
-            data_in[j * num_threads + i] = static_cast<short>(j + 1);
+            data_in[j * num_threads + i] = 1;//static_cast<short>(j + 1);
             cpu_data_out[j * num_threads + i] = 0;
             cgra_data_out[j * num_threads + i] = 0;
         }
@@ -59,7 +64,6 @@ int branch_test(int argc, char *argv[]) {
     } else {
         printf("Success!\n");
     }
-
     printf("DATA IN:\n");
     for (int j = 0; j < num_threads; ++j) {
         printf("Thread: %d\n", j);
