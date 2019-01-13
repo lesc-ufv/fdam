@@ -66,14 +66,14 @@ def create_fdam_project_cli():
         while True:
             try:
                 num_pe_io_in = int(raw_input('Number of PE-IN for CGRA %d[1 .. %d]: ' % (i, num_pe - 1)))
-                if num_pe_io_in > 0 and num_pe_io_in <= num_pe - 1:
+                if 0 < num_pe_io_in <= num_pe - 1:
                     break
             except:
                 pass
         while True:
             try:
                 num_pe_io_out = int(raw_input('Number of PE-OUT for CGRA %d[1 .. %d]: ' % (i, num_pe - num_pe_io_in)))
-                if num_pe_io_out > 0 and num_pe_io_out <= (num_pe - num_pe_io_in):
+                if 0 < num_pe_io_out <= (num_pe - num_pe_io_in):
                     break
             except:
                 pass
@@ -86,8 +86,15 @@ def create_fdam_project_cli():
                 pass
         while True:
             try:
+                extra_stagies = int(raw_input('Net Extra Stagies for CGRA %d[0 ... 8]: ' % i))
+                if 0 <= extra_stagies <= 8:
+                    break
+            except:
+                pass
+        while True:
+            try:
                 mem_conf_depth = int(raw_input('Instruction Memory Depth for CGRA %d[1 .. 12]: ' % i))
-                if mem_conf_depth > 0 and mem_conf_depth < 12:
+                if 0 < mem_conf_depth < 12:
                     break
             except:
                 pass
@@ -99,7 +106,7 @@ def create_fdam_project_cli():
             except:
                 pass
 
-        cgra_array.append((num_pe, num_pe_io_in, num_pe_io_out, radix, mem_conf_depth, data_width))
+        cgra_array.append((num_pe, num_pe_io_in, num_pe_io_out, radix, extra_stagies, mem_conf_depth, data_width))
 
     return [prj_name, prj_path, isDebug, cgra_array]
 
@@ -140,9 +147,11 @@ def create_fdam_project(prj_name, prj_path, cgra_array):
             num_pe_io_in = cgra_array[i][1]
             num_pe_io_out = cgra_array[i][2]
             radix = cgra_array[i][3]
-            mem_conf_depth = cgra_array[i][4]
-            data_width = cgra_array[i][5]
-            cgra_acc = make_cgra_accelerator(i, num_pe, num_pe_io_in, num_pe_io_out, data_width, radix, mem_conf_depth)
+            extra_stagies = cgra_array[i][4]
+            mem_conf_depth = cgra_array[i][5]
+            data_width = cgra_array[i][6]
+            cgra_acc = make_cgra_accelerator(i, num_pe, num_pe_io_in, num_pe_io_out, data_width, radix, extra_stagies,
+                                             mem_conf_depth)
             acc_array.append((cgra_array[i][1], cgra_array[i][2], cgra_acc))
         acc_management = make_acc_management(acc_array)
         code = acc_management.to_verilog()

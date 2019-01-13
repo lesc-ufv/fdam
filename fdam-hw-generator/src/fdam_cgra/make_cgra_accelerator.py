@@ -8,8 +8,8 @@ from make_control_conf import make_control_conf
 from make_control_exec import make_control_exec
 
 
-def make_cgra_accelerator(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, data_width, net_radix, mem_conf_depth):
-    net = make_omega(8, num_pe * 2, 0, net_radix, mem_conf_depth, False)
+def make_cgra_accelerator(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, data_width, net_radix, extra_stagies, mem_conf_depth):
+    net = make_omega(8, num_pe * 2, extra_stagies, net_radix, mem_conf_depth, False)
     en_net_bits = net.get_ports().get('en').width
     en_pc_net_bits = net.get_ports().get('en_pc_net').width
     num_cicle_wait_conf_finish = num_pe + en_pc_net_bits + 2
@@ -19,8 +19,8 @@ def make_cgra_accelerator(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, data_wid
     fd = make_fecth_data()
     dd = make_dispath_data()
     control_conf = make_control_conf(cgra_id, num_pe_io_in, num_pe_io_out, num_cicle_wait_conf_finish)
-    control_exec = make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix)
-    cgra = make_cgra(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, data_width, net_radix, mem_conf_depth)
+    control_exec = make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix,extra_stagies)
+    cgra = make_cgra(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, data_width, net_radix,extra_stagies, mem_conf_depth)
 
     m = Module('cgra%d_acc' % (cgra_id))
 

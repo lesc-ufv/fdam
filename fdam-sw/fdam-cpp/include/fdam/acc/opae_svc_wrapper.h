@@ -31,8 +31,6 @@
 #ifndef __OPAE_SVC_WRAPPER_H__
 #define __OPAE_SVC_WRAPPER_H__ 1
 
-#include <stdint.h>
-
 #include <opae/fpga.h>
 #include <opae/mpf/mpf.h>
 
@@ -41,7 +39,7 @@ typedef class OPAE_SVC_WRAPPER SVC_WRAPPER;
 class OPAE_SVC_WRAPPER {
 public:
     // The constructor and destructor connect to and disconnect from the FPGA.
-    OPAE_SVC_WRAPPER(const char *accel_uuid);
+    explicit OPAE_SVC_WRAPPER(const char *accel_uuid);
 
     ~OPAE_SVC_WRAPPER();
 

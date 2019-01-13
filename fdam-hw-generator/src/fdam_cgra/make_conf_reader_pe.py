@@ -26,9 +26,14 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
     pc_max_we = m.OutputReg('pc_max_we')
     pc_loop = m.OutputReg('pc_loop', conf_depth)
     pc_loop_we = m.OutputReg('pc_loop_we')
+    thread_id = m.OutputReg('thread_id', int(ceil(log(num_thread, 2))))
+
     ignore_data = m.OutputReg('ignore_data', conf_depth)
     ignore_we = m.OutputReg('ignore_we')
-    thread_id = m.OutputReg('thread_id', int(ceil(log(num_thread, 2))))
+    qtd_low = m.OutputReg('qtd_low', 32)
+    qtd_we_low = m.OutputReg('qtd_we_low')
+    qtd_high= m.OutputReg('qtd_high', 32)
+    qtd_we_high = m.OutputReg('qtd_we_high')
 
     CGRA_NOT_CONF = m.Localparam('CGRA_NOT_CONF', 0)
     CGRA_CONF_SET_PE_INSTRUCTION = m.Localparam('CGRA_CONF_SET_PE_INSTRUCTION', 1)
@@ -36,9 +41,8 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
     CGRA_CONF_SET_PE_PC_MAX = m.Localparam('CGRA_CONF_SET_PE_PC_MAX', 3)
     CGRA_CONF_SET_PE_PC_LOOP = m.Localparam('CGRA_CONF_SET_PE_PC_LOOP', 4)
     CGRA_CONF_SET_PE_STORE_IGNORE = m.Localparam('CGRA_CONF_SET_PE_STORE_IGNORE', 5)
-    CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_PC_MAX', 6)
-    CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_PC_LOOP', 7)
-    CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_SWITCH', 8)
+    CGRA_CONF_SET_PE_QTD_LOW = m.Localparam('CGRA_CONF_SET_PE_QTD_LOW', 6)
+    CGRA_CONF_SET_PE_QTD_HIGH = m.Localparam('CGRA_CONF_SET_PE_QTD_HIGH', 7)
 
     pe_conf_type = m.Reg('pe_conf_type', 8)
     pe_id = m.Reg('pe_id', 16)
@@ -49,6 +53,8 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
     pe_pc_max = m.Reg('pe_pc_max', 32)
     pe_pc_loop = m.Reg('pe_pc_loop', 32)
     pe_ignore = m.Reg('pe_ignore', 32)
+    pe_qtd_low = m.Reg('pe_qtd_low', 32)
+    pe_qtd_high = m.Reg('pe_qtd_high', 32)
 
     if data_width == 64:
         pe_constant = m.Reg('pe_constant', 64)
@@ -81,6 +87,8 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
         pe_pc_max(0),
         pe_pc_loop(0),
         pe_ignore(0),
+        pe_qtd_low(0),
+        pe_qtd_high(0),
     )
 
     m.Always(Posedge(clk))(
@@ -100,7 +108,9 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
 
             pe_pc_max(conf_bus_in[32:64]),
             pe_pc_loop(conf_bus_in[32:64]),
-            pe_ignore(conf_bus_in[32:64])
+            pe_ignore(conf_bus_in[32:64]),
+            pe_qtd_low(conf_bus_in[32:64]),
+            pe_qtd_high(conf_bus_in[32:64])
         )
     )
 
@@ -110,14 +120,17 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
             const_we(Int(0, 1, 2)),
             pc_loop_we(Int(0, 1, 2)),
             pc_max_we(Int(0, 1, 2)),
-            ignore_we(Int(0, 1, 2))
+            ignore_we(Int(0, 1, 2)),
+            qtd_we_low(Int(0, 1, 2)),
+            qtd_we_high(Int(0, 1, 2))
         ).Else(
             instruction_we(Int(0, 1, 2)),
             const_we(Int(0, 1, 2)),
             pc_loop_we(Int(0, 1, 2)),
             pc_max_we(Int(0, 1, 2)),
             ignore_we(Int(0, 1, 2)),
-
+            qtd_we_low(Int(0, 1, 2)),
+            qtd_we_high(Int(0, 1, 2)),
             If(pe_id == PE_ID)(
                 Case(pe_conf_type)(
                     When(CGRA_NOT_CONF)(),
@@ -138,9 +151,12 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
                     When(CGRA_CONF_SET_PE_STORE_IGNORE)(
                         ignore_we(Int(1, 1, 2)),
                     ),
-                    When(CGRA_CONF_SET_NET_PC_MAX)(),
-                    When(CGRA_CONF_SET_NET_PC_LOOP)(),
-                    When(CGRA_CONF_NET_SWITCH)(),
+                    When(CGRA_CONF_SET_PE_QTD_LOW)(
+                        qtd_we_low(Int(1, 1, 2)),
+                    ),
+                    When(CGRA_CONF_SET_PE_QTD_HIGH)(
+                        qtd_we_high(Int(1, 1, 2)),
+                    ),
                     When()(),
                 )
             )
@@ -155,7 +171,10 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
         const_data(pe_constant[0:const_data.width]),
         pc_max(pe_pc_max[0:pc_max.width]),
         pc_loop(pe_pc_loop[0:pc_loop.width]),
-        ignore_data(pe_ignore[0:ignore_data.width])
+        ignore_data(pe_ignore[0:ignore_data.width]),
+        qtd_low(pe_qtd_low[0:qtd_low.width]),
+        qtd_high(pe_qtd_high[0:qtd_high.width]),
+
     )
 
     return m

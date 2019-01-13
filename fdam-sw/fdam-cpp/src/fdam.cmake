@@ -3,23 +3,29 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 file(
-    GLOB
+    GLOB_RECURSE
     FDAM_ACC_HDR_CXX
     ${PROJECT_SOURCE_DIR}/include/fdam/acc/*.h
     )
 file(
-    GLOB
+    GLOB_RECURSE
     FDAM_CGRA_HDR_CXX
     ${PROJECT_SOURCE_DIR}/include/fdam/cgra/*.h
     )
     
-aux_source_directory(
-    ${PROJECT_SOURCE_DIR}/src
-    LIBFDAM
+file(
+    GLOB_RECURSE
+    FDAM_ACC_CXX
+    ${PROJECT_SOURCE_DIR}/src/acc/*.cpp
     )
+file(
+    GLOB_RECURSE
+    FDAM_CGRA_CXX
+    ${PROJECT_SOURCE_DIR}/src/cgra/*.cpp
+    )
+    
 
-
-add_library(fdam SHARED ${LIBFDAM})
+add_library(fdam SHARED ${FDAM_CGRA_CXX} ${FDAM_ACC_CXX})
 
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 if ("${LIB64}" STREQUAL "TRUE")
@@ -34,7 +40,7 @@ install(
     LIBRARY DESTINATION ${LIB_DIR}
     ARCHIVE DESTINATION ${LIB_DIR}
     )
-
+        
 install(FILES ${FDAM_ACC_HDR_CXX} DESTINATION include/fdam/acc)
 install(FILES ${FDAM_CGRA_HDR_CXX} DESTINATION include/fdam/cgra)
 

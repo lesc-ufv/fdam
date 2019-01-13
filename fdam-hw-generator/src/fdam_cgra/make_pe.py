@@ -67,6 +67,10 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
     pc_loop_we = m.Wire('pc_loop_we')
     ignore_mem = m.Wire('ignore_mem', conf_depth)
     ignore_we = m.Wire('ignore_we')
+    qtd_we_low = m.Wire('qtd_we_low')
+    qtd_mem_low = m.Wire('qtd_mem_low', 32)
+    qtd_we_high = m.Wire('qtd_we_high')
+    qtd_mem_high = m.Wire('qtd_mem_high', 32)
     thread_id = m.Wire('thread_id', int(ceil(log(num_thread, 2))))
     thread_id_dec = m.Wire('thread_id_dec', num_thread)
     thread_idx = m.Wire('thread_idx', int(ceil(log(num_thread, 2))))
@@ -97,13 +101,18 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
     if type == 1:
         fifo_data = m.Input('fifo_data', data_width)
         fifo_re = m.Output('fifo_re')
+        fifo_event = fifo_re
         mux_a_out = m.Wire('mux_a_out', data_width)
         ignore_end_counter = m.Wire('ignore_end_counter')
         ignore_end_counters = m.Wire('ignore_end_counters', num_thread)
         thread_idx_dec_p = m.Wire('thread_idx_dec_p', num_thread)
         ignore_en = fifo_re_inst_dec
         thread_idx_dec_ignore_counter = thread_idx_dec_p
-        thread_idx_ignore = thread_idx
+        thread_idx_ignore = thread_idx_p
+        qtd_low = m.Wire('qtd_low',32,num_thread)
+        qtd_high = m.Wire('qtd_high', 32,num_thread)
+        qtd_end_counters = m.Wire('qtd_end_counters',num_thread)
+
         m.EmbeddedCode('')
         fifo_re.assign(fifo_re_inst_dec & ignore_end_counter & en)
         param = [('WIDTH', data_width)]
@@ -117,17 +126,22 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
     elif type == 2:
         fifo_data = m.Output('fifo_data', data_width)
         fifo_we = m.Output('fifo_we')
+        fifo_event = fifo_we
         mux_a_out = ina
         fifo_we_ignore_en = m.Wire('fifo_we_ignore_en')
         ignore_end_counter = m.Wire('ignore_end_counter')
         ignore_end_counters = m.Wire('ignore_end_counters', num_thread)
-
+        we_trash = m.Wire("we_trash")
         thread_idx_dec_pppp = m.Wire('thread_idx_dec_pppp', num_thread)
+        qtd_low = m.Wire('qtd_low',32,num_thread)
+        qtd_high = m.Wire('qtd_high', 32,num_thread)
+        qtd_end_counters = m.Wire('qtd_end_counters',num_thread)
         ignore_en = fifo_we_ignore_en
         thread_idx_dec_ignore_counter = thread_idx_dec_pppp
         thread_idx_ignore = thread_idx_pppp
         m.EmbeddedCode('')
-        fifo_we.assign(fifo_we_ignore_en & ignore_end_counter & en)
+        fifo_we.assign(Or(AndList(fifo_we_ignore_en,ignore_end_counter,en),we_trash))
+        we_trash.assign(And(Uand(qtd_end_counters),en))
 
         param = [('NUM_STAGES', 4), ('DATA_WIDTH', thread_idx_dec.width)]
         con = [('clk', clk), ('rst', rst), ('en', en), ('in', thread_idx_dec), ('out', thread_idx_dec_pppp)]
@@ -148,6 +162,10 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
         ignore_en = ''
         thread_idx_dec_ignore_counter = ''
         thread_idx_ignore = ''
+        fifo_event = ''
+        qtd_low = ''
+        qtd_high = ''
+        qtd_end_counters = ''
 
     if type == 1 or type == 2:
         param = [('NUM_STAGES', 1), ('DATA_WIDTH', conf_depth)]
@@ -162,11 +180,34 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
                ('limit', ignore[genv]),
                ('end_counter', ignore_end_counters[genv])]
 
-        genfor = m.GenerateFor(genv(0), genv < num_thread, genv.inc(), 'sc_inst')
+        genfor = m.GenerateFor(genv(0), genv < num_thread, genv.inc(), 'ignore_counter_inst')
         genfor.Instance(ignore_counter, 'ignore_counter', param, con)
+#####################################################################################################################
 
+        param = [('NUM_STAGES', 1), ('DATA_WIDTH', 32)]
+        con = [('clk', clk), ('rst', rst), ('en', thread_id_dec[genv] & qtd_we_low), ('in', qtd_mem_low),
+               ('out', qtd_low[genv])]
+        genfor = m.GenerateFor(genv(0), genv < num_thread, genv.inc(), 'qtd_low_reg_inst')
+        genfor.Instance(reg_pipe, 'qtd_low_reg', param, con)
+
+        param = [('NUM_STAGES', 1), ('DATA_WIDTH', 32)]
+        con = [('clk', clk), ('rst', rst), ('en', thread_id_dec[genv] & qtd_we_high), ('in', qtd_mem_high),
+               ('out', qtd_high[genv])]
+        genfor = m.GenerateFor(genv(0), genv < num_thread, genv.inc(), 'qtd_high_reg_inst')
+        genfor.Instance(reg_pipe, 'qtd_high_reg', param, con)
+
+        qtd_counter = make_ignore_counter()
+        param = [('WIDTH', 64)]
+        con = [('clk', clk), ('rst', rst), ('en', thread_idx_dec_ignore_counter[genv] & fifo_event),
+               ('limit', Cat(qtd_high[genv],qtd_low[genv])),
+               ('end_counter', qtd_end_counters[genv])]
+
+        genfor = m.GenerateFor(genv(0), genv < num_thread, genv.inc(), 'qtd_counter_inst')
+        genfor.Instance(qtd_counter, 'qtd_counter', param, con)
+
+#####################################################################################################################
         param = [('WIDTH', 1)]
-        con1 = [('in%d' % i, ignore_end_counters[i]) for i in range(num_thread)]
+        con1 = [('in%d' % i, ignore_end_counters[i] & ~qtd_end_counters[i]) for i in range(num_thread)]
         con = [('sel', thread_idx_ignore), ('out', ignore_end_counter)]
         m.Instance(mux_ignore, 'mux_ignore_end_counter', param, con + con1)
 
@@ -312,8 +353,10 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
         ('clk', clk), ('rst', rst), ('conf_bus_in', conf_bus_in), ('instruction_we', conf_wr_en),
         ('instruction_addr', conf_wr_addr), ('instruction_data', conf_wr_data), ('const_we', init_const_we),
         ('const_waddr', init_conf_const_waddr), ('const_data', init_conf_const), ('pc_max', pc_max_mem),
-        ('pc_max_we', pc_max_we), ('pc_loop', pc_loop_mem), ('pc_loop_we', pc_loop_we),
-        ('ignore_data', ignore_mem), ('ignore_we', ignore_we), ('thread_id', thread_id)
+        ('pc_max_we', pc_max_we), ('pc_loop', pc_loop_mem), ('pc_loop_we', pc_loop_we), ('ignore_data', ignore_mem),
+        ('ignore_we', ignore_we), ('qtd_low',qtd_mem_low),('qtd_we_low',qtd_we_low),('qtd_high',qtd_mem_high),
+        ('qtd_we_high',qtd_we_high),
+        ('thread_id', thread_id)
     ]
     m.Instance(conf_reader_pe, 'conf_reader_pe', param, con)
 

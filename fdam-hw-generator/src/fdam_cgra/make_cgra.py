@@ -9,7 +9,7 @@ from fdam_cgra.make_omega import make_omega
 from make_pe import make_pe
 
 
-def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, conf_depth):
+def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, extra_stagies, conf_depth):
     m = Module('cgra%d_top' % cgra_id)
 
     clk = m.Input('clk')
@@ -17,17 +17,17 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, con
 
     PIPELINE_PE = 3
     conf_bus_width = 64
-    num_thread = int(ceil(log(num_pe * 2, net_radix)) + 0) + 1 + PIPELINE_PE
+    num_thread = int(ceil(log(num_pe * 2, net_radix)) + extra_stagies) + 1 + PIPELINE_PE
 
     pes_en = m.Input('pes_en', num_pe)
     conf_bus_in = m.Input('conf_bus_in', conf_bus_width)
 
-    num_stages1 = int(ceil(log(num_pe * 2, net_radix)))
+    num_stages1 = int(ceil(log(num_pe * 2, net_radix))) + extra_stagies
     num_stages2 = int(ceil(log(num_pe, net_radix)))
     stagies_extra = num_stages1 - num_stages2
 
-    net = make_omega(num_thread, num_pe * 2, 0, net_radix, conf_depth, False,True)
-    net_branch = make_omega(num_thread, num_pe, stagies_extra, net_radix, conf_depth, True,True)
+    net = make_omega(num_thread, num_pe * 2, extra_stagies, net_radix, conf_depth, False, True)
+    net_branch = make_omega(num_thread, num_pe, stagies_extra, net_radix, conf_depth, True, True)
 
     net_en = m.Input('net_en', net.get_ports().get('en').width)
     en_pc_net = m.Input('en_pc_net', net.get_ports().get('en_pc_net').width)
@@ -75,8 +75,8 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, con
         params_pe = [('PE_ID', pe_id + 1)]
         con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[pe_id]),
                   ('conf_bus_in', conf_bus[pe_id]),
-                  ('branch_in',net_branch2pe[pe_id]),
-                  ('branch_out',pe2net_branch[pe_id]),
+                  ('branch_in', net_branch2pe[pe_id]),
+                  ('branch_out', pe2net_branch[pe_id]),
                   ('fifo_we', fifo_out_we[i]),
                   ('fifo_data', fifo_out_data[i * data_width:(i + 1) * data_width]),
                   ('ina', net2pea[pe_id]),

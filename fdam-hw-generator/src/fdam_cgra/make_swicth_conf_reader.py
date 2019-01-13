@@ -24,14 +24,28 @@ def make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth, is_ne
     net_mem_waddr = m.OutputReg('net_mem_waddr', conf_net_depth)
     net_mem_data = m.OutputReg('net_mem_data', swicth_conf_width)
 
+    # CGRA_CONF_SET_PE_INSTRUCTION = 1,
+    # CGRA_CONF_SET_PE_CONST = 2,
+    # CGRA_CONF_SET_PE_PC_MAX= 3,
+    # CGRA_CONF_SET_PE_PC_LOOP= 4,
+    # CGRA_CONF_SET_PE_IGNORE= 5,
+    # CGRA_CONF_SET_PE_QTD_LOW= 6,
+    # CGRA_CONF_SET_PE_QTD_HIGH= 7,
+    # CGRA_CONF_SET_NET_PC_MAX= 8,
+    # CGRA_CONF_SET_NET_PC_LOOP= 9,
+    # CGRA_CONF_NET_SWITCH=10,
+    # CGRA_CONF_SET_NET_BRANCH_PC_MAX=11,
+    # CGRA_CONF_SET_NET_BRANCH_PC_LOOP=12,
+    # CGRA_CONF_NET_BRANCH_SWITCH=13
+
     if is_net_branch:
-        CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_BRANCH_PC_MAX', 9)
-        CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_BRANCH_PC_LOOP', 10)
-        CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_BRANCH_SWITCH', 11)
+        CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_BRANCH_PC_MAX', 11)
+        CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_BRANCH_PC_LOOP', 12)
+        CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_BRANCH_SWITCH', 13)
     else:
-        CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_PC_MAX', 6)
-        CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_PC_LOOP', 7)
-        CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_SWITCH', 8)
+        CGRA_CONF_SET_NET_PC_MAX = m.Localparam('CGRA_CONF_SET_NET_PC_MAX', 8)
+        CGRA_CONF_SET_NET_PC_LOOP = m.Localparam('CGRA_CONF_SET_NET_PC_LOOP', 9)
+        CGRA_CONF_NET_SWITCH = m.Localparam('CGRA_CONF_NET_SWITCH', 10)
 
     net_conf_type = m.Reg('net_conf_type', 8)
     net_swicth_number = m.Reg('net_swicth_number', 16)
