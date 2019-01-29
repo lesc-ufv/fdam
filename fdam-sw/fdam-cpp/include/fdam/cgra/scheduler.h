@@ -4,15 +4,19 @@
 #include <queue>
 #include <fdam/cgra/data_flow.h>
 #include <fdam/cgra/cgra_arch.h>
+#include <fdam/cgra/global.h>
 
 class Scheduler {
 
 private:
     std::map<int, DataFlow *> dataflows;
-
-    CgraArch *cgra;
+    CgraArch *cgraArch;
 
     bool mapAndRoute(int ThreadId);
+
+    int placeAndRoute(std::vector<int> &mapping, int threadID);
+
+    int getRandomPE(int type);
 
 public:
     explicit Scheduler(CgraArch *cgra);
@@ -28,10 +32,6 @@ public:
     CgraArch *getCgra();
 
     bool scheduling();
-
-    int placeAndRoute(std::vector<int> &mapping, int threadID);
-
-
 };
 
 

@@ -7,8 +7,8 @@ module cgra0_alu #
   input [4-1:0] op,
   input branch_in,
   output branch_out,
-  input [DATA_WIDTH-1:0] ina,
-  input [DATA_WIDTH-1:0] inb,
+  input  [DATA_WIDTH-1:0] ina,
+  input  [DATA_WIDTH-1:0] inb,
   output [DATA_WIDTH-1:0] out
 );
 
@@ -53,7 +53,7 @@ module cgra0_alu #
     result[MIN] <= (ina < inb)? ina : inb;
     result[MAX] <= (ina > inb)? ina : inb;
     result[MUX] <= (branch_in)? ina : inb;
-    result[ABS] <= (ina[DATA_WIDTH - 1])? { 1'b1, ina[DATA_WIDTH-1-1:0] } : ina;
+    result[ABS] <= (ina[DATA_WIDTH - 1])? -ina : ina;
   end
 
 

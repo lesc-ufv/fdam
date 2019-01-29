@@ -25,22 +25,12 @@ Omega::~Omega() {
     Omega::graph.clear();
 }
 
-int Omega::bitRotateLeft(int val, int r_bits, int max_bits) {
-    return (val << r_bits % max_bits) & ((1 << max_bits) - 1) | (
-            (val & ((1 << max_bits) - 1)) >> (max_bits - (r_bits % max_bits)));
-}
-
-int Omega::bitRotateRigth(int val, int r_bits, int max_bits) {
-    return ((val & ((1 << max_bits) - 1)) >> r_bits % max_bits) | (
-            val << (max_bits - (r_bits % max_bits)) & ((1 << max_bits) - 1));
-}
-
 bool Omega::addRoute(int port_in, int port_out) {
 
     auto max_bits = static_cast<int>(std::ceil(Omega::intLog(Omega::size, 2)));
     auto r_bits = static_cast<int>(std::ceil(Omega::intLog(Omega::radix, 2)));
-    int sw_src = Omega::bitRotateLeft(port_in, r_bits, max_bits) >> r_bits;
-    int sw_dst = Omega::bitRotateRigth(port_out, r_bits, max_bits) >> r_bits;
+    int sw_src = Global::bitRotateLeft(port_in, r_bits, max_bits) >> r_bits;
+    int sw_dst = Global::bitRotateRigth(port_out, r_bits, max_bits) >> r_bits;
     sw_dst = (Omega::num_swicth_stages * (Omega::num_stagies - 1)) + sw_dst;
 
     std::pair<int, int> key(port_in, port_out);
@@ -58,7 +48,7 @@ bool Omega::addRoute(int port_in, int port_out) {
     for (auto path:Omega::route_table[key]) {
         path_invalid = false;
         int mask_port = (1 << intLog(radix, 2)) - 1;
-        int port_in_local = Omega::bitRotateLeft(port_in, r_bits, max_bits) & mask_port;
+        int port_in_local = Global::bitRotateLeft(port_in, r_bits, max_bits) & mask_port;
         int port_out_global = 0;
         int port_out_local = 0;
         int sw1 = 0;
@@ -74,10 +64,10 @@ bool Omega::addRoute(int port_in, int port_out) {
             } else {
                 switchs_disc.emplace_back(sw1, port_out_local);
             }
-            port_in_local = Omega::bitRotateLeft(port_out_global, r_bits, max_bits) & mask_port;
+            port_in_local = Global::bitRotateLeft(port_out_global, r_bits, max_bits) & mask_port;
         }
         if (!path_invalid) {
-            port_out_local = Omega::bitRotateRigth(port_out, r_bits, max_bits) & mask_port;
+            port_out_local = Global::bitRotateRigth(port_out, r_bits, max_bits) & mask_port;
             if (Omega::conf_array[sw2].connectPort(port_in_local, port_out_local)) {
                 Omega::used_route[key] = true;
                 return true;
@@ -113,7 +103,7 @@ void Omega::removeRoute(int port_in, int port_out) {
             port_out_local = port_out_global & mask_port;
             Omega::conf_array[sw1].disconnectPort(port_out_local);
         }
-        port_out_local = Omega::bitRotateRigth(port_out, r_bits, max_bits) & mask_port;
+        port_out_local = Global::bitRotateRigth(port_out, r_bits, max_bits) & mask_port;
         Omega::conf_array[sw2].disconnectPort(port_out_local);
     }
 
@@ -127,7 +117,7 @@ int Omega::getPortOut(int sw1, int sw2) {
     int sw1_local = sw1 & mask_switch;
     for (int k = 0; k < Omega::radix; ++k) {
         int sw1_port_global = sw1_local * Omega::radix + k;
-        int sw2_port_global = Omega::bitRotateLeft(sw1_port_global, r_bits, max_bits);
+        int sw2_port_global = Global::bitRotateLeft(sw1_port_global, r_bits, max_bits);
         if ((sw2_port_global >> r_bits) == (sw2 & mask_switch)) {
             return sw1_port_global;
         }
@@ -147,8 +137,8 @@ void Omega::createRouteTable() {
 #pragma omp for collapse(2)
         for (int port_in = 0; port_in < Omega::size; ++port_in) {
             for (int port_out = 0; port_out < Omega::size; ++port_out) {
-                int sw_src = Omega::bitRotateLeft(port_in, r_bits, max_bits) >> r_bits;
-                int sw_dst = Omega::bitRotateRigth(port_out, r_bits, max_bits) >> r_bits;
+                int sw_src = Global::bitRotateLeft(port_in, r_bits, max_bits) >> r_bits;
+                int sw_dst = Global::bitRotateRigth(port_out, r_bits, max_bits) >> r_bits;
                 sw_dst = (Omega::num_swicth_stages * (Omega::num_stagies - 1)) + sw_dst;
                 PathFinder::pathFinder(sw_src, sw_dst, graph,
                                        Omega::route_table[std::pair<int, int>(port_in, port_out)]);
@@ -164,8 +154,8 @@ void Omega::printRouteTable() {
         printf("SW STAGE %d;", i);
     }
     printf("\n");
-    for (auto p: Omega::route_table) {
-        for (auto r:p.second) {
+    for (const auto &p: Omega::route_table) {
+        for (const auto &r:p.second) {
             printf("%d;%d;", p.first.first, p.first.second);
             for (auto s:r) {
                 printf("%d;", s);
@@ -183,7 +173,7 @@ void Omega::createSwitchGraph() {
         for (int l = 0; l < Omega::num_swicth_stages; ++l) {
             for (int k = 0; k < Omega::radix; ++k) {
                 int v1 = j * Omega::num_swicth_stages + l;
-                int v2 = Omega::bitRotateLeft(l * Omega::radix + k, r_bits, max_bits) >> r_bits;
+                int v2 = Global::bitRotateLeft(l * Omega::radix + k, r_bits, max_bits) >> r_bits;
                 v2 = (j + 1) * Omega::num_swicth_stages + v2;
                 graph[v1].push_back(v2);
             }

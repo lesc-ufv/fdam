@@ -1096,11 +1096,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(9)
   )
-  pe_io_out_9
+  pe_9
   (
     .clk(clk),
     .rst(rst),
@@ -1108,8 +1108,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_8),
     .branch_in(net_branch2peb_8),
     .branch_out(pe2net_branch_8),
-    .fifo_we(fifo_out_we[0]),
-    .fifo_data(fifo_out_data[15:0]),
     .ina(net2pea_8),
     .inb(net2peb_8),
     .outa(pe2neta_8),
@@ -1117,11 +1115,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(10)
   )
-  pe_io_out_10
+  pe_10
   (
     .clk(clk),
     .rst(rst),
@@ -1129,8 +1127,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_9),
     .branch_in(net_branch2peb_9),
     .branch_out(pe2net_branch_9),
-    .fifo_we(fifo_out_we[1]),
-    .fifo_data(fifo_out_data[31:16]),
     .ina(net2pea_9),
     .inb(net2peb_9),
     .outa(pe2neta_9),
@@ -1138,11 +1134,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(11)
   )
-  pe_io_out_11
+  pe_11
   (
     .clk(clk),
     .rst(rst),
@@ -1150,8 +1146,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_10),
     .branch_in(net_branch2peb_10),
     .branch_out(pe2net_branch_10),
-    .fifo_we(fifo_out_we[2]),
-    .fifo_data(fifo_out_data[47:32]),
     .ina(net2pea_10),
     .inb(net2peb_10),
     .outa(pe2neta_10),
@@ -1159,11 +1153,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(12)
   )
-  pe_io_out_12
+  pe_12
   (
     .clk(clk),
     .rst(rst),
@@ -1171,8 +1165,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_11),
     .branch_in(net_branch2peb_11),
     .branch_out(pe2net_branch_11),
-    .fifo_we(fifo_out_we[3]),
-    .fifo_data(fifo_out_data[63:48]),
     .ina(net2pea_11),
     .inb(net2peb_11),
     .outa(pe2neta_11),
@@ -1180,11 +1172,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(13)
   )
-  pe_io_out_13
+  pe_13
   (
     .clk(clk),
     .rst(rst),
@@ -1192,8 +1184,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_12),
     .branch_in(net_branch2peb_12),
     .branch_out(pe2net_branch_12),
-    .fifo_we(fifo_out_we[4]),
-    .fifo_data(fifo_out_data[79:64]),
     .ina(net2pea_12),
     .inb(net2peb_12),
     .outa(pe2neta_12),
@@ -1201,11 +1191,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(14)
   )
-  pe_io_out_14
+  pe_14
   (
     .clk(clk),
     .rst(rst),
@@ -1213,8 +1203,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_13),
     .branch_in(net_branch2peb_13),
     .branch_out(pe2net_branch_13),
-    .fifo_we(fifo_out_we[5]),
-    .fifo_data(fifo_out_data[95:80]),
     .ina(net2pea_13),
     .inb(net2peb_13),
     .outa(pe2neta_13),
@@ -1222,11 +1210,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(15)
   )
-  pe_io_out_15
+  pe_15
   (
     .clk(clk),
     .rst(rst),
@@ -1234,8 +1222,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_14),
     .branch_in(net_branch2peb_14),
     .branch_out(pe2net_branch_14),
-    .fifo_we(fifo_out_we[6]),
-    .fifo_data(fifo_out_data[111:96]),
     .ina(net2pea_14),
     .inb(net2peb_14),
     .outa(pe2neta_14),
@@ -1243,11 +1229,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe_out
+  cgra0_pe
   #(
     .PE_ID(16)
   )
-  pe_io_out_16
+  pe_16
   (
     .clk(clk),
     .rst(rst),
@@ -1255,8 +1241,6 @@ module cgra0_top
     .conf_bus_in(conf_bus_15),
     .branch_in(net_branch2peb_15),
     .branch_out(pe2net_branch_15),
-    .fifo_we(fifo_out_we[7]),
-    .fifo_data(fifo_out_data[127:112]),
     .ina(net2pea_15),
     .inb(net2peb_15),
     .outa(pe2neta_15),
@@ -3240,11 +3224,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(121)
   )
-  pe_121
+  pe_io_out_121
   (
     .clk(clk),
     .rst(rst),
@@ -3252,6 +3236,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_120),
     .branch_in(net_branch2peb_120),
     .branch_out(pe2net_branch_120),
+    .fifo_we(fifo_out_we[0]),
+    .fifo_data(fifo_out_data[15:0]),
     .ina(net2pea_120),
     .inb(net2peb_120),
     .outa(pe2neta_120),
@@ -3259,11 +3245,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(122)
   )
-  pe_122
+  pe_io_out_122
   (
     .clk(clk),
     .rst(rst),
@@ -3271,6 +3257,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_121),
     .branch_in(net_branch2peb_121),
     .branch_out(pe2net_branch_121),
+    .fifo_we(fifo_out_we[1]),
+    .fifo_data(fifo_out_data[31:16]),
     .ina(net2pea_121),
     .inb(net2peb_121),
     .outa(pe2neta_121),
@@ -3278,11 +3266,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(123)
   )
-  pe_123
+  pe_io_out_123
   (
     .clk(clk),
     .rst(rst),
@@ -3290,6 +3278,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_122),
     .branch_in(net_branch2peb_122),
     .branch_out(pe2net_branch_122),
+    .fifo_we(fifo_out_we[2]),
+    .fifo_data(fifo_out_data[47:32]),
     .ina(net2pea_122),
     .inb(net2peb_122),
     .outa(pe2neta_122),
@@ -3297,11 +3287,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(124)
   )
-  pe_124
+  pe_io_out_124
   (
     .clk(clk),
     .rst(rst),
@@ -3309,6 +3299,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_123),
     .branch_in(net_branch2peb_123),
     .branch_out(pe2net_branch_123),
+    .fifo_we(fifo_out_we[3]),
+    .fifo_data(fifo_out_data[63:48]),
     .ina(net2pea_123),
     .inb(net2peb_123),
     .outa(pe2neta_123),
@@ -3316,11 +3308,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(125)
   )
-  pe_125
+  pe_io_out_125
   (
     .clk(clk),
     .rst(rst),
@@ -3328,6 +3320,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_124),
     .branch_in(net_branch2peb_124),
     .branch_out(pe2net_branch_124),
+    .fifo_we(fifo_out_we[4]),
+    .fifo_data(fifo_out_data[79:64]),
     .ina(net2pea_124),
     .inb(net2peb_124),
     .outa(pe2neta_124),
@@ -3335,11 +3329,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(126)
   )
-  pe_126
+  pe_io_out_126
   (
     .clk(clk),
     .rst(rst),
@@ -3347,6 +3341,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_125),
     .branch_in(net_branch2peb_125),
     .branch_out(pe2net_branch_125),
+    .fifo_we(fifo_out_we[5]),
+    .fifo_data(fifo_out_data[95:80]),
     .ina(net2pea_125),
     .inb(net2peb_125),
     .outa(pe2neta_125),
@@ -3354,11 +3350,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(127)
   )
-  pe_127
+  pe_io_out_127
   (
     .clk(clk),
     .rst(rst),
@@ -3366,6 +3362,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_126),
     .branch_in(net_branch2peb_126),
     .branch_out(pe2net_branch_126),
+    .fifo_we(fifo_out_we[6]),
+    .fifo_data(fifo_out_data[111:96]),
     .ina(net2pea_126),
     .inb(net2peb_126),
     .outa(pe2neta_126),
@@ -3373,11 +3371,11 @@ module cgra0_top
   );
 
 
-  cgra0_pe
+  cgra0_pe_out
   #(
     .PE_ID(128)
   )
-  pe_128
+  pe_io_out_128
   (
     .clk(clk),
     .rst(rst),
@@ -3385,6 +3383,8 @@ module cgra0_top
     .conf_bus_in(conf_bus_127),
     .branch_in(net_branch2peb_127),
     .branch_out(pe2net_branch_127),
+    .fifo_we(fifo_out_we[7]),
+    .fifo_data(fifo_out_data[127:112]),
     .ina(net2pea_127),
     .inb(net2peb_127),
     .outa(pe2neta_127),

@@ -16,21 +16,33 @@ CgraArch::CgraArch(int id, int num_pe, int num_pe_in, int num_pe_out, int net_ra
         CgraArch::netThreads.push_back(new Omega(num_pe * 2, net_radix, num_extra_stage));
         CgraArch::net_branchThreads.push_back(new Omega(num_pe, net_radix, stage_extra));
     }
-    for (int i = 0; i < num_pe_in; ++i) {
-        CgraArch::pe_array.push_back(new PEArch(i, PE_IN, numThreads));
-    }
-    for (int i = num_pe_in; i < num_pe_out + num_pe_in; ++i) {
-        CgraArch::pe_array.push_back(new PEArch(i, PE_OUT, numThreads));
-    }
-    for (int i = num_pe_out + num_pe_in; i < num_pe; ++i) {
-        CgraArch::pe_array.push_back(new PEArch(i, PE_BASIC, numThreads));
+
+    auto pe_list = CgraArch::makeListPe(num_pe,num_pe_in,num_pe_out);
+    int inId = 0;
+    int outId = 0;
+    for (auto p:pe_list) {
+        if(p.second == PE_IN){
+            CgraArch::pe_array[p.first] = new PEArch(p.first, PE_IN, numThreads);
+            CgraArch::pe_list_in.push_back(p.first);
+            CgraArch::pe_in_map[p.first] = inId;
+            inId++;
+
+        } else if(p.second == PE_OUT){
+            CgraArch::pe_array[p.first] = new PEArch(p.first, PE_OUT, numThreads);
+            CgraArch::pe_list_out.push_back(p.first);
+            CgraArch::pe_out_map[p.first] = outId;
+            outId++;
+        } else{
+            CgraArch::pe_array[p.first] = new PEArch(p.first, PE_BASIC, numThreads);
+            CgraArch::pe_list_basic.push_back(p.first);
+        }
     }
 }
 
 CgraArch::~CgraArch() {
     int numThreads = CgraArch::getNumThreads();
     for (auto it:CgraArch::pe_array) {
-        delete it;
+        delete it.second;
     }
     for (int i = 0; i < numThreads; ++i) {
         delete CgraArch::netThreads[i];
@@ -107,8 +119,8 @@ void CgraArch::reset() {
         CgraArch::net_branchThreads[i]->reset();
         CgraArch::dataFlows.clear();
         for (auto pe:CgraArch::pe_array) {
-            pe->setOperator(nullptr, i);
-            pe->setOut(-1, i);
+            pe.second->setOperator(nullptr, i);
+            pe.second->setOut(-1, i);
         }
     }
 }
@@ -120,8 +132,8 @@ void CgraArch::reset(int threadID) {
     CgraArch::net_branchThreads[threadID]->reset();
     CgraArch::dataFlows.erase(threadID);
     for (auto pe:CgraArch::pe_array) {
-        pe->setOperator(nullptr, threadID);
-        pe->setOut(-1, threadID);
+        pe.second->setOperator(nullptr, threadID);
+        pe.second->setOut(-1, threadID);
     }
 }
 
@@ -186,23 +198,6 @@ void CgraArch::makeProgram() {
     CgraArch::cgra_program.cgra_intial_conf.mask_output_fifo = 0;
     CgraArch::cgra_program.cgra_intial_conf.qtd_conf = 0;
 
-    for (auto pe:CgraArch::pe_array) {
-        if (pe->getType() == PE_IN || pe->getType() == PE_OUT) {
-            for (int i = 0; i < numThreads; ++i) {
-                initial_conf_t defaultConf;
-                defaultConf.pe_instruction_conf.conf_type = CGRA_CONF_SET_PE_INSTRUCTION;
-                defaultConf.pe_instruction_conf.pe_id = (unsigned long) pe->getId() + 1;
-                defaultConf.pe_instruction_conf.thread_id = (unsigned long) i;
-                defaultConf.pe_instruction_conf.inst_addr = 0;
-                defaultConf.pe_instruction_conf.alu_op = 0;
-                defaultConf.pe_instruction_conf.control = 0;
-                defaultConf.pe_instruction_conf.rf_raddr = 0;
-                defaultConf.pe_instruction_conf.rf_waddr = 0;
-                CgraArch::cgra_program.initial_conf.push_back(defaultConf);
-            }
-        }
-    }
-
     for (int j = 0; j < numThreads; ++j) {
         auto sw_branch_array = CgraArch::net_branchThreads[j]->getConfArray();
         auto sw_array = CgraArch::netThreads[j]->getConfArray();
@@ -223,28 +218,29 @@ void CgraArch::makeProgram() {
             }
         }
 
-        for (auto pe:CgraArch::pe_array) {
+        for (auto e:CgraArch::pe_array) {
+            PEArch * pe = e.second;
             Operator *op = pe->getOperator(j);
             if (op != nullptr) {
                 DataFlow *df = CgraArch::dataFlows[j];
                 CgraArch::cgra_program.initial_conf.push_back(pe->getConf(j));
                 CgraArch::cgra_program.initial_conf.push_back(pe->getPcMaxConf(j));
                 CgraArch::cgra_program.initial_conf.push_back(pe->getPcLoopConf(j));
+                CgraArch::cgra_program.map_pe_to_op[pe->getId()+1] = std::pair<int,int>(j,op->getId());
+
+                int inId = CgraArch::pe_in_map[pe->getId()];
+                int outId = CgraArch::pe_out_map[pe->getId()];
+                auto t = std::tuple<int, int, int, std::string>(j, df->getId(),op->getId(), df->getName());
                 switch (op->getType()) {
                     case OP_IN:
                         CgraArch::cgra_program.initial_conf.push_back(pe->getLoadIgnoreConf(j));
-                        CgraArch::cgra_program.cgra_intial_conf.mask_input_fifo =
-                                CgraArch::cgra_program.cgra_intial_conf.mask_input_fifo | (1 << pe->getId());
-                        CgraArch::cgra_program.input_map[std::tuple<int, int, int, std::string>(j, df->getId(), op->getId(),
-                                                                             df->getName())] = pe->getId();
+                        CgraArch::cgra_program.cgra_intial_conf.mask_input_fifo |= (1 << inId);
+                        CgraArch::cgra_program.input_map[t] = inId;
                         break;
                     case OP_OUT:
                         CgraArch::cgra_program.initial_conf.push_back(pe->getStoreIgnoreConf(j));
-                        CgraArch::cgra_program.cgra_intial_conf.mask_output_fifo =
-                                CgraArch::cgra_program.cgra_intial_conf.mask_output_fifo | (1 << (pe->getId() - CgraArch::num_pe_in));
-                        CgraArch::cgra_program.output_map[std::tuple<int, int, int, std::string>(j, df->getId(), op->getId(),
-                                                                              df->getName())] = (pe->getId() -
-                                                                                                 CgraArch::num_pe_in);
+                        CgraArch::cgra_program.cgra_intial_conf.mask_output_fifo |= (1 << outId);
+                        CgraArch::cgra_program.output_map[t] = outId;
                         break;
                     case OP_IMMEDIATE:
                         CgraArch::cgra_program.initial_conf.push_back(pe->getConstConf(j));
@@ -277,11 +273,49 @@ DataFlow *CgraArch::getDataFlow(int threadID) {
     return CgraArch::dataFlows[threadID];
 }
 
-const std::vector<PEArch *> &CgraArch::getPeArray() const {
+const std::map<int,PEArch *> &CgraArch::getPeArray() const {
     return pe_array;
 }
 
 cgra_program_t CgraArch::getCgraProgram() {
     CgraArch::makeProgram();
     return cgra_program;
+}
+
+std::map<int, int> CgraArch::makeListPe(int num_pe, int num_pe_in, int num_pe_out) {
+
+    std::map<int, int> pelist;
+    for (int j = 0; j < num_pe_in; ++j) {
+        pelist[j] = PE_IN;
+    }
+    for (int j = num_pe_in; j < num_pe-num_pe_out; ++j) {
+        pelist[j] = PE_BASIC;
+    }
+    for (int j = num_pe - num_pe_out; j < num_pe; ++j) {
+        pelist[j] = PE_OUT;
+    }
+    /*
+    srand(3);
+    for (int k = 0; k < num_pe_in; ++k) {
+        bool repeat = true;
+        while (repeat) {
+            int pe = (int)random() % num_pe;
+            if(pelist[pe] == PE_BASIC){
+                pelist[pe] = PE_IN;
+                repeat = false;
+            }
+        }
+    }
+    for (int l = 0; l < num_pe_out; ++l) {
+        bool repeat = true;
+        while (repeat) {
+            int pe = (int)random() % num_pe;
+            if(pelist[pe] == PE_BASIC){
+                pelist[pe] = PE_OUT;
+                repeat = false;
+            }
+        }
+    }
+     */
+    return pelist;
 }

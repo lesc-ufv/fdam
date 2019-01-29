@@ -2,6 +2,7 @@
 #define CGRASCHEDULER_OPERATOR_H
 
 #include <vector>
+#include <fdam/cgra/cgra_arch_defs.h>
 
 class Operator {
 
@@ -68,6 +69,10 @@ public:
     void setDataFlowId(int dataFlowId);
 
     int getDataFlowId();
+
+    int getPortA();
+
+    int getPortB();
 
 };
 

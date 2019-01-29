@@ -6,6 +6,7 @@
 #include <vector>
 #include <fdam/cgra/path_finder.h>
 #include <fdam/cgra/switch.h>
+#include <fdam/cgra/global.h>
 
 class Omega {
 
@@ -33,10 +34,6 @@ private:
     void createSwitchGraph();
 
     int getPortOut(int sw1, int sw2);
-
-    int bitRotateLeft(int val, int r_bits, int max_bits);
-
-    int bitRotateRigth(int val, int r_bits, int max_bits);
 
 public:
 

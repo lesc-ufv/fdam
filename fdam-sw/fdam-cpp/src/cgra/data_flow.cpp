@@ -1,13 +1,28 @@
 #include <fdam/cgra/data_flow.h>
 
 
-DataFlow::DataFlow(int id, std::string name) : id(id), name(std::move(name)) {}
+DataFlow::DataFlow(int id, std::string name) : id(id), name(std::move(name)), num_op_in(0), num_op_out(0), num_op(0) {}
 
-DataFlow::~DataFlow() = default;
+DataFlow::~DataFlow() {
+    DataFlow::op_array.clear();
+    for (auto g:DataFlow::graph) {
+        g.second.clear();
+    }
+    DataFlow::graph.clear();
+}
 
 void DataFlow::addOperator(Operator *op) {
-    op->setDataFlowId(DataFlow::id);
-    DataFlow::op_array[op->getId()] = op;
+    if (op->getDataFlowId() == -1) {
+        op->setDataFlowId(DataFlow::id);
+        DataFlow::op_array[op->getId()] = op;
+        if (op->getType() == OP_IN) {
+            DataFlow::num_op_in++;
+        }
+        if (op->getType() == OP_OUT) {
+            DataFlow::num_op_out++;
+        }
+        DataFlow::num_op++;
+    }
 }
 
 Operator *DataFlow::removeOperator(int op_id) {
@@ -47,7 +62,7 @@ void DataFlow::toDot(std::string fileNamePath) {
             myfile << " [ label = " << op_label[op.second->getOpCode()] << "i";
             myfile << ", VALUE = " << op.second->getConstant();
             myfile << "]" << std::endl;
-            myfile << " " << op.first << "." << op.second->getConstant() << " [ label = " << op.second->getConstant()
+            myfile << " \"" << op.first << "." << op.second->getConstant() << "\"[ label = " << op.second->getConstant()
                    << " ]" << std::endl;
 
         } else {
@@ -57,7 +72,7 @@ void DataFlow::toDot(std::string fileNamePath) {
     }
     for (auto op:DataFlow::op_array) {
         if (op.second->getType() == OP_IMMEDIATE) {
-            myfile << " " << op.first << "." << op.second->getConstant() << " -> " << op.first << std::endl;
+            myfile << " \"" << op.first << "." << op.second->getConstant() << "\" -> " << op.first << std::endl;
         }
         for (auto op_dst:op.second->getDst()) {
             myfile << " " << op.first << " -> " << op_dst << std::endl;
@@ -69,6 +84,8 @@ void DataFlow::toDot(std::string fileNamePath) {
 
 void DataFlow::connect(Operator *src, Operator *dst, int dstPort) {
 
+    DataFlow::addOperator(src);
+    DataFlow::addOperator(dst);
     DataFlow::graph[src->getId()].push_back(dst->getId());
 
     src->getDst().push_back(dst->getId());
@@ -106,21 +123,19 @@ void DataFlow::updateOpLevel() {
     }
     for (auto op:DataFlow::op_array) {
         if (op.second->getType() == OP_IN) {
-            int level = 1;
-            for (int i = 0; i < DataFlow::graph[op.first].size(); i++) {
-                int child = DataFlow::graph[op.first][i];
-                if (i == 0) {
+            int level = 0;
+            for (auto child:DataFlow::graph[op.first]) {
+                if (DataFlow::op_array[child]->getLevel() > level) {
                     level = DataFlow::op_array[child]->getLevel();
-                } else {
-                    if (DataFlow::op_array[child]->getLevel() < level) {
-                        level = DataFlow::op_array[child]->getLevel();
-                    }
                 }
             }
-            op.second->setLevel(level - 1);
+            if (level > 0)
+                level = level - 1;
+            op.second->setLevel(level);
         }
     }
 }
+
 
 int DataFlow::getId() const {
     return id;
@@ -132,4 +147,16 @@ const std::string &DataFlow::getName() const {
 
 const std::map<int, std::vector<int>> &DataFlow::getGraph() const {
     return graph;
+}
+
+int DataFlow::getNumOpIn() const {
+    return num_op_in;
+}
+
+int DataFlow::getNumOpOut() const {
+    return num_op_out;
+}
+
+int DataFlow::getNumOp() const {
+    return num_op;
 }

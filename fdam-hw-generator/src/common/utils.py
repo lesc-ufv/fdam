@@ -110,3 +110,29 @@ def bit_rotate_rigth(val, r_bits, max_bits):
 
 def is_power_of_2(v):
     return v and not (v & (v - 1))
+
+
+def make_pe_list(num_pe, num_pe_in, num_pe_out):
+    # import ctypes
+    # libc = ctypes.cdll.LoadLibrary('libc.so.6')
+    # libc.srand(127)
+    # values = []
+    # for _ in range(size):
+    #     repeat = True
+    #     v = 0
+    #     while repeat:
+    #         v = libc.random() % limit
+    #         if v not in values:
+    #             repeat = False
+    #     values.append(v)
+    pelist = {}
+    for i in range(num_pe_in):
+        pelist[i] = 1
+
+    for i in range(num_pe_in,num_pe-num_pe_out):
+        pelist[i] = 0
+
+    for i in range(num_pe-num_pe_out,num_pe):
+        pelist[i] = 2
+
+    return pelist

@@ -2,26 +2,28 @@
 
 Scheduler::Scheduler() = default;
 
-Scheduler::Scheduler(CgraArch *cgra) : cgra(cgra) {}
+Scheduler::Scheduler(CgraArch *cgra) : cgraArch(cgra) {}
 
 Scheduler::~Scheduler() {
     Scheduler::dataflows.clear();
 }
 
 bool Scheduler::addDataFlow(DataFlow *df, int threadID) {
-    if (threadID >= 0 && threadID < Scheduler::cgra->getNumThreads()) {
-        Scheduler::dataflows[threadID] = df;
-        return true;
+    if (Scheduler::cgraArch) {
+        if (threadID >= 0 && threadID < Scheduler::cgraArch->getNumThreads()) {
+            Scheduler::dataflows[threadID] = df;
+            return true;
+        }
     }
     return false;
 }
 
 void Scheduler::setCgra(CgraArch *cgra) {
-    Scheduler::cgra = cgra;
+    Scheduler::cgraArch = cgra;
 }
 
 CgraArch *Scheduler::getCgra() {
-    return Scheduler::cgra;
+    return Scheduler::cgraArch;
 }
 
 bool Scheduler::scheduling() {
@@ -32,57 +34,65 @@ bool Scheduler::scheduling() {
             printf("Map and Route error:\n");
             printf("Thread ID: %d\n", df.first);
             printf("DataFlow name: %s\n", df.second->getName().c_str());
+            return false;
         } else {
             printf("Map and Route success!\n");
             printf("Thread ID: %d\n", df.first);
             printf("DataFlow name: %s\n", df.second->getName().c_str());
         }
-
     }
 
-    return false;
+    return true;
 }
 
 bool Scheduler::mapAndRoute(int threadID) {
 
+    if (dataflows[threadID]->getNumOp() > cgraArch->getNumPe()) {
+        return false;
+    }
+    if (dataflows[threadID]->getNumOpIn() > cgraArch->getNumPeIn()) {
+        return false;
+    }
+    if (dataflows[threadID]->getNumOpOut() > cgraArch->getNumPeOut()) {
+        return false;
+    }
+    srand(0);
     auto operators = dataflows[threadID]->getOpArray();
-    auto pes = cgra->getPeArray();
-
+    auto pes = cgraArch->getPeArray();
     std::vector<int> solution;
     std::deque<int> pe_free;
     std::deque<int> pe_in_free;
     std::deque<int> pe_out_free;
 
-    if (operators.size() > pes.size()) {
-        return false;
-    }
-
     solution.reserve(pes.size());
     for (auto pe:pes) {
         solution.push_back(-1);
     }
-
-    int idx = cgra->getNumPeIn() + cgra->getNumPeOut();
-    int idx_in = 0;
-    int idx_out = 0;
+    int idx = 0;
     for (auto op:operators) {
         if (op.second->getType() == OP_IN) {
-            solution[idx_in] = op.second->getId();
-            idx_in++;
-        } else if (op.second->getType() == OP_OUT) {
-            solution[idx_out + cgra->getNumPeIn()] = op.second->getId();
-            idx_out++;
-        } else {
+            do {
+                idx = Scheduler::getRandomPE(PE_IN);
+            } while (solution[idx] != -1);
             solution[idx] = op.second->getId();
-            idx++;
+        } else if (op.second->getType() == OP_OUT) {
+            do {
+                idx = Scheduler::getRandomPE(PE_OUT);
+            } while (solution[idx] != -1);
+            solution[idx] = op.second->getId();
+        } else{
+            do {
+                idx = Scheduler::getRandomPE(PE_BASIC);
+            } while (solution[idx] != -1);
+            solution[idx] = op.second->getId();
         }
     }
 
     for (int k = 0; k < solution.size(); k++) {
         if (solution[k] == -1) {
-            if (k < cgra->getNumPeIn()) {
+            if (pes[k]->getType() == PE_IN) {
                 pe_in_free.push_back(k);
-            } else if (k < (cgra->getNumPeIn() + cgra->getNumPeOut())) {
+            } else if (pes[k]->getType() == PE_OUT) {
                 pe_out_free.push_back(k);
             } else {
                 pe_free.push_back(k);
@@ -93,18 +103,28 @@ bool Scheduler::mapAndRoute(int threadID) {
     int r = 0;
     do {
 
-        r = Scheduler::placeAndRoute(solution, threadID);
-        if (r == -1)
-            return true;
+        printf("%d ", j++);
+        for (int k = 0; k < solution.size(); k++) {
+            if (solution[k] != -1) {
+                printf("PE%d[OP%d] ", k, solution[k]);
+            }
+        }
+        printf("\n");
 
-        int swap;
-        if (r < cgra->getNumPeIn()) {
+        r = Scheduler::placeAndRoute(solution, threadID);
+
+        if (r == -1) {
+            return true;
+        }
+
+        int swap = -1;
+        if (r < cgraArch->getNumPeIn()) {
             if (!pe_in_free.empty()) {
                 swap = pe_in_free.back();
                 pe_in_free.pop_back();
                 pe_in_free.push_front(r);
             }
-        } else if (r < (cgra->getNumPeIn() + cgra->getNumPeOut())) {
+        } else if (r < (cgraArch->getNumPeIn() + cgraArch->getNumPeOut())) {
             if (!pe_out_free.empty()) {
                 swap = pe_out_free.back();
                 pe_out_free.pop_back();
@@ -117,11 +137,15 @@ bool Scheduler::mapAndRoute(int threadID) {
                 pe_free.push_front(r);
             }
         }
+        if (swap == -1) break;
         std::swap(solution[r], solution[swap]);
+        printf("\nSWAP: %d -> %d: ", r, swap);
+
 
     } while (r >= 0);
 
     return false;
+
 }
 
 
@@ -135,15 +159,15 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
     int pe_src_port_b;
     int pe_dst_port_in;
 
-    Scheduler::cgra->reset(threadID);
-    Omega *net = Scheduler::cgra->getNet(threadID);
-    Omega *net_branch = Scheduler::cgra->getNetBranch(threadID);
-    Scheduler::cgra->setDataFlow(Scheduler::dataflows[threadID], threadID);
+    Scheduler::cgraArch->reset(threadID);
+    Omega *net = Scheduler::cgraArch->getNet(threadID);
+    Omega *net_branch = Scheduler::cgraArch->getNetBranch(threadID);
+    Scheduler::cgraArch->setDataFlow(Scheduler::dataflows[threadID], threadID);
 
     for (int i = 0; i < mapping.size(); ++i) {
         if (mapping[i] != -1) {
             op_src = Scheduler::dataflows[threadID]->getOp(mapping[i]);
-            pe_src = Scheduler::cgra->getPE(i);
+            pe_src = Scheduler::cgraArch->getPE(i);
             if (pe_src && op_src) {
                 if (op_src->getType() == OP_IN && pe_src->getType() != PE_IN) {
                     return i;
@@ -160,7 +184,7 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
                             for (int j = 0; j < mapping.size(); ++j) {
                                 if (mapping[j] == p) {
                                     op_dst = Scheduler::dataflows[threadID]->getOp(mapping[j]);
-                                    pe_dst = Scheduler::cgra->getPE(j);
+                                    pe_dst = Scheduler::cgraArch->getPE(j);
                                     break;
                                 }
                             }
@@ -182,7 +206,7 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
                                     else if (op_dst->getSrcB() == op_src->getId())
                                         pe_dst_port_in = (pe_dst->getId() * 2) + 1;
                                     else {
-                                        printf("DataFlow error: Operator ID: %d\n", i);
+                                        printf("DataFlow error: Operator ID: %d\n", op_src->getId());
                                         exit(2);
                                     }
                                     if (pe_src->getOut(threadID) == PORT_A) {
@@ -221,4 +245,22 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
         }
     }
     return -1;
+}
+
+int Scheduler::getRandomPE(int type) {
+
+    int value = 0;
+    if (type == PE_IN) {
+        value = static_cast<int>(random() % Scheduler::cgraArch->getNumPeIn());
+        value = cgraArch->pe_list_in[value];
+    } else if (type == PE_OUT) {
+        value = static_cast<int>(random() % Scheduler::cgraArch->getNumPeOut());
+        value = cgraArch->pe_list_out[value];
+    } else {
+        value = static_cast<int>(random() % (Scheduler::cgraArch->getNumPe() -
+                                             (Scheduler::cgraArch->getNumPeOut() + Scheduler::cgraArch->getNumPeIn())));
+        value = cgraArch->pe_list_basic[value];
+    }
+
+    return value;
 }

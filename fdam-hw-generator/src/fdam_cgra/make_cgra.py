@@ -5,6 +5,7 @@ from veriloggen import *
 from common.make_memory import make_memory
 from common.make_program_counter import make_program_counter
 from common.make_reg_pipe import make_reg_pipe
+from common.utils import make_pe_list
 from fdam_cgra.make_omega import make_omega
 from make_pe import make_pe
 
@@ -58,44 +59,45 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
     con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', Int(1, 1, 2)), ('in', conf_bus_in), ('out', conf_bus[0])]
     m.Instance(reg_pipe, 'reg_conf_bus_in2', param, con)
 
-    pe_id = 0
-    for _ in range(num_pe_in):
-        params_pe = [('PE_ID', pe_id + 1)]
-        con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[pe_id]), ('conf_bus_in', conf_bus[pe_id]),
-                  ('branch_in', net_branch2pe[pe_id]),
-                  ('branch_out', pe2net_branch[pe_id]),
-                  ('fifo_re', fifo_in_re[pe_id]),
-                  ('fifo_data', fifo_in_data[pe_id * data_width:(pe_id + 1) * data_width]),
-                  ('ina', net2pea[pe_id]), ('inb', net2peb[pe_id]), ('outa', pe2neta[pe_id]),
-                  ('outb', pe2netb[pe_id])]
-        m.Instance(pe_in, 'pe_io_in_%d' % (pe_id + 1), params_pe, con_pe)
-        pe_id = pe_id + 1
+    pelist = make_pe_list(num_pe, num_pe_in, num_pe_out)
+    fin = 0
+    fout = 0
+    for p in pelist.keys():
+        if pelist[p] == 1:
+            params_pe = [('PE_ID', p + 1)]
+            con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[p]), ('conf_bus_in', conf_bus[p]),
+                      ('branch_in', net_branch2pe[p]),
+                      ('branch_out', pe2net_branch[p]),
+                      ('fifo_re', fifo_in_re[fin]),
+                      ('fifo_data', fifo_in_data[fin * data_width:(fin + 1) * data_width]),
+                      ('ina', net2pea[p]), ('inb', net2peb[p]), ('outa', pe2neta[p]),
+                      ('outb', pe2netb[p])]
+            m.Instance(pe_in, 'pe_io_in_%d' % (p + 1), params_pe, con_pe)
+            fin = fin + 1
 
-    for i in range(num_pe_out):
-        params_pe = [('PE_ID', pe_id + 1)]
-        con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[pe_id]),
-                  ('conf_bus_in', conf_bus[pe_id]),
-                  ('branch_in', net_branch2pe[pe_id]),
-                  ('branch_out', pe2net_branch[pe_id]),
-                  ('fifo_we', fifo_out_we[i]),
-                  ('fifo_data', fifo_out_data[i * data_width:(i + 1) * data_width]),
-                  ('ina', net2pea[pe_id]),
-                  ('inb', net2peb[pe_id]), ('outa', pe2neta[pe_id]),
-                  ('outb', pe2netb[pe_id])]
-        m.Instance(pe_out, 'pe_io_out_%d' % (pe_id + 1), params_pe, con_pe)
-        pe_id = pe_id + 1
-
-    for _ in range(num_pe - (num_pe_in + num_pe_out)):
-        params_pe = [('PE_ID', pe_id + 1)]
-        con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[pe_id]),
-                  ('conf_bus_in', conf_bus[pe_id]),
-                  ('branch_in', net_branch2pe[pe_id]),
-                  ('branch_out', pe2net_branch[pe_id]),
-                  ('ina', net2pea[pe_id]),
-                  ('inb', net2peb[pe_id]), ('outa', pe2neta[pe_id]),
-                  ('outb', pe2netb[pe_id])]
-        m.Instance(pe, 'pe_%d' % (pe_id + 1), params_pe, con_pe)
-        pe_id = pe_id + 1
+        elif pelist[p] == 2:
+            params_pe = [('PE_ID', p + 1)]
+            con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[p]),
+                      ('conf_bus_in', conf_bus[p]),
+                      ('branch_in', net_branch2pe[p]),
+                      ('branch_out', pe2net_branch[p]),
+                      ('fifo_we', fifo_out_we[fout]),
+                      ('fifo_data', fifo_out_data[fout * data_width:(fout + 1) * data_width]),
+                      ('ina', net2pea[p]),
+                      ('inb', net2peb[p]), ('outa', pe2neta[p]),
+                      ('outb', pe2netb[p])]
+            m.Instance(pe_out, 'pe_io_out_%d' % (p + 1), params_pe, con_pe)
+            fout = fout + 1
+        else:
+            params_pe = [('PE_ID', p + 1)]
+            con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[p]),
+                      ('conf_bus_in', conf_bus[p]),
+                      ('branch_in', net_branch2pe[p]),
+                      ('branch_out', pe2net_branch[p]),
+                      ('ina', net2pea[p]),
+                      ('inb', net2peb[p]), ('outa', pe2neta[p]),
+                      ('outb', pe2netb[p])]
+            m.Instance(pe, 'pe_%d' % (p + 1), params_pe, con_pe)
 
     for i in range(num_pe):
         param_reg_pipe = [('NUM_STAGES', 1), ('DATA_WIDTH', conf_bus_width)]

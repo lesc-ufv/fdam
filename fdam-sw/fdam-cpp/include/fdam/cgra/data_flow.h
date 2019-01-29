@@ -16,13 +16,16 @@ private:
     std::string name;
     std::map<int, Operator *> op_array;
     std::map<int, std::vector<int>> graph;
+    int num_op_in;
+    int num_op_out;
+    int num_op;
+
+    void addOperator(Operator *op);
 public:
 
     explicit DataFlow(int id, std::string name);
 
     ~DataFlow();
-
-    void addOperator(Operator *op);
 
     Operator *removeOperator(int op_id);
 
@@ -44,6 +47,11 @@ public:
 
     const std::map<int, std::vector<int>> &getGraph() const;
 
+    int getNumOpIn() const;
+
+    int getNumOpOut() const;
+
+    int getNumOp() const;
 };
 
 

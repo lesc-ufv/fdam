@@ -150,8 +150,8 @@ typedef struct initial_conf_t {
     };
 } initial_conf_t;
 
-typedef struct cgra_program_t {
 
+typedef struct cgra_program_t {
     unsigned short cgra_id;
     unsigned short num_pe;
     unsigned short num_pe_io_in;
@@ -161,10 +161,12 @@ typedef struct cgra_program_t {
     unsigned short word_size;
     cgra_intial_conf_t cgra_intial_conf;
     std::vector<initial_conf_t> initial_conf;
-    //key = id thread,id dataflow,id operador, dataflow name | value cgra in queue id
+    //key = id thread,id dataflow,id operador, dataflow name | value cgraArch in queue id
     std::map<std::tuple<int, int, int, std::string>, int> input_map;
-    //key = id thread,id dataflow,id operador, dataflow name | value cgra out queue id
+    //key = id thread,id dataflow,id operador, dataflow name | value cgraArch out queue id
     std::map<std::tuple<int, int, int, std::string>, int> output_map;
+    //key = id pe, value = id thread, id op
+    std::map<int,std::pair<int,int>> map_pe_to_op;
 } cgra_program_t;
 
 typedef enum {
@@ -173,7 +175,7 @@ typedef enum {
     PE_OUT
 } pe_type_t;
 
-typedef struct qtd_conf_t{
+typedef struct qtd_conf_t {
     union {
         unsigned long qtd;
         struct {
@@ -181,6 +183,6 @@ typedef struct qtd_conf_t{
             unsigned int qtd_high;
         };
     };
-}qtd_conf_t;
+} qtd_conf_t;
 
 #endif //CGRA_DEFS_H

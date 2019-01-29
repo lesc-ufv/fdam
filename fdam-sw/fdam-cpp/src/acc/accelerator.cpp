@@ -136,11 +136,11 @@ bool Accelerator::createInputQueue(unsigned char idQueue, long long nBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumInputQueue()) {
         double nb = nBytes;
         auto nBytesAlign = static_cast<long long>((std::ceil(nb / 256.0)) * 256.0);
-        void *ptrQueue = Accelerator::accManagement.accAllocQueue(nBytesAlign);
-        std::memset(ptrQueue, 0x00, static_cast<size_t>(nBytesAlign));
         if (Accelerator::getInputQueue(idQueue) != nullptr) {
             Accelerator::accManagement.accFreeQueue(Accelerator::getInputQueue(idQueue));
         }
+        void *ptrQueue = Accelerator::accManagement.accAllocQueue(nBytesAlign);
+        std::memset(ptrQueue, 0x00, static_cast<size_t>(nBytesAlign));
         Accelerator::setInputQueue(idQueue, ptrQueue, nBytesAlign);
         Accelerator::sendConfIn(idQueue);
         return true;
@@ -152,11 +152,11 @@ bool Accelerator::createOutputQueue(unsigned char idQueue, long long nBytes) {
     if (idQueue >= 0 && idQueue < Accelerator::getNumOutputQueue()) {
         double nb = nBytes;
         auto nBytesAlign = static_cast<long long>((std::ceil(nb / 256.0)) * 256.0);
-        void *ptrQueue = Accelerator::accManagement.accAllocQueue(nBytesAlign);
-        std::memset(ptrQueue, 0x00, static_cast<size_t>(nBytesAlign));
         if (Accelerator::getOutputQueue(idQueue) != nullptr) {
             Accelerator::accManagement.accFreeQueue(Accelerator::getOutputQueue(idQueue));
         }
+        void *ptrQueue = Accelerator::accManagement.accAllocQueue(nBytesAlign);
+        std::memset(ptrQueue, 0x00, static_cast<size_t>(nBytesAlign));
         Accelerator::setOutputQueue(idQueue, ptrQueue, nBytesAlign);
         Accelerator::sendConfOut(idQueue);
         return true;
@@ -418,7 +418,7 @@ bool Accelerator::isDoneInputQueue(unsigned char idQueue) const {
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
 
-    return (doneDword & (1UL << bit));
+    return (doneDword & (1UL << bit)) == 1UL;
 }
 
 bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
@@ -432,7 +432,7 @@ bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
     unsigned long doneDword = 0;
     doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
 
-    return (doneDword & (1UL << bit));
+    return (doneDword & (1UL << bit)) == 1UL;
 }
 
 void Accelerator::waitDone(long long timeWaitMax) {
