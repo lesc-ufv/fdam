@@ -5,11 +5,11 @@
 #include <test.h>
 
 void Test::runLoopBack() {
-    CgraArch cgraArch(0, 128, 9, 9, 4, 0, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
     Scheduler scheduler(&cgraArch);
     Cgra cgra;
 
-    int numThread = 1;
+    int numThread = 8;
     int copies = 1;
     int data_size = 32;
 
@@ -40,7 +40,6 @@ void Test::runLoopBack() {
 
     for (int l = 0; l < numThread; ++l) {
         auto df = Samples::loopback(l, 1, copies);
-        // auto df = Samples::test();
         df->toDot("/home/lucas/Documentos/loopback.dot");
         scheduler.addDataFlow(df, l);
     }

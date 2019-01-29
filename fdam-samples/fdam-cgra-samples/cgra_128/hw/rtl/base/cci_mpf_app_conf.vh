@@ -32,7 +32,7 @@
 // Application configuration.
 //
 
-`define AFU_CLOCK_FREQ 400
+`define AFU_CLOCK_FREQ 200
 
 // Use virtual addresses in the AFU
 `define MPF_CONF_ENABLE_VTP 1

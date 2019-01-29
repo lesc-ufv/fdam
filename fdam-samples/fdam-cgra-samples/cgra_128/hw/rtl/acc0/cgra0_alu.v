@@ -7,8 +7,8 @@ module cgra0_alu #
   input [4-1:0] op,
   input branch_in,
   output branch_out,
-  input  [DATA_WIDTH-1:0] ina,
-  input  [DATA_WIDTH-1:0] inb,
+  input [DATA_WIDTH-1:0] ina,
+  input [DATA_WIDTH-1:0] inb,
   output [DATA_WIDTH-1:0] out
 );
 
