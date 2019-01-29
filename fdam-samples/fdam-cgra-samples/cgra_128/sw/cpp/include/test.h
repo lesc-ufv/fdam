@@ -23,7 +23,8 @@ public:
 
     static void runKmeans();
 
-    static void helpKmeansUpdateCentroids(short **data_in, short *data_out, short *centroids, int k, int d, int data_size);
+    static void
+    helpKmeansUpdateCentroids(short **data_in, short *data_out, short *centroids, int k, int d, int data_size);
 
     static void helpKmeansUpdateConstants(cgra_program_t *cgra_program, int thread, short *constants, int k, int d);
 
@@ -33,7 +34,7 @@ public:
 
     static int rgbToGray(byte *rgb, byte **gray, int buffer_size);
 
-    static  void makeOpMem(byte *buffer, int buffer_size, int width, short **op_mem);
+    static void makeOpMem(byte *buffer, int buffer_size, int width, short **op_mem);
 
     static void readFile(char *file_name, byte **buffer, int buffer_size);
 

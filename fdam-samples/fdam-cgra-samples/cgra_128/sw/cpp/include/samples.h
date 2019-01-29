@@ -7,8 +7,8 @@
 
 #include <fdam/cgra/data_flow.h>
 #include <fdam/cgra/input_stream.h>
-#include <fdam/cgra/add.h>
 #include <fdam/cgra/output_stream.h>
+#include <fdam/cgra/add.h>
 #include <fdam/cgra/sub.h>
 #include <fdam/cgra/abs.h>
 #include <fdam/cgra/pass_a.h>

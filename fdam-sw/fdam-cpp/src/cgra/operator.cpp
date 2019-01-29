@@ -99,10 +99,11 @@ int Operator::getDataFlowId() {
     return Operator::dataFlowId;
 }
 
-int Operator::getPortA(){
+int Operator::getPortA() {
     return PORT_A;
 }
-int Operator::getPortB(){
+
+int Operator::getPortB() {
     return PORT_B;
 }
 

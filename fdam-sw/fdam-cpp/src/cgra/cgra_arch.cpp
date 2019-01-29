@@ -17,22 +17,22 @@ CgraArch::CgraArch(int id, int num_pe, int num_pe_in, int num_pe_out, int net_ra
         CgraArch::net_branchThreads.push_back(new Omega(num_pe, net_radix, stage_extra));
     }
 
-    auto pe_list = CgraArch::makeListPe(num_pe,num_pe_in,num_pe_out);
+    auto pe_list = CgraArch::makeListPe(num_pe, num_pe_in, num_pe_out);
     int inId = 0;
     int outId = 0;
     for (auto p:pe_list) {
-        if(p.second == PE_IN){
+        if (p.second == PE_IN) {
             CgraArch::pe_array[p.first] = new PEArch(p.first, PE_IN, numThreads);
             CgraArch::pe_list_in.push_back(p.first);
             CgraArch::pe_in_map[p.first] = inId;
             inId++;
 
-        } else if(p.second == PE_OUT){
+        } else if (p.second == PE_OUT) {
             CgraArch::pe_array[p.first] = new PEArch(p.first, PE_OUT, numThreads);
             CgraArch::pe_list_out.push_back(p.first);
             CgraArch::pe_out_map[p.first] = outId;
             outId++;
-        } else{
+        } else {
             CgraArch::pe_array[p.first] = new PEArch(p.first, PE_BASIC, numThreads);
             CgraArch::pe_list_basic.push_back(p.first);
         }
@@ -219,18 +219,18 @@ void CgraArch::makeProgram() {
         }
 
         for (auto e:CgraArch::pe_array) {
-            PEArch * pe = e.second;
+            PEArch *pe = e.second;
             Operator *op = pe->getOperator(j);
             if (op != nullptr) {
                 DataFlow *df = CgraArch::dataFlows[j];
                 CgraArch::cgra_program.initial_conf.push_back(pe->getConf(j));
                 CgraArch::cgra_program.initial_conf.push_back(pe->getPcMaxConf(j));
                 CgraArch::cgra_program.initial_conf.push_back(pe->getPcLoopConf(j));
-                CgraArch::cgra_program.map_pe_to_op[pe->getId()+1] = std::pair<int,int>(j,op->getId());
+                CgraArch::cgra_program.map_pe_to_op[pe->getId() + 1] = std::pair<int, int>(j, op->getId());
 
                 int inId = CgraArch::pe_in_map[pe->getId()];
                 int outId = CgraArch::pe_out_map[pe->getId()];
-                auto t = std::tuple<int, int, int, std::string>(j, df->getId(),op->getId(), df->getName());
+                auto t = std::tuple<int, int, int, std::string>(j, df->getId(), op->getId(), df->getName());
                 switch (op->getType()) {
                     case OP_IN:
                         CgraArch::cgra_program.initial_conf.push_back(pe->getLoadIgnoreConf(j));
@@ -257,7 +257,7 @@ void CgraArch::makeProgram() {
 
 int CgraArch::getNumThreads() {
 
-    int num_threads = CgraArch::intLog(CgraArch::num_pe * 2, CgraArch::net_radix) + 1 + 3;
+    int num_threads = CgraArch::intLog(CgraArch::num_pe * 2, CgraArch::net_radix) + 1 + 3 + CgraArch::num_extra_stage;
     return num_threads;
 }
 
@@ -273,7 +273,7 @@ DataFlow *CgraArch::getDataFlow(int threadID) {
     return CgraArch::dataFlows[threadID];
 }
 
-const std::map<int,PEArch *> &CgraArch::getPeArray() const {
+const std::map<int, PEArch *> &CgraArch::getPeArray() const {
     return pe_array;
 }
 
@@ -288,7 +288,7 @@ std::map<int, int> CgraArch::makeListPe(int num_pe, int num_pe_in, int num_pe_ou
     for (int j = 0; j < num_pe_in; ++j) {
         pelist[j] = PE_IN;
     }
-    for (int j = num_pe_in; j < num_pe-num_pe_out; ++j) {
+    for (int j = num_pe_in; j < num_pe - num_pe_out; ++j) {
         pelist[j] = PE_BASIC;
     }
     for (int j = num_pe - num_pe_out; j < num_pe; ++j) {

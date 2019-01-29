@@ -26,22 +26,29 @@ DataFlow *Samples::loopback(int id, int pipe, int copies) {
 
 DataFlow *Samples::fir(int id, short **coef, int n, int copies) {
     auto df = new DataFlow(id, "fir");
-    int idCount = 0;
+    int idx = 0;
+    std::vector<Operator *> in_cp;
+    std::vector<Operator *> out_cp;
+
+    for (int j = 0; j < copies; ++j){
+        in_cp.push_back(new InputStream(idx++));
+    }
+    for (int j = 0; j < copies; ++j){
+        out_cp.push_back(new OutputStream(idx++));
+    }
     for (int j = 0; j < copies; ++j) {
-        auto in0 = new Operator(idCount++, OP_PASS_A, OP_IN);
-        auto out0 = new Operator(idCount++, OP_PASS_A, OP_OUT);
         Operator *op, *op1, *op2;
         std::vector<Operator *> add;
         add.reserve((unsigned long) n - 1);
         for (int i = 0; i < n; ++i) {
-            auto m = new Operator(idCount++, OP_MULT, OP_IMMEDIATE, coef[j][n - i - 1]);
+            auto m = new Multi(idx++, coef[j][n - i - 1]);
             if (i == 0) {
-                op = new Operator(idCount++, OP_PASS_A, OP_BASIC);
+                op = new PassA(idx++);
             } else {
-                op = new Operator(idCount++, OP_ADD, OP_BASIC);
+                op = new Add(idx++);
             }
             add.push_back(op);
-            df->connect(in0, m, PORT_A);
+            df->connect(in_cp[j], m, PORT_A);
             df->connect(m, op, PORT_A);
         }
         for (int i = 0; i < n - 1; ++i) {
@@ -50,7 +57,7 @@ DataFlow *Samples::fir(int id, short **coef, int n, int copies) {
             df->connect(op1, op2, PORT_B);
         }
         op1 = add[n - 1];
-        df->connect(op1, out0, PORT_A);
+        df->connect(op1,out_cp[j], PORT_A);
     }
 
     return df;
@@ -204,22 +211,22 @@ DataFlow *Samples::sobelFilter() {
     std::vector<Operator *> aux1;
     std::vector<Operator *> adds;
 
-    int gx_gy[2][9] = {{1, 2, 1, 0, 0, 0, -1, -2, -1},
-                       {-1, 0, 1, -2, 0, 2, -1, 0, 1}};
+    int gx_gy[2][9] = {{1,  2, 1, 0,  0, 0, -1, -2, -1},
+                       {-1, 0, 1, -2, 0, 2, -1, 0,  1}};
 
 
     for (int i = 0; i < 9; ++i) {
-        if(i != 4)
+        if (i != 4)
             inputs[i] = new InputStream(idx++);
     }
     output[0] = new OutputStream(idx++);
     //output[1] = new output_stream(idx++);
 
     for (int i = 0; i < 9; ++i) {
-        if(i == 4){
-            auto r = new PassBi(idx++,0);
+        if (i == 4) {
+            auto r = new PassBi(idx++, 0);
             inputs[i] = r;
-        } else{
+        } else {
             auto r = new PassB(idx++);
             df->connect(inputs[i], r, PORT_B);
             inputs[i] = r;
@@ -264,8 +271,8 @@ DataFlow *Samples::sobelFilter() {
     df->connect(adds[0], mult1, PORT_B);
     df->connect(adds[1], mult2, PORT_A);
     df->connect(adds[1], mult2, PORT_B);
-    df->connect(mult1,add, PORT_A);
-    df->connect(mult2,add, PORT_B);
+    df->connect(mult1, add, PORT_A);
+    df->connect(mult2, add, PORT_B);
     df->connect(add, output[0], PORT_A);
 
     return df;

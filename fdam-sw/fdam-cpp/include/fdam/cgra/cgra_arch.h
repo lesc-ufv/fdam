@@ -31,8 +31,8 @@ public:
     std::vector<int> pe_list_out;
     std::vector<int> pe_list_basic;
 
-    std::map<int,int>pe_in_map;
-    std::map<int,int>pe_out_map;
+    std::map<int, int> pe_in_map;
+    std::map<int, int> pe_out_map;
 
 private:
 

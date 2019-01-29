@@ -10,6 +10,11 @@ class Scheduler {
 
 private:
     std::map<int, DataFlow *> dataflows;
+
+    std::map<int, int> dataflow_group;
+
+    std::map<int, std::vector<int>> data_flow_mapping;
+
     CgraArch *cgraArch;
 
     bool mapAndRoute(int ThreadId);
@@ -25,7 +30,7 @@ public:
 
     ~Scheduler();
 
-    bool addDataFlow(DataFlow *df, int threadID);
+    bool addDataFlow(DataFlow *df, int threadID, int groupID);
 
     void setCgra(CgraArch *cgra);
 

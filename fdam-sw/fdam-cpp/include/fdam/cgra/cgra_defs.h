@@ -166,7 +166,7 @@ typedef struct cgra_program_t {
     //key = id thread,id dataflow,id operador, dataflow name | value cgraArch out queue id
     std::map<std::tuple<int, int, int, std::string>, int> output_map;
     //key = id pe, value = id thread, id op
-    std::map<int,std::pair<int,int>> map_pe_to_op;
+    std::map<int, std::pair<int, int>> map_pe_to_op;
 } cgra_program_t;
 
 typedef enum {

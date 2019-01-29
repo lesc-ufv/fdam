@@ -38,7 +38,6 @@ bool Omega::addRoute(int port_in, int port_out) {
     if (Omega::used_route[key]) {
         return false;
     }
-
     if (Omega::route_table.find(key) == Omega::route_table.end()) {
         PathFinder::pathFinder(sw_src, sw_dst, graph, Omega::route_table[std::pair<int, int>(port_in, port_out)]);
     }

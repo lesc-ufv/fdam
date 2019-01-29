@@ -399,7 +399,7 @@ std::map<int, int> Cgra::makeListPe(int num_pe, int num_pe_in, int num_pe_out) {
     return pelist;
 }
 
-cgra_program_t *Cgra::getCgraProgram(){
+cgra_program_t *Cgra::getCgraProgram() {
     return Cgra::cgra_program;
 }
 

@@ -8,10 +8,11 @@ Scheduler::~Scheduler() {
     Scheduler::dataflows.clear();
 }
 
-bool Scheduler::addDataFlow(DataFlow *df, int threadID) {
+bool Scheduler::addDataFlow(DataFlow *df, int threadID, int groupID) {
     if (Scheduler::cgraArch) {
-        if (threadID >= 0 && threadID < Scheduler::cgraArch->getNumThreads()) {
+        if (threadID >= 0 && threadID < (Scheduler::cgraArch->getNumThreads()-1)) {
             Scheduler::dataflows[threadID] = df;
+            Scheduler::dataflow_group[df->getId()] = groupID;
             return true;
         }
     }
@@ -46,7 +47,7 @@ bool Scheduler::scheduling() {
 }
 
 bool Scheduler::mapAndRoute(int threadID) {
-
+    srand(time(NULL));
     if (dataflows[threadID]->getNumOp() > cgraArch->getNumPe()) {
         return false;
     }
@@ -56,46 +57,52 @@ bool Scheduler::mapAndRoute(int threadID) {
     if (dataflows[threadID]->getNumOpOut() > cgraArch->getNumPeOut()) {
         return false;
     }
-    srand(0);
     auto operators = dataflows[threadID]->getOpArray();
     auto pes = cgraArch->getPeArray();
     std::vector<int> solution;
     std::deque<int> pe_free;
     std::deque<int> pe_in_free;
     std::deque<int> pe_out_free;
+    int swapness[pes.size()];
+    int i = 0;
+    int group = Scheduler::dataflow_group[Scheduler::dataflows[threadID]->getId()];
 
-    solution.reserve(pes.size());
-    for (auto pe:pes) {
-        solution.push_back(-1);
-    }
-    int idx = 0;
-    for (auto op:operators) {
-        if (op.second->getType() == OP_IN) {
-            do {
-                idx = Scheduler::getRandomPE(PE_IN);
-            } while (solution[idx] != -1);
-            solution[idx] = op.second->getId();
-        } else if (op.second->getType() == OP_OUT) {
-            do {
-                idx = Scheduler::getRandomPE(PE_OUT);
-            } while (solution[idx] != -1);
-            solution[idx] = op.second->getId();
-        } else{
-            do {
-                idx = Scheduler::getRandomPE(PE_BASIC);
-            } while (solution[idx] != -1);
-            solution[idx] = op.second->getId();
+    if (Scheduler::data_flow_mapping.find(group) != Scheduler::data_flow_mapping.end()) {
+        solution = Scheduler::data_flow_mapping[group];
+    } else {
+        solution.reserve(pes.size());
+        for (auto pe:pes) {
+            solution.push_back(-1);
+            swapness[i++] = -1;
         }
-    }
-
-    for (int k = 0; k < solution.size(); k++) {
-        if (solution[k] == -1) {
-            if (pes[k]->getType() == PE_IN) {
-                pe_in_free.push_back(k);
-            } else if (pes[k]->getType() == PE_OUT) {
-                pe_out_free.push_back(k);
+        int idx = 0;
+        for (auto op:operators) {
+            if (op.second->getType() == OP_IN) {
+                do {
+                    idx = Scheduler::getRandomPE(PE_IN);
+                } while (solution[idx] != -1);
+                solution[idx] = op.second->getId();
+            } else if (op.second->getType() == OP_OUT) {
+                do {
+                    idx = Scheduler::getRandomPE(PE_OUT);
+                } while (solution[idx] != -1);
+                solution[idx] = op.second->getId();
             } else {
-                pe_free.push_back(k);
+                do {
+                    idx = Scheduler::getRandomPE(PE_BASIC);
+                } while (solution[idx] != -1);
+                solution[idx] = op.second->getId();
+            }
+        }
+        for (int k = 0; k < solution.size(); k++) {
+            if (solution[k] == -1) {
+                if (pes[k]->getType() == PE_IN) {
+                    pe_in_free.push_back(k);
+                } else if (pes[k]->getType() == PE_OUT) {
+                    pe_out_free.push_back(k);
+                } else {
+                    pe_free.push_back(k);
+                }
             }
         }
     }
@@ -114,6 +121,7 @@ bool Scheduler::mapAndRoute(int threadID) {
         r = Scheduler::placeAndRoute(solution, threadID);
 
         if (r == -1) {
+            Scheduler::data_flow_mapping[group] = solution;
             return true;
         }
 
@@ -137,17 +145,23 @@ bool Scheduler::mapAndRoute(int threadID) {
                 pe_free.push_front(r);
             }
         }
-        if (swap == -1) break;
+        if (swap == -1){
+            printf("Map error: No more free PEs to make the exchange!\n");
+            exit(1);
+        };
         std::swap(solution[r], solution[swap]);
         printf("\nSWAP: %d -> %d: ", r, swap);
-
+        if(swapness[r] == swap){
+            printf("Map error: Swap already done, Map looped!\n");
+            exit(1);
+        }
+        swapness[r] = swap;
 
     } while (r >= 0);
 
     return false;
 
 }
-
 
 int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
 

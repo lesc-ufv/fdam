@@ -21,6 +21,7 @@ private:
     int num_op;
 
     void addOperator(Operator *op);
+
 public:
 
     explicit DataFlow(int id, std::string name);
