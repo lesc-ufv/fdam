@@ -10,7 +10,7 @@ Scheduler::~Scheduler() {
 
 bool Scheduler::addDataFlow(DataFlow *df, int threadID, int groupID) {
     if (Scheduler::cgraArch) {
-        if (threadID >= 0 && threadID < (Scheduler::cgraArch->getNumThreads()-1)) {
+        if (threadID >= 0 && threadID <= (Scheduler::cgraArch->getNumThreads()-1)) {
             Scheduler::dataflows[threadID] = df;
             Scheduler::dataflow_group[df->getId()] = groupID;
             return true;

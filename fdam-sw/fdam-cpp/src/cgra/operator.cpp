@@ -107,3 +107,7 @@ int Operator::getPortB() {
     return PORT_B;
 }
 
+int Operator::getPortBranch() {
+    return PORT_BRANCH;
+}
+

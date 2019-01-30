@@ -32,7 +32,7 @@ public:
 
     static DataFlow *sobelFilter();
 
-    static DataFlow *test();
+    static DataFlow *maxTest();
 
 };
 

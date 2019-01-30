@@ -11,7 +11,7 @@
 #include <samples.h>
 #include <common.h>
 
-typedef unsigned char byte;
+typedef unsigned short byte;
 
 class Test {
 public:
@@ -28,7 +28,7 @@ public:
 
     static void helpKmeansUpdateConstants(cgra_program_t *cgra_program, int thread, short *constants, int k, int d);
 
-    static int runSobelFilter(int argc, char *argv[]);
+    static int runSobelFilter();
 
     static int sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int height);
 

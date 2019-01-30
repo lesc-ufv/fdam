@@ -11,8 +11,7 @@ void Test::runLoopBack() {
 
     int numThread = 8;
     int copies = 8;
-    int pipe = 4;
-    int data_size = 32;
+    int data_size = 64;
 
     short ***data_in_a;
     short ***data_out;
@@ -40,8 +39,8 @@ void Test::runLoopBack() {
     }
 
     for (int l = 0; l < numThread; ++l) {
-        auto df = Samples::loopback(l, pipe, copies);
-        df->toDot("/home/lucas/Documentos/loopback.dot");
+        auto df = Samples::loopback(l, 0, copies);
+        df->toDot("../dot_files/loopback.dot");
         scheduler.addDataFlow(df, l, 0);
     }
 
@@ -49,8 +48,8 @@ void Test::runLoopBack() {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < numThread; ++i) {
             for (int j = 0; j < copies; ++j) {
-                cgra.setCgraProgramInputStreamByID(i, j * (pipe + 1), data_in_a[i][j], sizeof(short) * data_size);
-                cgra.setCgraProgramOutputStreamByID(i, (j * (pipe + 1)) + 1, data_out[i][j], sizeof(short) * data_size);
+                cgra.setCgraProgramInputStreamByID(i, j, data_in_a[i][j], sizeof(short) * data_size);
+                cgra.setCgraProgramOutputStreamByID(i, j + copies, data_out[i][j], sizeof(short) * data_size);
             }
         }
         cgra.syncExecute(0);
@@ -78,7 +77,6 @@ void Test::runLoopBack() {
             printf("\n");
         }
         printf("\n");
-        //print_program(cgraArch.getCgraProgram());
     } else {
         printf("Error!\n");
     }
@@ -86,12 +84,12 @@ void Test::runLoopBack() {
 
 void Test::runFir() {
 
-    CgraArch cgraArch(0, 256, 8, 8, 8, 1, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
     Scheduler scheduler;
-    //Cgra cgra;
+    Cgra cgra;
     int numThread = 8;
-    int copies = 1;
-    int firSize = 64;
+    int copies = 4;
+    int firSize = 4;
     int data_size = 32;
 
     short ***coef;
@@ -132,20 +130,19 @@ void Test::runFir() {
     }
     for (int l = 0; l < numThread; ++l) {
         auto df = Samples::fir(l, coef[l], firSize, copies);
-        df->toDot("/home/lucas/Documentos/fir.dot");
+        df->toDot("../dot_files/fir.dot");
         scheduler.addDataFlow(df, l, 0);
     }
 
     if (scheduler.scheduling()) {
-//        cgra.loadCgraProgram(cgraArch.getCgraProgram());
-//        for (int i = 0; i < numThread; ++i) {
-//            for (int j = 0; j < copies; ++j) {
-//                cgra.setCgraProgramInputStreamByID(i, j, data_in[i][j], sizeof(short) * data_size);
-//                cgra.setCgraProgramOutputStreamByID(i, j + 1, data_out[i][j], sizeof(short) * data_size);
-//            }
-//
-//        }
-//        cgra.syncExecute(0);
+        cgra.loadCgraProgram(cgraArch.getCgraProgram());
+        for (int i = 0; i < numThread; ++i) {
+            for (int j = 0; j < copies; ++j) {
+                cgra.setCgraProgramInputStreamByID(i, j, data_in[i][j], sizeof(short) * data_size);
+                cgra.setCgraProgramOutputStreamByID(i, j + copies, data_out[i][j], sizeof(short) * data_size);
+            }
+        }
+        cgra.syncExecute(0);
         printf("\n");
         for (int k = 0; k < numThread; ++k) {
             printf("Thread %d data in:\n", k);
@@ -216,6 +213,7 @@ void Test::runVetSum() {
 
     for (int l = 0; l < numThread; ++l) {
         auto df = Samples::vetorialSum(l, copies);
+        df->toDot("../dot_files/vetorial_sum.dot");
         scheduler.addDataFlow(df, l, 0);
     }
 
@@ -223,9 +221,9 @@ void Test::runVetSum() {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < numThread; ++i) {
             for (int j = 0; j < copies; ++j) {
-                cgra.setCgraProgramInputStreamByID(i, j * 4, data_in_a[i][j], sizeof(short) * data_size);
-                cgra.setCgraProgramInputStreamByID(i, j * 4 + 1, data_in_b[i][j], sizeof(short) * data_size);
-                cgra.setCgraProgramOutputStreamByID(i, j * 4 + 2, data_out[i][j], sizeof(short) * data_size);
+                cgra.setCgraProgramInputStreamByID(i, j * 2, data_in_a[i][j], sizeof(short) * data_size);
+                cgra.setCgraProgramInputStreamByID(i, j * 2 + 1, data_in_b[i][j], sizeof(short) * data_size);
+                cgra.setCgraProgramOutputStreamByID(i, j + (copies * 2), data_out[i][j], sizeof(short) * data_size);
             }
         }
         cgra.syncExecute(0);
@@ -375,38 +373,13 @@ void Test::helpKmeansUpdateConstants(cgra_program_t *cgra_program, int thread, s
     }
 }
 
-int Test::runSobelFilter(int argc, char *argv[]) {
+int Test::runSobelFilter() {
 
-    char *file_in, *file_out;
+    char file_in[] = {"../src/img.rgb"};
+    char file_out[] = {"../src/img.gray"};
 
     byte *rgb, *gray, *contour_img;
-
-    int rgb_size, width, height;
-
-    if (argc < 4) {
-        printf("Usage: TODO\n");
-        return 1;
-    }
-
-    file_in = argv[1];
-    file_out = argv[2];
-
-    // Get size of input image
-    char *width_token = strtok(argv[3], "x");
-    if (width_token) {
-        width = atoi(width_token);
-    } else {
-        printf("Bad image size argument\n");
-        return 1;
-    }
-
-    char *height_token = strtok(NULL, "x");
-    if (height_token) {
-        height = atoi(height_token);
-    } else {
-        printf("Bad image size argument\n");
-        return 1;
-    }
+    int rgb_size, width = 8, height = 8;
 
     rgb_size = width * height * 3;
 
@@ -448,7 +421,7 @@ int Test::sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int
     Test::makeOpMem(*gray, gray_size, width, inputs);
 
     scheduler.addDataFlow(df, 0, 0);
-    df->toDot("/home/lucas/Documentos/sobel_filter.dot");
+    df->toDot("../dot_files/sobel_filter.dot");
 
     if (scheduler.scheduling()) {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
@@ -458,7 +431,7 @@ int Test::sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int
         cgra.setCgraProgramOutputStreamByID(0, 8, output[0], sizeof(short) * gray_size);
         cgra.syncExecute(0);
         for (int j = 0; j < gray_size; ++j) {
-            (*contour_img)[j] = (byte) sqrt(output[0][j]);
+            (*contour_img)[j] = (byte)(255 - sqrt(output[0][j]));
         }
     } else {
         printf("Scheduling error!\n");
@@ -468,15 +441,13 @@ int Test::sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int
 }
 
 int Test::rgbToGray(byte *rgb, byte **gray, int buffer_size) {
-    // Take size for gray image and allocate memory
+
     int gray_size = buffer_size / 3;
     *gray = (byte *) malloc(sizeof(byte) * gray_size);
 
-    // Make pointers for iteration
     byte *p_rgb = rgb;
     byte *p_gray = *gray;
 
-    // Calculate the value for every pixel in gray
     for (int i = 0; i < gray_size; i++) {
         *p_gray = 0.30 * p_rgb[0] + 0.59 * p_rgb[1] + 0.11 * p_rgb[2];
         p_rgb += 3;
@@ -510,15 +481,12 @@ void Test::makeOpMem(byte *buffer, int buffer_size, int width, short **op_mem) {
 }
 
 void Test::readFile(char *file_name, byte **buffer, int buffer_size) {
-    // Open
+
     FILE *file = fopen(file_name, "r");
-
     *buffer = (byte *) malloc(sizeof(byte) * buffer_size);
-
     for (int i = 0; i < buffer_size; i++) {
         (*buffer)[i] = fgetc(file);
     }
-
     fclose(file);
 }
 

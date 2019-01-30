@@ -1,0 +1,122 @@
+digraph fir{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = IN3 ]
+ 4 [ label = OUT4 ]
+ 5 [ label = OUT5 ]
+ 6 [ label = OUT6 ]
+ 7 [ label = OUT7 ]
+ 8 [ label = MULTi, VALUE = 4]
+ "8.4"[ label = 4 ]
+ 9 [ label = REG]
+ 10 [ label = MULTi, VALUE = 3]
+ "10.3"[ label = 3 ]
+ 11 [ label = ADD]
+ 12 [ label = MULTi, VALUE = 2]
+ "12.2"[ label = 2 ]
+ 13 [ label = ADD]
+ 14 [ label = MULTi, VALUE = 1]
+ "14.1"[ label = 1 ]
+ 15 [ label = ADD]
+ 16 [ label = MULTi, VALUE = 4]
+ "16.4"[ label = 4 ]
+ 17 [ label = REG]
+ 18 [ label = MULTi, VALUE = 3]
+ "18.3"[ label = 3 ]
+ 19 [ label = ADD]
+ 20 [ label = MULTi, VALUE = 2]
+ "20.2"[ label = 2 ]
+ 21 [ label = ADD]
+ 22 [ label = MULTi, VALUE = 1]
+ "22.1"[ label = 1 ]
+ 23 [ label = ADD]
+ 24 [ label = MULTi, VALUE = 4]
+ "24.4"[ label = 4 ]
+ 25 [ label = REG]
+ 26 [ label = MULTi, VALUE = 3]
+ "26.3"[ label = 3 ]
+ 27 [ label = ADD]
+ 28 [ label = MULTi, VALUE = 2]
+ "28.2"[ label = 2 ]
+ 29 [ label = ADD]
+ 30 [ label = MULTi, VALUE = 1]
+ "30.1"[ label = 1 ]
+ 31 [ label = ADD]
+ 32 [ label = MULTi, VALUE = 4]
+ "32.4"[ label = 4 ]
+ 33 [ label = REG]
+ 34 [ label = MULTi, VALUE = 3]
+ "34.3"[ label = 3 ]
+ 35 [ label = ADD]
+ 36 [ label = MULTi, VALUE = 2]
+ "36.2"[ label = 2 ]
+ 37 [ label = ADD]
+ 38 [ label = MULTi, VALUE = 1]
+ "38.1"[ label = 1 ]
+ 39 [ label = ADD]
+ 0 -> 8
+ 0 -> 10
+ 0 -> 12
+ 0 -> 14
+ 1 -> 16
+ 1 -> 18
+ 1 -> 20
+ 1 -> 22
+ 2 -> 24
+ 2 -> 26
+ 2 -> 28
+ 2 -> 30
+ 3 -> 32
+ 3 -> 34
+ 3 -> 36
+ 3 -> 38
+ "8.4" -> 8
+ 8 -> 9
+ 9 -> 11
+ "10.3" -> 10
+ 10 -> 11
+ 11 -> 13
+ "12.2" -> 12
+ 12 -> 13
+ 13 -> 15
+ "14.1" -> 14
+ 14 -> 15
+ 15 -> 4
+ "16.4" -> 16
+ 16 -> 17
+ 17 -> 19
+ "18.3" -> 18
+ 18 -> 19
+ 19 -> 21
+ "20.2" -> 20
+ 20 -> 21
+ 21 -> 23
+ "22.1" -> 22
+ 22 -> 23
+ 23 -> 5
+ "24.4" -> 24
+ 24 -> 25
+ 25 -> 27
+ "26.3" -> 26
+ 26 -> 27
+ 27 -> 29
+ "28.2" -> 28
+ 28 -> 29
+ 29 -> 31
+ "30.1" -> 30
+ 30 -> 31
+ 31 -> 6
+ "32.4" -> 32
+ 32 -> 33
+ 33 -> 35
+ "34.3" -> 34
+ 34 -> 35
+ 35 -> 37
+ "36.2" -> 36
+ 36 -> 37
+ 37 -> 39
+ "38.1" -> 38
+ 38 -> 39
+ 39 -> 7
+}

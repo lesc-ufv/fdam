@@ -73,6 +73,8 @@ public:
     int getPortA();
 
     int getPortB();
+    
+    int getPortBranch();
 
 };
 
