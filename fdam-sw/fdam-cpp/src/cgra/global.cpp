@@ -24,3 +24,7 @@ int Global::bitRotateRigth(int val, int r_bits, int max_bits) {
     return ((val & ((1 << max_bits) - 1)) >> r_bits % max_bits) | (
             val << (max_bits - (r_bits % max_bits)) & ((1 << max_bits) - 1));
 }
+
+int Global::intLog(double x, double base) {
+    return (int) std::ceil(log(x) / log(base));
+}

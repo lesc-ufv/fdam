@@ -19,7 +19,7 @@ bool Cgra::loadCgraProgram(cgra_program_t cp) {
     return true;
 }
 
-bool Cgra::loadCgraProgramFromFile(string filePath) {
+bool Cgra::loadCgraProgram(string filePath) {
     return readProgramFile(std::move(filePath));
 }
 

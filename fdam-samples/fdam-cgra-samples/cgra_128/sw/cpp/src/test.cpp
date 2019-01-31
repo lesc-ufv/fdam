@@ -5,13 +5,13 @@
 #include <test.h>
 
 void Test::runLoopBack() {
-    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 8, 1, 2);
     Scheduler scheduler(&cgraArch);
     Cgra cgra;
 
     int numThread = 8;
     int copies = 8;
-    int data_size = 64;
+    int data_size = 32;
 
     short ***data_in_a;
     short ***data_out;
@@ -39,12 +39,12 @@ void Test::runLoopBack() {
     }
 
     for (int l = 0; l < numThread; ++l) {
-        auto df = Samples::loopback(l, 0, copies);
+        auto df = Samples::loopback(l, 1, copies);
         df->toDot("../dot_files/loopback.dot");
         scheduler.addDataFlow(df, l, 0);
     }
-
-    if (scheduler.scheduling()) {
+    int r = scheduler.scheduling();
+    if (r == SCHEDULE_SUCCESS) {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < numThread; ++i) {
             for (int j = 0; j < copies; ++j) {
@@ -78,19 +78,18 @@ void Test::runLoopBack() {
         }
         printf("\n");
     } else {
-        printf("Error!\n");
+        printf("Error: %d\n",r);
     }
 }
 
 void Test::runFir() {
-
-    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 8, 1, 2);
     Scheduler scheduler;
     Cgra cgra;
-    int numThread = 8;
-    int copies = 4;
-    int firSize = 4;
-    int data_size = 32;
+    int numThread = 1;
+    int copies = 1;
+    int firSize = 48;
+    int data_size = 1;
 
     short ***coef;
     short ***data_in;
@@ -128,13 +127,14 @@ void Test::runFir() {
             }
         }
     }
+
     for (int l = 0; l < numThread; ++l) {
         auto df = Samples::fir(l, coef[l], firSize, copies);
         df->toDot("../dot_files/fir.dot");
         scheduler.addDataFlow(df, l, 0);
     }
-
-    if (scheduler.scheduling()) {
+    int r = scheduler.scheduling();
+    if (r == SCHEDULE_SUCCESS) {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < numThread; ++i) {
             for (int j = 0; j < copies; ++j) {
@@ -167,14 +167,13 @@ void Test::runFir() {
             printf("\n");
         }
         printf("\n");
-
     } else {
-        printf("Error!\n");
+        printf("Error: %d\n",r);
     }
 }
 
 void Test::runVetSum() {
-    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 8, 1, 2);
     Scheduler scheduler(&cgraArch);
     Cgra cgra;
     int numThread = 8;
@@ -217,7 +216,8 @@ void Test::runVetSum() {
         scheduler.addDataFlow(df, l, 0);
     }
 
-    if (scheduler.scheduling()) {
+    int r = scheduler.scheduling();
+    if (r == SCHEDULE_SUCCESS) {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < numThread; ++i) {
             for (int j = 0; j < copies; ++j) {
@@ -264,15 +264,15 @@ void Test::runVetSum() {
         printf("\n");
 
     } else {
-        printf("Error!\n");
+        printf("Error: %d\n",r);
     }
 }
 
 void Test::runKmeans() {
-    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 8, 1, 2);
     Scheduler scheduler(&cgraArch);
     Cgra cgra;
-    int d = 4;
+    int d = 8;
     int k = 4;
     int data_size = 32;
 
@@ -294,11 +294,11 @@ void Test::runKmeans() {
             data_out[i] = 0;
         }
     }
-
     auto df = Samples::kmeans(0, k, d);
-    df->toDot("/home/lucas/Documentos/kmeans.dot");
+    df->toDot("../dot_files/kmeans.dot");
     scheduler.addDataFlow(df, 0, 0);
-    if (scheduler.scheduling()) {
+    int r = scheduler.scheduling();
+    if (r == SCHEDULE_SUCCESS) {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < d; ++i) {
             cgra.setCgraProgramInputStreamByID(0, (k * d) + i, data_in_a[i], sizeof(short) * data_size);
@@ -309,31 +309,31 @@ void Test::runKmeans() {
             Test::helpKmeansUpdateCentroids(data_in_a, data_out, centroids, k, d, data_size);
             Test::helpKmeansUpdateConstants(cgra.getCgraProgram(), 0, centroids, k, d);
         }
-    } else {
-        printf("Error!\n");
-    }
 
-    for (int i1 = 0; i1 < d; ++i1) {
-        printf("k %d: [ ", i1);
-        for (int i = 0; i < k; ++i) {
-            printf("%d ", centroids[i * d + i1]);
+        for (int i1 = 0; i1 < d; ++i1) {
+            printf("k %d: [ ", i1);
+            for (int i = 0; i < k; ++i) {
+                printf("%d ", centroids[i * d + i1]);
+            }
+            printf("]\n");
         }
-        printf("]\n");
-    }
 
-    for (int j = 0; j < d; ++j) {
-        printf("D%d: [", j);
+        for (int j = 0; j < d; ++j) {
+            printf("D%d: [", j);
+            for (int i = 0; i < data_size; ++i) {
+                printf("%d ", data_in_a[j][i]);
+            }
+            printf("]\n");
+        }
+        printf("\nOUT: [");
         for (int i = 0; i < data_size; ++i) {
-            printf("%d ", data_in_a[j][i]);
+            printf("%d ", data_out[i]);
         }
         printf("]\n");
+    } else {
+        printf("Error: %d\n",r);
     }
 
-    printf("\nOUT: [");
-    for (int i = 0; i < data_size; ++i) {
-        printf("%d ", data_out[i]);
-    }
-    printf("]\n");
 
 
 }
@@ -394,9 +394,10 @@ int Test::runSobelFilter() {
 
 int Test::sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int height) {
 
-    CgraArch cgraArch(0, 128, 8, 8, 4, 0, 2);
+    CgraArch cgraArch(0, 128, 8, 8, 8, 1, 2);
     Scheduler scheduler(&cgraArch);
     Cgra cgra;
+
     auto df = Samples::sobelFilter();
 
     short **inputs;
@@ -423,7 +424,8 @@ int Test::sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int
     scheduler.addDataFlow(df, 0, 0);
     df->toDot("../dot_files/sobel_filter.dot");
 
-    if (scheduler.scheduling()) {
+    int r = scheduler.scheduling();
+    if (r == SCHEDULE_SUCCESS) {
         cgra.loadCgraProgram(cgraArch.getCgraProgram());
         for (int i = 0; i < 8; ++i) {
             cgra.setCgraProgramInputStreamByID(0, i, inputs[i], sizeof(short) * gray_size);
@@ -431,10 +433,10 @@ int Test::sobelFilter(byte *rgb, byte **gray, byte **contour_img, int width, int
         cgra.setCgraProgramOutputStreamByID(0, 8, output[0], sizeof(short) * gray_size);
         cgra.syncExecute(0);
         for (int j = 0; j < gray_size; ++j) {
-            (*contour_img)[j] = (byte)(255 - sqrt(output[0][j]));
+            (*contour_img)[j] = (byte) (255 - sqrt(output[0][j]));
         }
     } else {
-        printf("Scheduling error!\n");
+        printf("Error: %d\n",r);
         exit(0);
     }
     return gray_size;
@@ -449,7 +451,7 @@ int Test::rgbToGray(byte *rgb, byte **gray, int buffer_size) {
     byte *p_gray = *gray;
 
     for (int i = 0; i < gray_size; i++) {
-        *p_gray = 0.30 * p_rgb[0] + 0.59 * p_rgb[1] + 0.11 * p_rgb[2];
+        *p_gray = (byte)(0.30 * p_rgb[0] + 0.59 * p_rgb[1] + 0.11 * p_rgb[2]);
         p_rgb += 3;
         p_gray++;
     }
@@ -485,7 +487,7 @@ void Test::readFile(char *file_name, byte **buffer, int buffer_size) {
     FILE *file = fopen(file_name, "r");
     *buffer = (byte *) malloc(sizeof(byte) * buffer_size);
     for (int i = 0; i < buffer_size; i++) {
-        (*buffer)[i] = fgetc(file);
+        (*buffer)[i] = (byte)fgetc(file);
     }
     fclose(file);
 }
@@ -497,4 +499,67 @@ void Test::writeFile(char *file_name, byte *buffer, int buffer_size) {
         fputc(buffer[i], file);
     }
     fclose(file);
+}
+
+void Test::schedulingTimeMeasureBenchmarks() {
+
+    CgraArch cgraArch(0,128,8,8,8,1,2);
+    Scheduler scheduler(&cgraArch);
+
+    printf("Scheduling Time Measure\n\n");
+    printf("CGRA target architecture:\n");
+    printf("Number of Threads: %d\n",cgraArch.getNumThreads());
+    printf("Number of PEs: %d\n",cgraArch.getNumPe());
+    printf("Number of input PEs: %d\n",cgraArch.getNumPeIn());
+    printf("Number of output PEs: %d\n",cgraArch.getNumPeOut());
+    printf("Omega net PEs size: %d\n",cgraArch.getNet(0)->getSize());
+    printf("Omega net PEs radix: %d\n",cgraArch.getNet(0)->getRadix());
+    printf("Omega net branch size: %d\n",cgraArch.getNetBranch(0)->getSize());
+    printf("Omega net branch radix: %d\n",cgraArch.getNetBranch(0)->getRadix());
+    printf("Word size(bits): %d\n",cgraArch.getWordSize()*8);
+
+    high_resolution_clock::time_point s;
+    duration<double> diff={};
+    std::vector<DataFlow *>dataflows;
+    short **coef;
+    coef = new short *[1];
+    coef[0] = new short[48];
+    int numThreads = 1;
+
+    s = high_resolution_clock::now();
+    cgraArch.getNetBranch(0)->createRouteTable();
+    cgraArch.getNet(0)->createRouteTable();
+    diff = high_resolution_clock::now() - s;
+
+    printf("\nTime to create omega net routing tables: %.3lfms\n\n", diff.count() * 1000);
+
+    for (int i = 0; i < 48; ++i) {
+        coef[0][i] = (short)(i+1);
+    }
+
+    dataflows.push_back(Samples::loopback(0,1,8));
+    dataflows.push_back(Samples::vetorialSum(0,4));
+    dataflows.push_back(Samples::sobelFilter());
+    dataflows.push_back(Samples::kmeans(0,4,8));
+    dataflows.push_back(Samples::fir(0, coef, 48, 1));
+
+    for(auto df:dataflows) {
+        scheduler.reset();
+        for (int i = 0; i < numThreads; ++i) {
+            scheduler.addDataFlow(df,i,0);
+        }
+        s = high_resolution_clock::now();
+        int r = scheduler.scheduling();
+        diff = high_resolution_clock::now() - s;
+        if(r==SCHEDULE_SUCCESS){
+            printf("DataFlow \"%s\" successfully scheduled!\n",df->getName().c_str());
+            printf("Num input nodes: %d\n",df->getNumOpIn());
+            printf("Num output nodes: %d\n",df->getNumOpOut());
+            printf("Num total nodes: %d\n",df->getNumOp());
+            printf("Execution Time: %.3lfms\n\n", diff.count() * 1000);
+            char file[100];
+            sprintf(file,"../cgra_prog_files/%s.cgra",df->getName().c_str());
+            cgraArch.writeCgraProgram(file);
+        }
+    }
 }

@@ -17,7 +17,7 @@ private:
 
     CgraArch *cgraArch;
 
-    bool mapAndRoute(int ThreadId);
+    int mapAndRoute(int ThreadId);
 
     int placeAndRoute(std::vector<int> &mapping, int threadID);
 
@@ -36,7 +36,9 @@ public:
 
     CgraArch *getCgra();
 
-    bool scheduling();
+    int scheduling();
+
+    void reset();
 };
 
 

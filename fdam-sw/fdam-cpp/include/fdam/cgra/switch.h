@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <fdam/cgra/cgra_defs.h>
+#include <fdam/cgra/global.h>
 
 class Switch {
 private:
@@ -13,8 +14,6 @@ private:
     int size;
 
     std::vector<int> port_out;
-
-    int intlog(double x, double base);
 
 public:
 

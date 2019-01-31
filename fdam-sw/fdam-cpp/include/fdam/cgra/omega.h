@@ -29,8 +29,6 @@ private:
 
     std::vector<Switch> conf_array;
 
-    int intLog(double x, double base);
-
     void createSwitchGraph();
 
     int getPortOut(int sw1, int sw2);
@@ -56,6 +54,10 @@ public:
     int getNumSwicthStages() const;
 
     int getNumStages();
+
+    int getSize();
+
+    int getRadix();
 
 };
 

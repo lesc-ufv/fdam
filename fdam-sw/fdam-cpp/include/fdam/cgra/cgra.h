@@ -37,7 +37,7 @@ public:
 
     ~Cgra();
 
-    bool loadCgraProgramFromFile(std::string filePath);
+    bool loadCgraProgram(std::string filePath);
 
     bool loadCgraProgram(cgra_program_t cp);
 

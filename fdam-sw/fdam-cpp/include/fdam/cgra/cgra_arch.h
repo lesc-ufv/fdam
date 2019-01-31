@@ -48,8 +48,6 @@ private:
 
     void makeProgram();
 
-    int intLog(double x, double base);
-
     std::map<int, int> makeListPe(int num_pe, int num_pe_in, int num_pe_out);
 
 public:
@@ -98,6 +96,8 @@ public:
     const std::map<int, PEArch *> &getPeArray() const;
 
     cgra_program_t getCgraProgram();
+
+    int getWordSize();
 
 };
 

@@ -15,10 +15,11 @@ int Switch::getSize() const {
 }
 
 bool Switch::connectPort(int port_in, int port_out) {
-    if (Switch::port_out[port_out] == -1) {
+    if (Switch::port_out[port_out] == -1 || Switch::port_out[port_out] == port_in) {
         Switch::port_out[port_out] = port_in;
         return true;
-    } else return Switch::port_out[port_out] == port_in;
+    } else
+        return false;
 }
 
 void Switch::setId(int id) {
@@ -55,7 +56,7 @@ void Switch::disconnectPort(int port_out) {
 initial_conf_t Switch::getSwConf(bool isNetBranch, int threadID, int confAddr) {
 
     initial_conf_t conf;
-    int bits = intlog(Switch::size, 2);
+    int bits = Global::intLog(Switch::size, 2);
     int mask = (1 << bits) - 1;
 
     conf.net_switch_conf.conf_type = isNetBranch ? CGRA_CONF_NET_BRANCH_SWITCH : CGRA_CONF_NET_SWITCH;
@@ -95,10 +96,6 @@ initial_conf_t Switch::getSwLoopConf(bool isNetBranch, int threadID) {
     conf.net_pc_loop_conf.pc_loop = 0;
 
     return conf;
-}
-
-int Switch::intlog(double x, double base) {
-    return (int) std::ceil(log(x) / log(base));
 }
 
 bool Switch::getUsed() {

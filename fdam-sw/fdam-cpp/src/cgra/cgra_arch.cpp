@@ -7,8 +7,8 @@ CgraArch::CgraArch(int id, int num_pe, int num_pe_in, int num_pe_out, int net_ra
           net_radix(net_radix),
           num_extra_stage(num_extra_stage),
           word_size(word_size) {
-    int num_stages1 = CgraArch::intLog(num_pe * 2, net_radix) + num_extra_stage;
-    int num_stages2 = CgraArch::intLog(num_pe, net_radix);
+    int num_stages1 = Global::intLog(num_pe * 2, net_radix) + num_extra_stage;
+    int num_stages2 = Global::intLog(num_pe, net_radix);
     int stage_extra = num_stages1 - num_stages2;
     int numThreads = CgraArch::getNumThreads();
     CgraArch::cgra_program = {};
@@ -126,7 +126,6 @@ void CgraArch::reset() {
 }
 
 void CgraArch::reset(int threadID) {
-
 
     CgraArch::netThreads[threadID]->reset();
     CgraArch::net_branchThreads[threadID]->reset();
@@ -257,12 +256,8 @@ void CgraArch::makeProgram() {
 
 int CgraArch::getNumThreads() {
 
-    int num_threads = CgraArch::intLog(CgraArch::num_pe * 2, CgraArch::net_radix) + 1 + 3 + CgraArch::num_extra_stage;
+    int num_threads = Global::intLog(CgraArch::num_pe * 2, CgraArch::net_radix) + 1 + 3 + CgraArch::num_extra_stage;
     return num_threads;
-}
-
-int CgraArch::intLog(double x, double base) {
-    return (int) std::ceil(log(x) / log(base));
 }
 
 void CgraArch::setDataFlow(DataFlow *df, int threadID) {
@@ -318,4 +313,8 @@ std::map<int, int> CgraArch::makeListPe(int num_pe, int num_pe_in, int num_pe_ou
     }
      */
     return pelist;
+}
+
+int CgraArch::getWordSize() {
+    return CgraArch::word_size;
 }

@@ -99,10 +99,7 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net
         for j in range(num_swicth_stages):
             param = [('WIDTH', WIDTH)]
             con0 = [('sel', conf_out[conf_idx * swicth_conf_width:(conf_idx + 1) * swicth_conf_width])]
-            con1 = [('in%d' % p, in_reg_wire[i][bit_rotate_rigth(j * radix + p, int(ceil(log(radix, 2))), max_bits)])
-                    for
-                    p in
-                    range(radix)]
+            con1 = [('in%d' % p, in_reg_wire[i][bit_rotate_rigth(j * radix + p, int(ceil(log(radix, 2))), max_bits)]) for p in range(radix)]
             con2 = [('out%d' % p, in_reg_wire[i + 1][j * radix + p]) for p in range(radix)]
             m.Instance(switch_box, 'sw_%d_%d' % (i / 2, j), param, con0 + con1 + con2)
             conf_idx = conf_idx + 1

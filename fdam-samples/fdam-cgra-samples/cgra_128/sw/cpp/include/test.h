@@ -5,11 +5,16 @@
 #ifndef MAIN_TEST_H
 #define MAIN_TEST_H
 
+#include <chrono>
+
+using namespace std::chrono;
+
 #include <fdam/cgra/cgra.h>
 #include <fdam/cgra/cgra_arch.h>
 #include <fdam/cgra/scheduler.h>
 #include <samples.h>
 #include <common.h>
+#include <fdam/cgra/scheduler_defs.h>
 
 typedef unsigned short byte;
 
@@ -39,6 +44,8 @@ public:
     static void readFile(char *file_name, byte **buffer, int buffer_size);
 
     static void writeFile(char *file_name, byte *buffer, int buffer_size);
+
+    static void schedulingTimeMeasureBenchmarks();
 };
 
 
