@@ -160,3 +160,7 @@ int DataFlow::getNumOpOut() const {
 int DataFlow::getNumOp() const {
     return num_op;
 }
+
+void DataFlow::setId(int id) {
+    DataFlow::id = id;
+}

@@ -15,7 +15,8 @@ module cgra0_acc
   output acc_user_done
 );
 
-  wire [8-1:0] request_read;
+  wire [8-1:0] request_read; 
+  wire [8-1:0] request_write;
   wire conf_control_req_rd_data;
   wire [8-1:0] en_fecth_data;
   wire [128-1:0] en_pe;
@@ -31,10 +32,13 @@ module cgra0_acc
   wire [8-1:0] read_fifo_mask;
   wire [8-1:0] write_fifo_mask;
   wire conf_done;
+  
   genvar genv;
-  assign acc_user_request_read[7:1] = request_read[7:1];
-  assign acc_user_request_read[0] = request_read[0] | conf_control_req_rd_data;
-
+  
+  assign acc_user_request_read[7:1] = request_read[7:1] & read_fifo_mask[7:1];
+  assign acc_user_request_read[0] = (request_read[0]&read_fifo_mask[0]) | conf_control_req_rd_data;
+  assign acc_user_request_write = request_write & write_fifo_mask;
+  
   generate for(genv=0; genv<8; genv=genv+1) begin : inst_fecth_data
 
     fecth_data
@@ -72,7 +76,7 @@ module cgra0_acc
       .clk(clk),
       .rst(rst),
       .available_write(acc_user_available_write[genv]),
-      .request_write(acc_user_request_write[genv]),
+      .request_write(request_write[genv]),
       .write_data(acc_user_write_data[(genv+1)*512-1:genv*512]),
       .push_data(fifo_out_we[genv]),
       .available_push(available_push[genv]),

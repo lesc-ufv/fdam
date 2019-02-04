@@ -1,13 +1,36 @@
 #ifndef CGRASCHEDULER_DATAFLOW_H
 #define CGRASCHEDULER_DATAFLOW_H
 
-#include <fdam/cgra/data_flow_defs.h>
-#include <fdam/cgra/cgra_arch_defs.h>
-#include <fdam/cgra/operator.h>
 #include <queue>
 #include <map>
 #include <iostream>
 #include <fstream>
+
+#include <fdam/cgra/data_flow_defs.h>
+#include <fdam/cgra/cgra_arch_defs.h>
+#include <fdam/cgra/operator.h>
+#include <fdam/cgra/abs.h>
+#include <fdam/cgra/add.h>
+#include <fdam/cgra/and.h>
+#include <fdam/cgra/beq.h>
+#include <fdam/cgra/bne.h>
+#include <fdam/cgra/input_stream.h>
+#include <fdam/cgra/max.h>
+#include <fdam/cgra/min.h>
+#include <fdam/cgra/mult.h>
+#include <fdam/cgra/mux.h>
+#include <fdam/cgra/not.h>
+#include <fdam/cgra/or.h>
+#include <fdam/cgra/output_stream.h>
+#include <fdam/cgra/pass_a.h>
+#include <fdam/cgra/pass_b.h>
+#include <fdam/cgra/sgt.h>
+#include <fdam/cgra/shl.h>
+#include <fdam/cgra/shr.h>
+#include <fdam/cgra/slt.h>
+#include <fdam/cgra/sub.h>
+#include <fdam/cgra/xor.h>
+
 
 class DataFlow {
 
@@ -43,6 +66,8 @@ public:
     void updateOpLevel();
 
     int getId() const;
+
+    void setId(int id);
 
     const std::string &getName() const;
 

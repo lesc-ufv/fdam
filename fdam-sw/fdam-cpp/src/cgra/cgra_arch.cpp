@@ -144,7 +144,7 @@ void CgraArch::writeCgraProgram(const std::string &filePath) {
 
     CgraArch::makeProgram();
 
-    hearder.reserve(9);
+    hearder.reserve(10);
     hearder.push_back(CgraArch::cgra_program.cgra_id);
     hearder.push_back(CgraArch::cgra_program.num_pe);
     hearder.push_back(CgraArch::cgra_program.num_pe_io_in);
@@ -154,7 +154,8 @@ void CgraArch::writeCgraProgram(const std::string &filePath) {
     hearder.push_back(CgraArch::cgra_program.word_size);
     hearder.push_back(static_cast<unsigned short>(CgraArch::cgra_program.input_map.size()));
     hearder.push_back(static_cast<unsigned short>(CgraArch::cgra_program.output_map.size()));
-
+    hearder.push_back(static_cast<unsigned short>(CgraArch::cgra_program.map_pe_to_op.size()));
+   
     myfile.open(filePath);
     myfile.write((char *) &hearder[0], hearder.size() * sizeof(unsigned short));
     myfile.write((char *) &CgraArch::cgra_program.cgra_intial_conf, sizeof(cgra_intial_conf_t));
@@ -179,6 +180,12 @@ void CgraArch::writeCgraProgram(const std::string &filePath) {
         myfile.write((char *) &std::get<2>(it.first), sizeof(int));
         myfile.write(std::get<3>(it.first).c_str(), s * sizeof(char));
     }
+    for (auto it:CgraArch::cgra_program.map_pe_to_op) {
+        myfile.write((char *) &it.first.first, sizeof(int));
+        myfile.write((char *) &it.first.second, sizeof(int));
+        myfile.write((char *) &it.second, sizeof(int));
+    }
+    
     myfile.close();
 }
 
@@ -225,7 +232,7 @@ void CgraArch::makeProgram() {
                 CgraArch::cgra_program.initial_conf.push_back(pe->getConf(j));
                 CgraArch::cgra_program.initial_conf.push_back(pe->getPcMaxConf(j));
                 CgraArch::cgra_program.initial_conf.push_back(pe->getPcLoopConf(j));
-                CgraArch::cgra_program.map_pe_to_op[pe->getId() + 1] = std::pair<int, int>(j, op->getId());
+                CgraArch::cgra_program.map_pe_to_op[std::pair<int, int>(j,pe->getId() + 1)] = op->getId();
 
                 int inId = CgraArch::pe_in_map[pe->getId()];
                 int outId = CgraArch::pe_out_map[pe->getId()];

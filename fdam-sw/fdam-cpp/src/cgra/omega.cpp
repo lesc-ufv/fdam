@@ -78,7 +78,7 @@ bool Omega::addRoute(int port_in, int port_out) {
                 Omega::used_route[key_port] = true;
                 return true;
             }
-        } else{
+        } else {
             Omega::conf_array.clear();
             for (const auto &s:conf_array) {
                 Omega::conf_array.push_back(s);

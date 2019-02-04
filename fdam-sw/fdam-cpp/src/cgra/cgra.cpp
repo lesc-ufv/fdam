@@ -94,12 +94,14 @@ bool Cgra::readProgramFile(std::string filePath) {
 
     unsigned short input_map_size;
     unsigned short output_map_size;
+    unsigned short map_pe_to_op_size;
     std::ifstream myfile;
     Cgra::cgra_program = new cgra_program_t;
     int threadID;
     int id_df;
     int id_op;
     int id_in;
+    int id_pe;
     int size;
     myfile.open(filePath);
     if (myfile.is_open()) {
@@ -112,6 +114,8 @@ bool Cgra::readProgramFile(std::string filePath) {
         myfile.read((char *) &Cgra::cgra_program->word_size, sizeof(unsigned short));
         myfile.read((char *) &input_map_size, sizeof(unsigned short));
         myfile.read((char *) &output_map_size, sizeof(unsigned short));
+        myfile.read((char *) &map_pe_to_op_size, sizeof(unsigned short));
+        
         myfile.read((char *) &Cgra::cgra_program->cgra_intial_conf, sizeof(cgra_intial_conf_t));
         Cgra::cgra_program->initial_conf.reserve(Cgra::cgra_program->cgra_intial_conf.qtd_conf);
         for (int i = 0; i < Cgra::cgra_program->cgra_intial_conf.qtd_conf; ++i) {
@@ -140,6 +144,12 @@ bool Cgra::readProgramFile(std::string filePath) {
             myfile.read(name, size * sizeof(char));
             std::string s(name, static_cast<unsigned long>(size));
             Cgra::cgra_program->output_map[std::tuple<int, int, int, std::string>(threadID, id_df, id_op, s)] = id_in;
+        }
+        for (int i = 0; i < map_pe_to_op_size; ++i) {
+            myfile.read((char *) &threadID, sizeof(int));
+            myfile.read((char *) &id_pe, sizeof(int)); 
+            myfile.read((char *) &id_op, sizeof(int));
+            Cgra::cgra_program->map_pe_to_op[std::pair<int, int>(threadID,id_pe)] = id_op;
         }
         myfile.close();
     } else {
@@ -401,6 +411,10 @@ std::map<int, int> Cgra::makeListPe(int num_pe, int num_pe_in, int num_pe_out) {
 
 cgra_program_t *Cgra::getCgraProgram() {
     return Cgra::cgra_program;
+}
+
+AccManagement *Cgra::getAccManagement() {
+    return Cgra::accManagement;
 }
 
 cgra_program_t *Cgra::makeCopy(cgra_program_t cp) {

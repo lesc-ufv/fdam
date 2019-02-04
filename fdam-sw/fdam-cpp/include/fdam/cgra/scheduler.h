@@ -39,6 +39,8 @@ public:
     int scheduling();
 
     void reset();
+
+    std::vector<int> getMapping(int dataFlowId, int threadID);
 };
 
 

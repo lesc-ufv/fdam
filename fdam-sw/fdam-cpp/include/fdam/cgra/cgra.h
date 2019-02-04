@@ -54,6 +54,8 @@ public:
     void syncExecute(long waitTime);
 
     cgra_program_t *getCgraProgram();
+    
+    AccManagement *getAccManagement();
 };
 
 #endif //CGRA_H

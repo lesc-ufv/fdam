@@ -32,7 +32,7 @@ int Scheduler::scheduling() {
 
     for (const auto &df : Scheduler::dataflows) {
         int r = mapAndRoute(df.first);
-        if(r != SCHEDULE_SUCCESS){
+        if (r != SCHEDULE_SUCCESS) {
             return r;
         }
     }
@@ -146,6 +146,7 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
     Operator *op_dst = nullptr;
     PEArch *pe_dst = nullptr;
     PEArch *pe_src = nullptr;
+
     int pe_src_port_a;
     int pe_src_port_b;
     int pe_dst_port_in;
@@ -154,7 +155,6 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
     Omega *net = Scheduler::cgraArch->getNet(threadID);
     Omega *net_branch = Scheduler::cgraArch->getNetBranch(threadID);
     Scheduler::cgraArch->setDataFlow(Scheduler::dataflows[threadID], threadID);
-
 
     for (int j = 0; j < mapping.size(); ++j) {
         mapping_op[mapping[j]] = j;
@@ -252,3 +252,9 @@ void Scheduler::reset() {
     Scheduler::dataflow_group.clear();
     Scheduler::data_flow_mapping.clear();
 }
+
+std::vector<int> Scheduler::getMapping(int dataFlowId, int threadID){
+    int group = Scheduler::dataflow_group[Scheduler::dataflows[threadID]->getId()];
+    return  Scheduler::data_flow_mapping[group];
+}
+

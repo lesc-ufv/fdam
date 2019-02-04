@@ -59,8 +59,8 @@ size_t Accelerator::getDsmSize() const {
 
 void Accelerator::sendConfDsm() {
     int idQueueGlobal = Accelerator::getId();
-    auto numCl = static_cast<unsigned long>(Accelerator::getDsmSize() / 64);
-    auto val_low = static_cast<unsigned long>(numCl << 32 | idQueueGlobal);
+    auto numCl = (Accelerator::getDsmSize() / 64);
+    auto val_low = (numCl << 32 | idQueueGlobal);
     auto val_high = static_cast<unsigned long>(intptr_t(Accelerator::getDsm()) / 64);
     Accelerator::accManagement.writeCSR(REG_CONF_DSM_LOW, val_low);
     Accelerator::accManagement.writeCSR(REG_CONF_DSM_HIGH, val_high);
@@ -126,7 +126,6 @@ void Accelerator::stop() {
 }
 
 void Accelerator::reset() {
-    Accelerator::clearDsm();
     Accelerator::accManagement.resetAccelerators(static_cast<const unsigned long>(1L << Accelerator::getId()));
     Accelerator::accManagement.resetAccelerators(0L);
     Accelerator::sendConfDsm();
