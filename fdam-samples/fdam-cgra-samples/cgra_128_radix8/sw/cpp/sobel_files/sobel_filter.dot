@@ -1,0 +1,172 @@
+digraph sobel_filter{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = IN3 ]
+ 4 [ label = IN4 ]
+ 5 [ label = IN5 ]
+ 6 [ label = IN6 ]
+ 7 [ label = IN7 ]
+ 8 [ label = OUT8 ]
+ 9 [ label = REG]
+ 10 [ label = REG]
+ 11 [ label = REG]
+ 12 [ label = REG]
+ 13 [ label = REGi, VALUE = 0]
+ "13.0"[ label = 0 ]
+ 14 [ label = REG]
+ 15 [ label = REG]
+ 16 [ label = REG]
+ 17 [ label = REG]
+ 18 [ label = MULTi, VALUE = -1]
+ "18.-1"[ label = -1 ]
+ 19 [ label = MULTi, VALUE = -2]
+ "19.-2"[ label = -2 ]
+ 20 [ label = MULTi, VALUE = -1]
+ "20.-1"[ label = -1 ]
+ 21 [ label = MULTi, VALUE = 0]
+ "21.0"[ label = 0 ]
+ 22 [ label = MULTi, VALUE = 0]
+ "22.0"[ label = 0 ]
+ 23 [ label = MULTi, VALUE = 0]
+ "23.0"[ label = 0 ]
+ 24 [ label = MULTi, VALUE = 1]
+ "24.1"[ label = 1 ]
+ 25 [ label = MULTi, VALUE = 2]
+ "25.2"[ label = 2 ]
+ 26 [ label = MULTi, VALUE = 1]
+ "26.1"[ label = 1 ]
+ 27 [ label = REG]
+ 28 [ label = ADD]
+ 29 [ label = ADD]
+ 30 [ label = ADD]
+ 31 [ label = ADD]
+ 32 [ label = REG]
+ 33 [ label = ADD]
+ 34 [ label = ADD]
+ 35 [ label = REG]
+ 36 [ label = ADD]
+ 37 [ label = ADD]
+ 38 [ label = MULTi, VALUE = 1]
+ "38.1"[ label = 1 ]
+ 39 [ label = MULTi, VALUE = 0]
+ "39.0"[ label = 0 ]
+ 40 [ label = MULTi, VALUE = -1]
+ "40.-1"[ label = -1 ]
+ 41 [ label = MULTi, VALUE = 2]
+ "41.2"[ label = 2 ]
+ 42 [ label = MULTi, VALUE = 0]
+ "42.0"[ label = 0 ]
+ 43 [ label = MULTi, VALUE = -2]
+ "43.-2"[ label = -2 ]
+ 44 [ label = MULTi, VALUE = 1]
+ "44.1"[ label = 1 ]
+ 45 [ label = MULTi, VALUE = 0]
+ "45.0"[ label = 0 ]
+ 46 [ label = MULTi, VALUE = -1]
+ "46.-1"[ label = -1 ]
+ 47 [ label = REG]
+ 48 [ label = ADD]
+ 49 [ label = ADD]
+ 50 [ label = ADD]
+ 51 [ label = ADD]
+ 52 [ label = REG]
+ 53 [ label = ADD]
+ 54 [ label = ADD]
+ 55 [ label = REG]
+ 56 [ label = ADD]
+ 57 [ label = ADD]
+ 58 [ label = MULT]
+ 59 [ label = MULT]
+ 60 [ label = ADD]
+ 0 -> 9
+ 1 -> 10
+ 2 -> 11
+ 3 -> 12
+ 4 -> 14
+ 5 -> 15
+ 6 -> 16
+ 7 -> 17
+ 9 -> 18
+ 9 -> 38
+ 10 -> 19
+ 10 -> 39
+ 11 -> 20
+ 11 -> 40
+ 12 -> 21
+ 12 -> 41
+ "13.0" -> 13
+ 13 -> 22
+ 13 -> 42
+ 14 -> 23
+ 14 -> 43
+ 15 -> 24
+ 15 -> 44
+ 16 -> 25
+ 16 -> 45
+ 17 -> 26
+ 17 -> 46
+ "18.-1" -> 18
+ 18 -> 28
+ "19.-2" -> 19
+ 19 -> 28
+ "20.-1" -> 20
+ 20 -> 29
+ "21.0" -> 21
+ 21 -> 29
+ "22.0" -> 22
+ 22 -> 30
+ "23.0" -> 23
+ 23 -> 30
+ "24.1" -> 24
+ 24 -> 31
+ "25.2" -> 25
+ 25 -> 31
+ "26.1" -> 26
+ 26 -> 27
+ 27 -> 33
+ 28 -> 33
+ 29 -> 34
+ 30 -> 34
+ 31 -> 32
+ 32 -> 36
+ 33 -> 36
+ 34 -> 35
+ 35 -> 37
+ 36 -> 37
+ 37 -> 58
+ 37 -> 58
+ "38.1" -> 38
+ 38 -> 48
+ "39.0" -> 39
+ 39 -> 48
+ "40.-1" -> 40
+ 40 -> 49
+ "41.2" -> 41
+ 41 -> 49
+ "42.0" -> 42
+ 42 -> 50
+ "43.-2" -> 43
+ 43 -> 50
+ "44.1" -> 44
+ 44 -> 51
+ "45.0" -> 45
+ 45 -> 51
+ "46.-1" -> 46
+ 46 -> 47
+ 47 -> 53
+ 48 -> 53
+ 49 -> 54
+ 50 -> 54
+ 51 -> 52
+ 52 -> 56
+ 53 -> 56
+ 54 -> 55
+ 55 -> 57
+ 56 -> 57
+ 57 -> 59
+ 57 -> 59
+ 58 -> 60
+ 59 -> 60
+ 60 -> 8
+}
