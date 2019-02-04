@@ -223,6 +223,9 @@ void Kmeans::runCGRA(unsigned short ***data_in, unsigned short **data_out, unsig
 void Kmeans::runCPU(unsigned short ***data_in, unsigned short **data_out, unsigned short **centroids, int data_size,
                     int numThread) {
 
+    high_resolution_clock::time_point s;
+    duration<double> diff = {};
+    s = high_resolution_clock::now();
     for (int t = 0; t < numThread; ++t) {
         for (int i = 0; i < data_size; i++) {
             unsigned short min = UINT16_MAX, min_id = 0;
@@ -239,8 +242,9 @@ void Kmeans::runCPU(unsigned short ***data_in, unsigned short **data_out, unsign
             data_out[t][i] = min_id;
         }
     }
-    printf("\n");
-
+    diff = high_resolution_clock::now() - s;
+    Kmeans::cpuExecTime = diff.count() * 1000;
+  
 }
 
 void Kmeans::compile(int numThreads) {
@@ -305,7 +309,7 @@ void Kmeans::printStatistics() {
 
 void Kmeans::benchmarking(int numThreads) {
 
-    int data_size = 5000000;
+    int data_size = 10000000;
     unsigned short ***data_in;
     unsigned short **data_out_cpu;
     unsigned short **data_out_cgra;

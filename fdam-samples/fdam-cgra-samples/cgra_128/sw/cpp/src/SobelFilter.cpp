@@ -250,7 +250,7 @@ void SobelFilter::makeOpMemCPU(byte *buffer, int buffer_size, int width, int cin
 
 void SobelFilter::contour(byte *sobel_h, byte *sobel_v, int gray_size, byte *contour_img) {
     for (int i = 0; i < gray_size; i++) {
-        contour_img[i] = (byte) (255 - sqrt(pow(sobel_h[i], 2) + pow(sobel_v[i], 2)));
+        contour_img[i] = (byte)(255 - (byte)(sqrt(pow(sobel_h[i], 2) + pow(sobel_v[i], 2))));
     }
 }
 

@@ -45,7 +45,7 @@ void Paeth::runCPU(unsigned short ***data_in, unsigned short **data_out, int dat
             bool test_1, test_2, test_3, test_4;
             pas = data_in[1][j][i] - data_in[2][j][i];
             pbs = data_in[0][j][i] - data_in[2][j][i];
-            pcs = data_in[0][j][i] | data_in[1][j][i] - 2 * data_in[2][j][i];
+            pcs = data_in[0][j][i] | (data_in[1][j][i] - 2 * data_in[2][j][i]);
             test_1 = abs(pas) <= abs(pbs);
             test_2 = abs(pas) <= abs(pcs);
             test_4 = abs(pbs) <= abs(pcs);
