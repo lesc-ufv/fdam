@@ -124,13 +124,13 @@ void SobelFilter::runCGRA(byte **gray, byte **contour_img, int width, int gray_s
     }
     s = high_resolution_clock::now();
     SobelFilter::cgraHw->syncExecute(0);
+    diff = high_resolution_clock::now() - s;
+    SobelFilter::cgraExecTime = diff.count() * 1000;
     for (int n = 0; n < num_img; ++n) {
         for (int j = 0; j < gray_size; ++j) {
             contour_img[n][j] = (byte) (255 - sqrt(output[n][j]));
         }
     }
-    diff = high_resolution_clock::now() - s;
-    SobelFilter::cgraExecTime = diff.count() * 1000;
     for (int l = 0; l < num_img; ++l) {
         for (int k = 0; k < 8; ++k) {
             delete inputs[l][k];
