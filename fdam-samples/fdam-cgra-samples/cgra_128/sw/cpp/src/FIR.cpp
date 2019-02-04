@@ -173,7 +173,7 @@ void FIR::printStatistics() {
 
 void FIR::benchmarking(int numThreads) {
 
-    int data_size = 64;
+    int data_size = 10000000;
     unsigned short **data_in;
     unsigned short **data_out_cgra;
     unsigned short **data_out_cpu;

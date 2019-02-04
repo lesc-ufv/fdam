@@ -52,8 +52,8 @@ void SobelFilter::benchmarking(int numThread) {
     byte **contour_img_cpu;
     byte **contour_img_cgra;
 
-    int width = 8;
-    int height = 8;
+    int width = 1333;
+    int height = 1333;
     int gray_size = width * height;
     int rgb_size = gray_size * 3;
 

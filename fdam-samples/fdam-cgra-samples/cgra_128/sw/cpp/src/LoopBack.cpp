@@ -19,7 +19,7 @@ void LoopBack::runCGRA(unsigned short ***data_in, unsigned short ***data_out, in
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-
+    printf("loading program...\n");
     LoopBack::cgraHw->loadCgraProgram("../loopback_files/loopback.cgra");
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -27,15 +27,19 @@ void LoopBack::runCGRA(unsigned short ***data_in, unsigned short ***data_out, in
             LoopBack::cgraHw->setCgraProgramOutputStreamByID(i, j + 8, data_out[i][j], sizeof(short) * data_size);
         }
     }
+    printf("Start executition!\n");
     s = high_resolution_clock::now();
     LoopBack::cgraHw->syncExecute(0);
     diff = high_resolution_clock::now() - s;
     LoopBack::cgraExecTime = diff.count() * 1000;
-
+    printf("End of execuitition!\n");
 }
 
 void LoopBack::runCPU(unsigned short ***data_in, unsigned short ***data_out, int data_size, int numThreads) {
 
+    high_resolution_clock::time_point s;
+    duration<double> diff = {};
+    s = high_resolution_clock::now();
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < 8; ++j) {
             for (int k = 0; k < data_size; ++k) {
@@ -43,6 +47,8 @@ void LoopBack::runCPU(unsigned short ***data_in, unsigned short ***data_out, int
             }
         }
     }
+    diff = high_resolution_clock::now() - s;
+    LoopBack::cpuExecTime = diff.count() * 1000;
 }
 
 void LoopBack::compile(int numThreads) {
@@ -77,7 +83,7 @@ void LoopBack::compile(int numThreads) {
 
 void LoopBack::benchmarking(int numThreads) {
 
-    int data_size = 32;
+    int data_size = 1000000;
     unsigned short ***data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;

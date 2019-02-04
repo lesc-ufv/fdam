@@ -12,10 +12,10 @@ int main(int argc, char *argv[]) {
 //    LoopBack loopBack(&cgra, &cgraArch);
 //    loopBack.benchmarking(8);
 //    loopBack.printStatistics();
-//
-    SobelFilter sf(&cgra, &cgraArch);
-    sf.benchmarking(8);
-    sf.printStatistics();
+
+//    SobelFilter sf(&cgra, &cgraArch);
+//    sf.benchmarking(8);
+//    sf.printStatistics();
 
 //    Kmeans km(&cgra, &cgraArch,5,8);
 //    km.benchmarking(8);
@@ -24,10 +24,10 @@ int main(int argc, char *argv[]) {
 //    FIR fir(&cgra, &cgraArch, 48);
 //    fir.benchmarking(8);
 //    fir.printStatistics();
-//
-//    Paeth paeth(&cgra, &cgraArch);
-//    paeth.benchmarking(8);
-//    paeth.printStatistics();
+
+    Paeth paeth(&cgra, &cgraArch);
+    paeth.benchmarking(8);
+    paeth.printStatistics();
 
     return 0;
 }

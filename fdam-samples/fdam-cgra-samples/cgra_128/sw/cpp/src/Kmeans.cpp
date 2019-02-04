@@ -305,7 +305,7 @@ void Kmeans::printStatistics() {
 
 void Kmeans::benchmarking(int numThreads) {
 
-    int data_size = 32;
+    int data_size = 5000000;
     unsigned short ***data_in;
     unsigned short **data_out_cpu;
     unsigned short **data_out_cgra;
