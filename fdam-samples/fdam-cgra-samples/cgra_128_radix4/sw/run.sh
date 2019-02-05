@@ -8,7 +8,7 @@ cd build
 cmake .. -DCMAKE_PREFIX_PATH=$FDAM_INSTALLDIR
 make
 
-fpgaconf ../../../hw/synth/cgra_128_radix8.gbs
+fpgaconf ../../../hw/synth/cgra_128_radix4.gbs
 
 ./main "loopback" > ../output/loopback_out.txt
 
