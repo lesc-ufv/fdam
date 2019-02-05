@@ -226,7 +226,9 @@ void Kmeans::runCPU(unsigned short ***data_in, unsigned short **data_out, unsign
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     s = high_resolution_clock::now();
-    for (int t = 0; t < numThread; ++t) {
+#pragma omp parallel
+#pragma omp for
+    for (int t = 0; t < NUM_THREADS; ++t) {
         for (int i = 0; i < data_size; i++) {
             unsigned short min = UINT16_MAX, min_id = 0;
             for (unsigned short c = 0; c < Kmeans::num_clusters; c++) {

@@ -13,7 +13,7 @@ Paeth::Paeth(Cgra *cgra, CgraArch *cgraArch) {
     Paeth::cgraConfTime = 0;
 }
 
-Paeth::~Paeth()=default;
+Paeth::~Paeth() = default;
 
 void Paeth::runCGRA(unsigned short ***data_in, unsigned short **data_out, int data_size, int numThreads) {
 
@@ -39,8 +39,10 @@ void Paeth::runCPU(unsigned short ***data_in, unsigned short **data_out, int dat
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     s = high_resolution_clock::now();
-    for (int i = 0; i < data_size; ++i) {
-        for (int j = 0; j < numThreads; j++) {
+#pragma omp parallel
+#pragma omp for
+    for (int j = 0; j < NUM_THREADS; j++) {
+        for (int i = 0; i < data_size; ++i) {
             int pas, pbs, pcs;
             bool test_1, test_2, test_3, test_4;
             pas = data_in[1][j][i] - data_in[2][j][i];
@@ -64,7 +66,7 @@ void Paeth::compile(int numThreads) {
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     char filename[100];
-    std::vector<DataFlow *>dfs;
+    std::vector<DataFlow *> dfs;
     for (int i = 0; i < numThreads; ++i) {
         dfs.push_back(Paeth::createDataFlow(i));
         scheduler.addDataFlow(dfs[i], i, 0);

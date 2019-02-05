@@ -14,6 +14,8 @@
 
 using namespace std::chrono;
 
+#define NUM_THREADS 8
+
 class Paeth {
 private:
     Cgra *cgraHw;

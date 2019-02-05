@@ -14,6 +14,8 @@
 
 using namespace std::chrono;
 
+#define NUM_THREADS 8
+
 #define SOBEL_OP_SIZE 9
 #define pow2(x) (x)*(x)
 typedef int byte;

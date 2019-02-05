@@ -132,7 +132,9 @@ void FIR::runCPU(unsigned short **data_in, unsigned short **data_out, int data_s
     duration<double> diff = {};
 
     s = high_resolution_clock::now();
-    for (int i = 0; i < numThreads; i++) {
+#pragma omp parallel
+#pragma omp for
+    for (int i = 0; i < NUM_THREADS; i++) {
         for (int j = 0; j < data_size - FIR::size; j++) {
             unsigned short fir = 0;
             for (int k = 0; k < FIR::size; ++k) {

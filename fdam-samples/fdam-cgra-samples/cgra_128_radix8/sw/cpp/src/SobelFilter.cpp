@@ -147,22 +147,34 @@ void SobelFilter::runCPU(byte **gray, byte **contour_img, int width, int gray_si
     byte sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1},
          sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 
-    auto *sobel_h_res = new byte[gray_size];
-    auto *sobel_v_res = new byte[gray_size];
+    auto **sobel_h_res = new byte*[num_img];
+    auto **sobel_v_res = new byte*[num_img];
+
+    for (int j = 0; j < num_img; ++j) {
+        sobel_h_res[j] = new byte[gray_size];
+        sobel_v_res[j] = new byte[gray_size];
+    }
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     s = high_resolution_clock::now();
-    for (int i = 0; i < num_img; ++i) {
-        SobelFilter::itConv(gray[i], gray_size, width, sobel_h, sobel_h_res);
-        SobelFilter::itConv(gray[i], gray_size, width, sobel_v, sobel_v_res);
-        SobelFilter::contour(sobel_h_res, sobel_v_res, gray_size, contour_img[i]);
+#pragma omp parallel
+#pragma omp for
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        SobelFilter::itConv(gray[i], gray_size, width, sobel_h, sobel_h_res[i]);
+        SobelFilter::itConv(gray[i], gray_size, width, sobel_v, sobel_v_res[i]);
+        SobelFilter::contour(sobel_h_res[i], sobel_v_res[i], gray_size, contour_img[i]);
     }
     diff = high_resolution_clock::now() - s;
     SobelFilter::cpuExecTime = diff.count() * 1000;
 
-    delete[]sobel_h_res;
-    delete[]sobel_v_res;
+    for (int k = 0; k < num_img; ++k) {
+        delete sobel_h_res[k];
+        delete sobel_v_res[k];
+    }
+
+    delete[] sobel_h_res;
+    delete[] sobel_v_res;
 }
 
 void SobelFilter::rgbToGray(byte *rgb, byte *gray, int gray_size) {

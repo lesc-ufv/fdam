@@ -40,7 +40,9 @@ void LoopBack::runCPU(unsigned short ***data_in, unsigned short ***data_out, int
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     s = high_resolution_clock::now();
-    for (int i = 0; i < numThreads; ++i) {
+#pragma omp parallel
+#pragma omp for
+    for (int i = 0; i < NUM_THREADS; ++i) {
         for (int j = 0; j < 8; ++j) {
             for (int k = 0; k < data_size; ++k) {
                 data_out[i][j][k] = data_in[i][j][k];
