@@ -19,7 +19,7 @@ void LoopBack::runCGRA(unsigned short ***data_in, unsigned short ***data_out, in
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-    printf("loading program...\n");
+
     LoopBack::cgraHw->loadCgraProgram("../loopback_files/loopback.cgra");
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < 8; ++j) {
@@ -27,12 +27,12 @@ void LoopBack::runCGRA(unsigned short ***data_in, unsigned short ***data_out, in
             LoopBack::cgraHw->setCgraProgramOutputStreamByID(i, j + 8, data_out[i][j], sizeof(short) * data_size);
         }
     }
-    printf("Start executition!\n");
+
     s = high_resolution_clock::now();
     LoopBack::cgraHw->syncExecute(0);
     diff = high_resolution_clock::now() - s;
     LoopBack::cgraExecTime = diff.count() * 1000;
-    printf("End of execuitition!\n");
+
 }
 
 void LoopBack::runCPU(unsigned short ***data_in, unsigned short ***data_out, int data_size, int numThreads) {
@@ -83,7 +83,7 @@ void LoopBack::compile(int numThreads) {
 
 void LoopBack::benchmarking(int numThreads) {
 
-    int data_size = 10000000;
+    int data_size = 32;
     unsigned short ***data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
@@ -200,7 +200,8 @@ void LoopBack::printStatistics() {
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
     MSG("INFO Scheduling time: " << LoopBack::schedulingTime << "ms");
-    MSG("INFO CGRA execution time: " << LoopBack::cgraExecTime << "ms");
+    MSG("INFO CGRA total execution time: " << LoopBack::cgraExecTime << "ms");
+    MSG("INFO CGRA execution time: " << LoopBack::cgraHw->getTimeExec() << "ms");
     MSG("INFO CPU execution time: " << LoopBack::cpuExecTime << "ms");
     LoopBack::cgraHw->getAccManagement()->getAccelerator(0).printHwInfo();
     LoopBack::cgraHw->getAccManagement()->printHwInfo();

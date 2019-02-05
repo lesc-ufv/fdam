@@ -236,7 +236,8 @@ void Paeth::printStatistics() {
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
     MSG("INFO Scheduling time: " << Paeth::schedulingTime << "ms");
-    MSG("INFO CGRA execution time: " << Paeth::cgraExecTime << "ms");
+    MSG("INFO CGRA total execution time: " << Paeth::cgraExecTime << "ms");
+    MSG("INFO CGRA execution time: " << Paeth::cgraHw->getTimeExec() << "ms");
     MSG("INFO CPU execution time: " << Paeth::cpuExecTime << "ms");
     Paeth::cgraHw->getAccManagement()->getAccelerator(0).printHwInfo();
     Paeth::cgraHw->getAccManagement()->printHwInfo();
@@ -245,7 +246,7 @@ void Paeth::printStatistics() {
 
 void Paeth::benchmarking(int numThreads) {
 
-    int data_size = 10000000;
+    int data_size = 50000000;
     unsigned short ***data_in;
     unsigned short **data_out_cpu;
     unsigned short **data_out_cgra;

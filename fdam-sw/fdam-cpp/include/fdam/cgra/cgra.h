@@ -1,6 +1,7 @@
 #ifndef CGRA_H
 #define CGRA_H
 
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <cmath>
@@ -8,11 +9,13 @@
 #include <fdam/cgra/cgra_defs.h>
 #include <fdam/acc/acc_management.h>
 
+using namespace std::chrono;
 using namespace std;
 
 class Cgra {
 
 private:
+    double timeExecCgra;
     // key = Input ID, Value = key = ThreadID value =  ( Pointer Data, Size Data)
     std::map<int, std::map<int, std::pair<unsigned char *, size_t>>> input_queue;
     // key = Output ID, Value = key = ThreadID value =  ( Pointer Data, Size Data)
@@ -56,6 +59,8 @@ public:
     cgra_program_t *getCgraProgram();
     
     AccManagement *getAccManagement();
+
+    double getTimeExec();
 };
 
 #endif //CGRA_H

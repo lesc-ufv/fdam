@@ -1,6 +1,7 @@
 #include <fdam/cgra/cgra.h>
 
 Cgra::Cgra() {
+    Cgra::timeExecCgra = 0;
     Cgra::cgra_program = nullptr;
     Cgra::accManagement = new AccManagement();
 }
@@ -339,11 +340,14 @@ void Cgra::syncExecute(long waitTime) {
             }
         }
     }
-
+    high_resolution_clock::time_point s;
+    duration<double> diff = {};
+    s = high_resolution_clock::now();
     acc.start();
     acc.waitDone(waitTime);
+    diff = high_resolution_clock::now() - s;
+    Cgra::timeExecCgra = diff.count() * 1000;
     acc.reset();
-
     for (const auto &it:Cgra::output_queue) {
         auto queue_ptr = (unsigned char *) acc.getOutputQueue((unsigned char) it.first);
         auto len = total_size_out[it.first];
@@ -450,4 +454,8 @@ void Cgra::freeProgram(cgra_program_t *cp) {
         cp->output_map.clear();
         delete cp;
     }
+}
+
+double Cgra::getTimeExec() {
+    return Cgra::timeExecCgra;
 }

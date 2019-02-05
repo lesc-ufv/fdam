@@ -14,7 +14,9 @@
 
 using namespace std::chrono;
 
-typedef unsigned char byte;
+#define SOBEL_OP_SIZE 9
+#define pow2(x) (x)*(x)
+typedef int byte;
 
 class SobelFilter {
 
@@ -40,11 +42,11 @@ private:
 
     void itConv(byte *buffer, int buffer_size, int width, int *op, byte *res);
 
-    int convolution(const byte *X, const int *Y, int c_size);
+    int convolution(byte *X, byte *Y, int c_size);
 
-    void makeOpMemCPU(byte *buffer, int buffer_size, int width, int cindex, byte *op_mem);
+    void makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, byte *op_mem);
 
-    void contour(byte *sobel_h, byte *sobel_v, int gray_size, byte *contour_img);
+    void contour(const byte *sobel_h,const byte *sobel_v, int gray_size, byte *contour_img);
 
     DataFlow *createDataFlow(int id);
 
