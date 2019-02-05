@@ -8,14 +8,16 @@ cd build
 cmake .. -DCMAKE_PREFIX_PATH=$FDAM_INSTALLDIR
 make
 
+echo "fpgaconf..."
 fpgaconf ../../../hw/synth/cgra_128_radix8.gbs
-
-./main "loopback" > ../output/loopback_out.txt
-
-./main "sobel" > ../output/sobel_out.txt
-
-./main "kmeans" > ../output/kmeans_out.txt
-
-./main "fir" > ../output/fir_out.txt
-
-./main "paeth" > ../output/paeth_out.txt
+mkdir ../$1
+echo "running loopback..."
+./main "loopback" > ../$1/loopback_out.txt
+echo "running sobel..."
+./main "sobel" > ../$1/sobel_out.txt
+echo "running kmeans..."
+./main "kmeans" > ../$1/kmeans_out.txt
+echo "running fir..."
+./main "fir" > ../$1/fir_out.txt
+echo "running paeth..."
+./main "paeth" > ../$1/paeth_out.txt

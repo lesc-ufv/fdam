@@ -14,29 +14,30 @@ Success!
   [FDAM]  INFO Num input nodes: 5
   [FDAM]  INFO Num output nodes: 1
   [FDAM]  INFO Num total nodes: 116
-  [FDAM]  INFO Scheduling time: 88.4397ms
-  [FDAM]  INFO CGRA execution time: 15281.8ms
-  [FDAM]  INFO CPU execution time: 14292.7ms
+  [FDAM]  INFO Scheduling time: 84.9882ms
+  [FDAM]  INFO CGRA total execution time: 78986.6ms
+  [FDAM]  INFO CGRA execution time: 2005.03ms
+  [FDAM]  INFO CPU execution time: 17666.3ms
   [FDAM]  INFO Accelerator:
   [FDAM]  ID: 0
   [FDAM]  Amount of input queues: 8
   [FDAM]  Amount of output queues: 8
   [FDAM]  Status: Done
   [FDAM]  INFO Input Queues:
-  [FDAM]  Queue ID: 0, State: Done, Bytes read: 160053504
-  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 160000000
-  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 0
-  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 160000000
-  [FDAM]  Queue ID: 4, State: Not done, Bytes read: 160000000
-  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 0
-  [FDAM]  Queue ID: 6, State: Not done, Bytes read: 160000000
+  [FDAM]  Queue ID: 0, State: Done, Bytes read: 52736
+  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 800000000
+  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 800000000
+  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 800000000
+  [FDAM]  Queue ID: 4, State: Not done, Bytes read: 800000000
+  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 800000000
+  [FDAM]  Queue ID: 6, State: Not done, Bytes read: 0
   [FDAM]  Queue ID: 7, State: Not done, Bytes read: 0
   [FDAM]  INFO Output Queues:
   [FDAM]  Queue ID: 0 State: Not done, Written bytes: 16128
   [FDAM]  Queue ID: 1 State: Not done, Written bytes: 16128
   [FDAM]  Queue ID: 2 State: Not done, Written bytes: 16128
-  [FDAM]  Queue ID: 3 State: Not done, Written bytes: 16128
-  [FDAM]  Queue ID: 4 State: Not done, Written bytes: 160001216
+  [FDAM]  Queue ID: 3 State: Not done, Written bytes: 800001216
+  [FDAM]  Queue ID: 4 State: Not done, Written bytes: 16128
   [FDAM]  Queue ID: 5 State: Not done, Written bytes: 16128
   [FDAM]  Queue ID: 6 State: Not done, Written bytes: 16128
   [FDAM]  Queue ID: 7 State: Not done, Written bytes: 16128
@@ -46,10 +47,10 @@ Success!
   [FDAM]  INFO: Number of accelerators: 1
   [FDAM]  INFO: Total number of input queues: 8
   [FDAM]  INFO: Total number of output queues: 8
-  [FDAM]  INFO: Total clock: 8.009e+07
-  [FDAM]  INFO: Total bytes read: 8.00054e+08
-  [FDAM]  INFO: Total written bytes: 1.60001e+08
-  [FDAM]  INFO: Approximate throughput: 2286.38MB/s
-  [FDAM]  INFO: VTP PT walk cycles: 15365
-  [FDAM]  INFO: VTP L2 4KB hit / miss: 1 / 1
-  [FDAM]  INFO: VTP L2 2MB hit / miss: 1253 / 462
+  [FDAM]  INFO: Total clock: 4.00082e+08
+  [FDAM]  INFO: Total bytes read: 4.00005e+09
+  [FDAM]  INFO: Total written bytes: 8.00001e+08
+  [FDAM]  INFO: Approximate throughput: 2288.38MB/s
+  [FDAM]  INFO: VTP PT walk cycles: 120312
+  [FDAM]  INFO: VTP L2 4KB hit / miss: 70 / 14
+  [FDAM]  INFO: VTP L2 2MB hit / miss: 6665 / 2290
