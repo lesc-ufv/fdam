@@ -52,8 +52,8 @@ void SobelFilter::benchmarking(int numThread) {
     byte **contour_img_cpu;
     byte **contour_img_cgra;
 
-    int width = 1333;
-    int height = 1333;
+    int width = 10200;
+    int height = 10200;
     int gray_size = width * height;
     int rgb_size = gray_size * 3;
 
@@ -124,13 +124,13 @@ void SobelFilter::runCGRA(byte **gray, byte **contour_img, int width, int gray_s
     }
     s = high_resolution_clock::now();
     SobelFilter::cgraHw->syncExecute(0);
+    diff = high_resolution_clock::now() - s;
+    SobelFilter::cgraExecTime = diff.count() * 1000;
     for (int n = 0; n < num_img; ++n) {
         for (int j = 0; j < gray_size; ++j) {
             contour_img[n][j] = (byte) (255 - sqrt(output[n][j]));
         }
     }
-    diff = high_resolution_clock::now() - s;
-    SobelFilter::cgraExecTime = diff.count() * 1000;
     for (int l = 0; l < num_img; ++l) {
         for (int k = 0; k < 8; ++k) {
             delete inputs[l][k];
@@ -144,11 +144,11 @@ void SobelFilter::runCGRA(byte **gray, byte **contour_img, int width, int gray_s
 
 void SobelFilter::runCPU(byte **gray, byte **contour_img, int width, int gray_size, int num_img) {
 
-    int sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1},
-            sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    byte sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1},
+         sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 
-    byte *sobel_h_res = new byte[gray_size];
-    byte *sobel_v_res = new byte[gray_size];
+    auto *sobel_h_res = new byte[gray_size];
+    auto *sobel_v_res = new byte[gray_size];
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
@@ -166,15 +166,19 @@ void SobelFilter::runCPU(byte **gray, byte **contour_img, int width, int gray_si
 }
 
 void SobelFilter::rgbToGray(byte *rgb, byte *gray, int gray_size) {
-    for (int g = 0, r = 0; g < gray_size; g++, r += 3) {
-        gray[g] = (byte) (0.30 * rgb[r] + 0.59 * rgb[r + 1] + 0.11 * rgb[r + 2]);
+    byte *p_rgb = rgb;
+    byte *p_gray = gray;
+    for(int i=0; i<gray_size; i++) {
+        *p_gray = (byte)(0.30*p_rgb[0] + 0.59*p_rgb[1] + 0.11*p_rgb[2]);
+        p_rgb += 3;
+        p_gray++;
     }
 }
 
 void SobelFilter::readFile(char *file_name, byte *buffer, int buffer_size) {
     FILE *file = fopen(file_name, "r");
     for (int i = 0; i < buffer_size; i++) {
-        buffer[i] = (byte) fgetc(file);
+        buffer[i] = fgetc(file);
     }
     fclose(file);
 }
@@ -188,20 +192,21 @@ void SobelFilter::writeFile(char *file_name, byte *buffer, int buffer_size) {
     fclose(file);
 }
 
-void SobelFilter::itConv(byte *buffer, int buffer_size, int width, int *op, byte *res) {
-    byte op_mem[9];
-    memset(op_mem, 0, 9);
+void SobelFilter::itConv(byte *buffer, int buffer_size, int width, byte *op, byte *res) {
+    byte op_mem[SOBEL_OP_SIZE];
+    memset(op_mem, 0, SOBEL_OP_SIZE);
     for (int i = 0; i < buffer_size; i++) {
         SobelFilter::makeOpMemCPU(buffer, buffer_size, width, i, op_mem);
-        res[i] = (byte) (SobelFilter::convolution(op_mem, op, 9));
+        res[i] = (SobelFilter::convolution(op_mem, op, SOBEL_OP_SIZE));
     }
 }
 
-int SobelFilter::convolution(const byte *X, const int *Y, int c_size) {
-    int sum = 0;
+byte SobelFilter::convolution(byte *X, byte *Y, int c_size) {
+    byte sum = 0;
     for (int i = 0; i < c_size; i++) {
         sum += X[i] * Y[c_size - i - 1];
     }
+
     return sum;
 }
 
@@ -213,21 +218,21 @@ void SobelFilter::makeOpMemCGRA(byte *buffer, int buffer_size, int width, short 
         int right = (cindex + 1) % width == 0;
         short zero = 0;
 
-        op_mem[0][cindex] = !bottom && !left ? buffer[cindex - width - 1] : zero;
-        op_mem[1][cindex] = !bottom ? buffer[cindex - width] : zero;
-        op_mem[2][cindex] = !bottom && !right ? buffer[cindex - width + 1] : zero;
+        op_mem[0][cindex] = !bottom && !left ? (short)buffer[cindex - width - 1] : zero;
+        op_mem[1][cindex] = !bottom ? (short)buffer[cindex - width] : zero;
+        op_mem[2][cindex] = !bottom && !right ? (short)buffer[cindex - width + 1] : zero;
 
-        op_mem[3][cindex] = !left ? buffer[cindex - 1] : zero;
+        op_mem[3][cindex] = !left ? (short)buffer[cindex - 1] : zero;
         //op_mem[4][cindex] = buffer[cindex];
-        op_mem[4][cindex] = !right ? buffer[cindex + 1] : zero;
+        op_mem[4][cindex] = !right ? (short)buffer[cindex + 1] : zero;
 
-        op_mem[5][cindex] = !top && !left ? buffer[cindex + width - 1] : zero;
-        op_mem[6][cindex] = !top ? buffer[cindex + width] : zero;
-        op_mem[7][cindex] = !top && !right ? buffer[cindex + width + 1] : zero;
+        op_mem[5][cindex] = !top && !left ? (short)buffer[cindex + width - 1] : zero;
+        op_mem[6][cindex] = !top ? (short)buffer[cindex + width] : zero;
+        op_mem[7][cindex] = !top && !right ? (short)buffer[cindex + width + 1] : zero;
     }
 }
 
-void SobelFilter::makeOpMemCPU(byte *buffer, int buffer_size, int width, int cindex, byte *op_mem) {
+void SobelFilter::makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, byte *op_mem) {
 
     int bottom = cindex - width < 0;
     int top = cindex + width >= buffer_size;
@@ -241,16 +246,16 @@ void SobelFilter::makeOpMemCPU(byte *buffer, int buffer_size, int width, int cin
 
     op_mem[3] = !left ? buffer[cindex - 1] : zero;
     op_mem[4] = buffer[cindex];
-    op_mem[4] = !right ? buffer[cindex + 1] : zero;
+    op_mem[5] = !right ? buffer[cindex + 1] : zero;
 
-    op_mem[5] = !top && !left ? buffer[cindex + width - 1] : zero;
-    op_mem[6] = !top ? buffer[cindex + width] : zero;
-    op_mem[7] = !top && !right ? buffer[cindex + width + 1] : zero;
+    op_mem[6] = !top && !left ? buffer[cindex + width - 1] : zero;
+    op_mem[7] = !top ? buffer[cindex + width] : zero;
+    op_mem[8] = !top && !right ? buffer[cindex + width + 1] : zero;
 }
 
-void SobelFilter::contour(byte *sobel_h, byte *sobel_v, int gray_size, byte *contour_img) {
+void SobelFilter::contour(const byte *sobel_h,const byte *sobel_v, int gray_size, byte *contour_img) {
     for (int i = 0; i < gray_size; i++) {
-        contour_img[i] = (byte)(255 - (byte)(sqrt(pow(sobel_h[i], 2) + pow(sobel_v[i], 2))));
+        contour_img[i] = 255 - (byte)sqrt(pow2(sobel_h[i]) + pow2(sobel_v[i]));
     }
 }
 
@@ -300,7 +305,6 @@ DataFlow *SobelFilter::createDataFlow(int id) {
     int gx_gy[2][9] = {{1,  2, 1, 0,  0, 0, -1, -2, -1},
                        {-1, 0, 1, -2, 0, 2, -1, 0,  1}};
 
-
     for (int i = 0; i < 9; ++i) {
         if (i != 4)
             inputs[i] = new InputStream(idx++);
@@ -318,11 +322,11 @@ DataFlow *SobelFilter::createDataFlow(int id) {
         }
     }
 
-    for (int l = 0; l < 2; ++l) {
+    for (auto &l : gx_gy) {
         aux0.clear();
         aux1.clear();
         for (int j = 0; j < 9; ++j) {
-            auto mul = new Multi(idx++, gx_gy[l][9 - j - 1]);
+            auto mul = new Multi(idx++, l[9 - j - 1]);
             df->connect(inputs[j], mul, mul->getPortA());
             aux0.push_back(mul);
         }
@@ -380,7 +384,8 @@ void SobelFilter::printStatistics() {
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
     MSG("INFO Scheduling time: " << SobelFilter::schedulingTime << "ms");
-    MSG("INFO CGRA execution time: " << SobelFilter::cgraExecTime << "ms");
+    MSG("INFO CGRA total execution time: " << SobelFilter::cgraExecTime << "ms");
+    MSG("INFO CGRA execution time: " << SobelFilter::cgraHw->getTimeExec() << "ms");
     MSG("INFO CPU execution time: " << SobelFilter::cpuExecTime << "ms");
     SobelFilter::cgraHw->getAccManagement()->getAccelerator(0).printHwInfo();
     SobelFilter::cgraHw->getAccManagement()->printHwInfo();

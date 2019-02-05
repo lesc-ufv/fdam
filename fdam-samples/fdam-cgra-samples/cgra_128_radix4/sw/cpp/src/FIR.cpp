@@ -164,7 +164,8 @@ void FIR::printStatistics() {
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
     MSG("INFO Scheduling time: " << FIR::schedulingTime << "ms");
-    MSG("INFO CGRA execution time: " << FIR::cgraExecTime << "ms");
+    MSG("INFO CGRA total execution time: " << FIR::cgraExecTime << "ms");
+    MSG("INFO CGRA execution time: " << FIR::cgraHw->getTimeExec() << "ms");
     MSG("INFO CPU execution time: " << FIR::cpuExecTime << "ms");
     FIR::cgraHw->getAccManagement()->getAccelerator(0).printHwInfo();
     FIR::cgraHw->getAccManagement()->printHwInfo();
@@ -173,7 +174,7 @@ void FIR::printStatistics() {
 
 void FIR::benchmarking(int numThreads) {
 
-    int data_size = 10000000;
+    int data_size = 50000000;
     unsigned short **data_in;
     unsigned short **data_out_cgra;
     unsigned short **data_out_cpu;
