@@ -69,7 +69,7 @@ void Paeth::runCPU(unsigned short ****data_in, unsigned short ***data_out, int d
     Paeth::cpuExecTime = diff.count() * 1000;
 }
 
-void Paeth::compile(int numThreads) {
+bool Paeth::compile(int numThreads) {
     Scheduler scheduler(Paeth::cgraArch);
     high_resolution_clock::time_point s;
     duration<double> diff = {};
@@ -99,6 +99,7 @@ void Paeth::compile(int numThreads) {
     for (auto df:dfs) {
         delete df;
     }
+    return r == SCHEDULE_SUCCESS;
 }
 
 DataFlow *Paeth::createDataFlow(int id) {
@@ -307,28 +308,23 @@ void Paeth::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    Paeth::compile(numThreads);
-    Paeth::runCGRA(data_in, data_out_cgra, data_size, numThreads);
-    Paeth::runCPU(data_in, data_out_cpu, data_size, numThreads);
-
-    bool flag_error = false;
-
+    if(Paeth::compile(numThreads)) {
+        Paeth::runCGRA(data_in, data_out_cgra, data_size, numThreads);
+        Paeth::runCPU(data_in, data_out_cpu, data_size, numThreads);
+    }else{
+        printf("Compilation failed!\n");
+    }
     for (int t = 0; t < numThreads; ++t) {
         for (int c = 0; c < 2; ++c) {
             for (int i = 0; i < data_size; ++i) {
                 if (data_out_cpu[t][c][i] != data_out_cgra[t][c][i]) {
                     printf("Error: Thread %d, copy %d, index %d, expected %d found %d!\n", t,c,i, data_out_cpu[t][c][i],
                            data_out_cgra[t][c][i]);
-                    flag_error = true;
                     break;
                 }
             }
         }
     }
-    if (!flag_error) {
-        printf("Success!\n");
-    }
-
     for (int i = 0; i < numThreads; ++i) {
         delete data_in[i][0][0];
         delete data_in[i][0][1];

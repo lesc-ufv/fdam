@@ -11,7 +11,6 @@ int main(int argc, char *argv[]) {
     int num_thread = 8;//atoi(argv[2]);
     int data_size = atoi(argv[3]);
 
-
     if (std::strcmp("loopback", argv[1]) == 0) {
         LoopBack loopBack(cgra, cgraArch);
         loopBack.benchmarking(num_thread, data_size);
@@ -27,7 +26,7 @@ int main(int argc, char *argv[]) {
         km.benchmarking(num_thread, data_size);
         km.printStatistics();
     } else if (std::strcmp("fir", argv[1]) == 0) {
-        FIR fir(cgra, cgraArch, 52);
+        FIR fir(cgra, cgraArch, 63);
         fir.benchmarking(num_thread, data_size);
         fir.printStatistics();
     } else if (std::strcmp("paeth", argv[1]) == 0) {

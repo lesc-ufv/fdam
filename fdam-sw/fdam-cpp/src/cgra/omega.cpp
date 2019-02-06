@@ -144,18 +144,14 @@ void Omega::createRouteTable() {
     auto max_bits = Global::intLog(size, 2);
     auto r_bits = Global::intLog(radix, 2);
 
-#pragma omp parallel
-    {
-#pragma omp for collapse(2)
-
-        for (int sw_src = 0; sw_src < Omega::num_swicth_stages; ++sw_src) {
-            for (int sw_dst = 0; sw_dst < Omega::num_swicth_stages; ++sw_dst) {
-                int sw_dst_aux = (Omega::num_swicth_stages * (Omega::num_stagies - 1)) + sw_dst;
-                std::pair<int, int> key_sw(sw_src, sw_dst_aux);
-                PathFinder::pathFinder(sw_src, sw_dst_aux, Omega::graph, Omega::route_table[key_sw]);
-            }
+    for (int sw_src = 0; sw_src < Omega::num_swicth_stages; ++sw_src) {
+        for (int sw_dst = 0; sw_dst < Omega::num_swicth_stages; ++sw_dst) {
+            int sw_dst_aux = (Omega::num_swicth_stages * (Omega::num_stagies - 1)) + sw_dst;
+            std::pair<int, int> key_sw(sw_src, sw_dst_aux);
+            PathFinder::pathFinder(sw_src, sw_dst_aux, Omega::graph, Omega::route_table[key_sw]);
         }
-    };
+    }
+
 }
 
 void Omega::printRouteTable() {

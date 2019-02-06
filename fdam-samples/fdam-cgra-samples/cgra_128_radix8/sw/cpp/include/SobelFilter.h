@@ -52,7 +52,7 @@ private:
 
     DataFlow *createDataFlow(int id);
 
-    void compile(int numThreads);
+    bool compile(int numThreads);
 
 public:
     SobelFilter(Cgra *cgraHw, CgraArch *cgraArch);

@@ -31,7 +31,7 @@ private:
 
     void runCPU(unsigned short ***data_in, unsigned short ***data_out, int data_size, int numThreads);
 
-    void compile(int numThreads);
+    bool compile(int numThreads);
 
 public:
 

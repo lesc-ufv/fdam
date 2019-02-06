@@ -21,8 +21,6 @@ private:
 
     int placeAndRoute(std::vector<int> &mapping, int threadID);
 
-    int getRandomPE(int type);
-
 public:
     explicit Scheduler(CgraArch *cgra);
 

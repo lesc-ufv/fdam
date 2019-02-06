@@ -36,7 +36,7 @@ private:
 
     DataFlow *createDataFlow(int thread);
 
-    void compile(int numThreads);
+    bool compile(int numThreads);
 
 public:
     FIR(Cgra *cgraHw, CgraArch *cgraArch, int size);

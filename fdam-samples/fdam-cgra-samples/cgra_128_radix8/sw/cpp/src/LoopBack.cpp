@@ -53,7 +53,7 @@ void LoopBack::runCPU(unsigned short ***data_in, unsigned short ***data_out, int
     LoopBack::cpuExecTime = diff.count() * 1000;
 }
 
-void LoopBack::compile(int numThreads) {
+bool LoopBack::compile(int numThreads) {
     Scheduler scheduler(LoopBack::cgraArch);
     high_resolution_clock::time_point s;
     duration<double> diff = {};
@@ -81,6 +81,7 @@ void LoopBack::compile(int numThreads) {
     for (auto df:dfs) {
         delete df;
     }
+    return r == SCHEDULE_SUCCESS;
 }
 
 void LoopBack::benchmarking(int numThreads,int data_size) {
@@ -114,11 +115,14 @@ void LoopBack::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    LoopBack::compile(numThreads);
-    LoopBack::runCGRA(data_in, data_out_cgra, data_size, numThreads);
-    LoopBack::runCPU(data_in, data_out_cpu, data_size, numThreads);
+    if(LoopBack::compile(numThreads)) {
+        LoopBack::runCGRA(data_in, data_out_cgra, data_size, numThreads);
+        LoopBack::runCPU(data_in, data_out_cpu, data_size, numThreads);
+    }else{
+        printf("Compilation failed!\n");
+    }
 
-    bool flag_error = false;
+
     for (int k = 0; k < numThreads; ++k) {
         for (int i = 0; i < 8; ++i) {
             for (int j = 0; j < data_size; ++j) {
@@ -126,16 +130,11 @@ void LoopBack::benchmarking(int numThreads,int data_size) {
                     printf("Error: Thread %d, queue %d, index %d, expected %d found %d!\n", k, i, j,
                            data_out_cpu[k][i][j],
                            data_out_cgra[k][i][j]);
-                    flag_error = true;
                     break;
                 }
             }
         }
     }
-    if (!flag_error) {
-        printf("Success!\n");
-    }
-
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < 8; ++j) {
             delete data_in[i][j];

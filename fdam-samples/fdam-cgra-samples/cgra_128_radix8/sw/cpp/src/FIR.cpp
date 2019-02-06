@@ -78,7 +78,7 @@ void FIR::setCoef(unsigned short **coef) {
     }
 }
 
-void FIR::compile(int numThreads) {
+bool FIR::compile(int numThreads) {
     Scheduler scheduler(FIR::cgraArch);
     high_resolution_clock::time_point s;
     duration<double> diff = {};
@@ -108,6 +108,7 @@ void FIR::compile(int numThreads) {
     for (auto df:dfs) {
         delete df;
     }
+    return r == SCHEDULE_SUCCESS;
 }
 
 void FIR::runCGRA(unsigned short **data_in, unsigned short **data_out, int data_size, int numThreads) {
@@ -116,8 +117,7 @@ void FIR::runCGRA(unsigned short **data_in, unsigned short **data_out, int data_
     FIR::cgraHw->loadCgraProgram("../fir_files/fir.cgra");
     for (int i = 0; i < numThreads; ++i) {
         FIR::cgraHw->setCgraProgramInputStreamByID(i, 0, data_in[i], sizeof(unsigned short) * data_size);
-        FIR::cgraHw->setCgraProgramOutputStreamByID(i, 1, data_out[i],
-                                                    sizeof(unsigned short) * (data_size - FIR::size));
+        FIR::cgraHw->setCgraProgramOutputStreamByID(i, 1, data_out[i], sizeof(unsigned short) * (data_size - FIR::size));
     }
     s = high_resolution_clock::now();
     FIR::cgraHw->syncExecute(0);
@@ -181,7 +181,9 @@ void FIR::benchmarking(int numThreads,int data_size) {
     unsigned short **data_out_cgra;
     unsigned short **data_out_cpu;
 
-    FIR::compile(numThreads);
+    if(data_size < FIR::size){
+        data_size = FIR::size + 1;
+    }
 
     data_in = new unsigned short *[numThreads];
     data_out_cgra = new unsigned short *[numThreads];
@@ -200,22 +202,21 @@ void FIR::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    FIR::runCGRA(data_in, data_out_cgra, data_size, numThreads);
-    FIR::runCPU(data_in, data_out_cpu, data_size, numThreads);
-
-    bool flag_error = false;
+    if(FIR::compile(numThreads)) {
+        FIR::runCGRA(data_in, data_out_cgra, data_size, numThreads);
+        FIR::runCPU(data_in, data_out_cpu, data_size, numThreads);
+    }
+    else{
+        printf("Compilation failed!\n");
+    }
     for (int k = 0; k < numThreads; ++k) {
         for (int j = 0; j < data_size - FIR::size; ++j) {
             if (data_out_cpu[k][j] != data_out_cgra[k][j]) {
                 printf("Error: Thread %d, index %d, expected %d found %d!\n", k, j, data_out_cpu[k][j],
                        data_out_cgra[k][j]);
-                flag_error = true;
                 break;
             }
         }
-    }
-    if (!flag_error) {
-        printf("Success!\n");
     }
     for (int i = 0; i < numThreads; ++i) {
         delete data_in[i];

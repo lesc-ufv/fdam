@@ -61,6 +61,8 @@ int Scheduler::mapAndRoute(int threadID) {
     int swapness[pes.size()];
     int i = 0;
     int group = Scheduler::dataflow_group[Scheduler::dataflows[threadID]->getId()];
+    std::vector<int>pe_list_aux;
+    random_selector<> selector{};
 
     if (Scheduler::data_flow_mapping.find(group) != Scheduler::data_flow_mapping.end()) {
         solution = Scheduler::data_flow_mapping[group];
@@ -73,21 +75,36 @@ int Scheduler::mapAndRoute(int threadID) {
         int idx = 0;
         for (auto op:operators) {
             if (op.second->getType() == OP_IN) {
-                do {
-                    idx = Scheduler::getRandomPE(PE_IN);
-                } while (solution[idx] != -1);
-                solution[idx] = op.second->getId();
+                pe_list_aux.clear();
+                for (auto p:pes) {
+                    if(solution[p.first] == -1 && p.second->getType() == PE_IN){
+                        pe_list_aux.push_back(p.first);
+                    }
+                }
             } else if (op.second->getType() == OP_OUT) {
-                do {
-                    idx = Scheduler::getRandomPE(PE_OUT);
-                } while (solution[idx] != -1);
-                solution[idx] = op.second->getId();
+                pe_list_aux.clear();
+                for (auto p:pes) {
+                    if(solution[p.first] == -1 && p.second->getType() == PE_OUT){
+                        pe_list_aux.push_back(p.first);
+                    }
+                }
             } else {
-                do {
-                    idx = Scheduler::getRandomPE(PE_BASIC);
-                } while (solution[idx] != -1);
-                solution[idx] = op.second->getId();
+                pe_list_aux.clear();
+                for (auto p:pes) {
+                    if(solution[p.first] == -1 && p.second->getType() == PE_BASIC){
+                        pe_list_aux.push_back(p.first);
+                    }
+                }
+                if(pe_list_aux.empty()){
+                    for (auto p:pes) {
+                        if(solution[p.first] == -1){
+                            pe_list_aux.push_back(p.first);
+                        }
+                    }
+                }
             }
+            idx = selector(pe_list_aux);
+            solution[idx] = op.second->getId();
         }
         for (int k = 0; k < solution.size(); k++) {
             if (solution[k] == -1) {
@@ -230,21 +247,6 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
         }
     }
     return -1;
-}
-
-int Scheduler::getRandomPE(int type) {
-
-    int value;
-    random_selector<> selector{};
-    if (type == PE_IN) {
-        value = selector(Scheduler::cgraArch->pe_list_in);
-    } else if (type == PE_OUT) {
-        value = selector(Scheduler::cgraArch->pe_list_out);
-    } else {
-        value = selector(Scheduler::cgraArch->pe_list_basic);
-    }
-
-    return value;
 }
 
 void Scheduler::reset() {

@@ -73,12 +73,12 @@ void SobelFilter::benchmarking(int numThread, int img_width, int img_height) {
         rgbToGray(rgb[j], gray[j], gray_size);
     }
 
-    SobelFilter::compile(numThread);
-
-    SobelFilter::runCGRA(gray, contour_img_cgra, width, gray_size, numThread);
-
-    SobelFilter::runCPU(gray, contour_img_cpu, width, gray_size, numThread);
-
+    if(SobelFilter::compile(numThread)) {
+        SobelFilter::runCGRA(gray, contour_img_cgra, width, gray_size, numThread);
+        SobelFilter::runCPU(gray, contour_img_cpu, width, gray_size, numThread);
+    } else{
+        printf("Compilation failed!\n");
+    }
     for (int k = 0; k < numThread; ++k) {
         writeFile(file_out_cgra[k], contour_img_cgra[k], gray_size);
         writeFile(file_out_cpu[k], contour_img_cpu[k], gray_size);
@@ -271,7 +271,7 @@ void SobelFilter::contour(const byte *sobel_h, const byte *sobel_v, int gray_siz
     }
 }
 
-void SobelFilter::compile(int numThreads) {
+bool SobelFilter::compile(int numThreads) {
 
     Scheduler scheduler(SobelFilter::cgraArch);
     high_resolution_clock::time_point s;
@@ -303,6 +303,7 @@ void SobelFilter::compile(int numThreads) {
     for (auto df:dfs) {
         delete df;
     }
+    return r == SCHEDULE_SUCCESS;
 }
 
 DataFlow *SobelFilter::createDataFlow(int id) {

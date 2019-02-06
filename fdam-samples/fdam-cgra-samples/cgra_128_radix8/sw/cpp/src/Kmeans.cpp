@@ -249,7 +249,7 @@ void Kmeans::runCPU(unsigned short ***data_in, unsigned short **data_out, unsign
 
 }
 
-void Kmeans::compile(int numThreads) {
+bool Kmeans::compile(int numThreads) {
 
     Scheduler scheduler(Kmeans::cgraArch);
     high_resolution_clock::time_point s;
@@ -281,6 +281,7 @@ void Kmeans::compile(int numThreads) {
     for (auto df:dfs) {
         delete df;
     }
+    return r == SCHEDULE_SUCCESS;
 }
 
 void Kmeans::printStatistics() {
@@ -350,10 +351,13 @@ void Kmeans::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    Kmeans::compile(numThreads);
-    Kmeans::runCGRA(data_in, data_out_cgra, centroids_cgra, data_size, numThreads);
-    Kmeans::runCPU(data_in, data_out_cpu, centroids_cpu, data_size, numThreads);
-/*
+    if(Kmeans::compile(numThreads)) {
+        Kmeans::runCGRA(data_in, data_out_cgra, centroids_cgra, data_size, numThreads);
+        Kmeans::runCPU(data_in, data_out_cpu, centroids_cpu, data_size, numThreads);
+    }else{
+        printf("Compilation failed!\n");
+    }
+    /*
     for (int m = 0; m < numThreads; ++m) {
         for (int i = 0; i < Kmeans::num_dim; ++i) {
             for (int l = 0; l < data_size; ++l) {
@@ -378,22 +382,16 @@ void Kmeans::benchmarking(int numThreads,int data_size) {
         printf("\n");
     }
     */
-    bool flag_error = false;
+
     for (int k = 0; k < numThreads; ++k) {
         for (int j = 0; j < data_size; ++j) {
             if (data_out_cpu[k][j] != data_out_cgra[k][j]) {
                 printf("Error: Thread %d, index %d, expected %d found %d!\n", k, j, data_out_cpu[k][j],
                        data_out_cgra[k][j]);
-                flag_error = true;
                 break;
             }
         }
     }
-
-    if (!flag_error) {
-        printf("Success!\n");
-    }
-
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < Kmeans::num_dim; ++j) {
             delete data_in[i][j];

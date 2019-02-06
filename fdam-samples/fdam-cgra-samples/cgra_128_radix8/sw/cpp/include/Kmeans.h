@@ -40,7 +40,7 @@ private:
     void runCPU(unsigned short ***data_in, unsigned short **data_out, unsigned short **centroids, int data_size,
                 int numThread);
 
-    void compile(int numThreads);
+    bool compile(int numThreads);
 
     static bool compare(Operator *a, Operator *b);
 
