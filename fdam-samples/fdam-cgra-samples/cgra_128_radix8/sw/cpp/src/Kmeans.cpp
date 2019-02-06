@@ -18,7 +18,7 @@ Kmeans::Kmeans(Cgra *cgra, CgraArch *cgraArch, int num_dim, int num_clusters) {
 
 Kmeans::~Kmeans() = default;
 
-DataFlow * Kmeans::createDataFlow(int id) {
+DataFlow *Kmeans::createDataFlow(int id) {
     auto df = new DataFlow(id, "kmeans");
     int idx = 0;
     std::vector<Operator *> inputs;
@@ -246,7 +246,7 @@ void Kmeans::runCPU(unsigned short ***data_in, unsigned short **data_out, unsign
     }
     diff = high_resolution_clock::now() - s;
     Kmeans::cpuExecTime = diff.count() * 1000;
-  
+
 }
 
 void Kmeans::compile(int numThreads) {
@@ -273,7 +273,7 @@ void Kmeans::compile(int numThreads) {
     if (r == SCHEDULE_SUCCESS) {
         sprintf(filename, "../kmeans_files/%s.cgra", dfs[0]->getName().c_str());
         Kmeans::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../kmeans_files/%s.dot",dfs[0]->getName().c_str());
+        sprintf(filename, "../kmeans_files/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);
@@ -310,9 +310,8 @@ void Kmeans::printStatistics() {
     delete df;
 }
 
-void Kmeans::benchmarking(int numThreads) {
+void Kmeans::benchmarking(int numThreads,int data_size) {
 
-    int data_size = 134217727;
     unsigned short ***data_in;
     unsigned short **data_out_cpu;
     unsigned short **data_out_cgra;

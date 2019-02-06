@@ -23,7 +23,7 @@ typedef int byte;
 class SobelFilter {
 
 private:
-    Cgra * cgraHw;
+    Cgra *cgraHw;
     CgraArch *cgraArch;
     double schedulingTime;
     double cpuExecTime;
@@ -48,7 +48,7 @@ private:
 
     void makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, byte *op_mem);
 
-    void contour(const byte *sobel_h,const byte *sobel_v, int gray_size, byte *contour_img);
+    void contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img);
 
     DataFlow *createDataFlow(int id);
 
@@ -59,7 +59,7 @@ public:
 
     ~SobelFilter();
 
-    void benchmarking(int numThreads);
+    void benchmarking(int numThreads, int img_width, int img_height);
 
     void printStatistics();
 };

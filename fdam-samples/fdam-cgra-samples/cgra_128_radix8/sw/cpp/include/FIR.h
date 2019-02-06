@@ -19,7 +19,7 @@ using namespace std::chrono;
 
 class FIR {
 private:
-    Cgra * cgraHw;
+    Cgra *cgraHw;
     CgraArch *cgraArch;
     int size;
     unsigned short **coef;
@@ -30,9 +30,9 @@ private:
 
     void setCoef(unsigned short **coef);
 
-    void runCGRA(unsigned short **data_in,unsigned short ** data_out,int data_size,int numThreads);
+    void runCGRA(unsigned short **data_in, unsigned short **data_out, int data_size, int numThreads);
 
-    void runCPU(unsigned short **data_in,unsigned short ** data_out,int data_size,int numThreads);
+    void runCPU(unsigned short **data_in, unsigned short **data_out, int data_size, int numThreads);
 
     DataFlow *createDataFlow(int thread);
 
@@ -43,7 +43,7 @@ public:
 
     ~FIR();
 
-    void benchmarking(int numThreads);
+    void benchmarking(int numThreads, int data_size);
 
     void printStatistics();
 

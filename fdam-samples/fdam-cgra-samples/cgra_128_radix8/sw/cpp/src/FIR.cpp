@@ -83,7 +83,7 @@ void FIR::compile(int numThreads) {
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     char filename[100];
-    std::vector<DataFlow *>dfs;
+    std::vector<DataFlow *> dfs;
 
     for (int i = 0; i < numThreads; ++i) {
         dfs.push_back(FIR::createDataFlow(i));
@@ -98,14 +98,14 @@ void FIR::compile(int numThreads) {
     FIR::schedulingTime = diff.count() * 1000;
 
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../fir_files/%s.cgra",dfs[0]->getName().c_str());
+        sprintf(filename, "../fir_files/%s.cgra", dfs[0]->getName().c_str());
         FIR::cgraArch->writeCgraProgram(filename);
         sprintf(filename, "../fir_files/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);
     }
-    for(auto df:dfs){
+    for (auto df:dfs) {
         delete df;
     }
 }
@@ -130,8 +130,8 @@ void FIR::runCPU(unsigned short **data_in, unsigned short **data_out, int data_s
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-
     s = high_resolution_clock::now();
+
 #pragma omp parallel
 #pragma omp for
     for (int i = 0; i < NUM_THREADS; i++) {
@@ -143,6 +143,7 @@ void FIR::runCPU(unsigned short **data_in, unsigned short **data_out, int data_s
             data_out[i][j] = fir;
         }
     }
+
     diff = high_resolution_clock::now() - s;
     FIR::cpuExecTime = diff.count() * 1000;
 }
@@ -174,9 +175,8 @@ void FIR::printStatistics() {
     delete df;
 }
 
-void FIR::benchmarking(int numThreads) {
+void FIR::benchmarking(int numThreads,int data_size) {
 
-    int data_size = 134217727;
     unsigned short **data_in;
     unsigned short **data_out_cgra;
     unsigned short **data_out_cpu;
@@ -194,7 +194,7 @@ void FIR::benchmarking(int numThreads) {
     }
     for (int k = 0; k < numThreads; ++k) {
         for (int i = 0; i < data_size; ++i) {
-            data_in[k][i] = (unsigned short)(random() % 64);
+            data_in[k][i] = (unsigned short) (random() % 64);
             data_out_cgra[k][i] = 0;
             data_out_cpu[k][i] = 0;
         }

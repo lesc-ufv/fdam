@@ -39,7 +39,7 @@ public:
 
     ~LoopBack();
 
-    void benchmarking(int numThreads);
+    void benchmarking(int numThreads, int data_size);
 
     void printStatistics();
 };

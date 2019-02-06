@@ -27,7 +27,7 @@ private:
     double cgraExecTime;
     double cgraConfTime;
 
-    DataFlow * createDataFlow(int id);
+    DataFlow *createDataFlow(int id);
 
     void helpKmeansUpdateCentroids(unsigned short ***data_in, unsigned short **data_out, unsigned short **centroids,
                                    unsigned short **centroids_old, int data_size, int numThreads);
@@ -42,7 +42,7 @@ private:
 
     void compile(int numThreads);
 
-    static bool compare(Operator *a,Operator *b);
+    static bool compare(Operator *a, Operator *b);
 
 public:
 
@@ -50,7 +50,7 @@ public:
 
     ~Kmeans();
 
-    void benchmarking(int numThreads);
+    void benchmarking(int numThreads, int data_size);
 
     void printStatistics();
 

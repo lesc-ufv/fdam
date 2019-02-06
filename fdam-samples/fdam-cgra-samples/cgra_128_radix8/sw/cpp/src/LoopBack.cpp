@@ -58,7 +58,7 @@ void LoopBack::compile(int numThreads) {
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     char filename[100];
-    std::vector<DataFlow *>dfs;
+    std::vector<DataFlow *> dfs;
 
     for (int i = 0; i < numThreads; ++i) {
         dfs.push_back(LoopBack::createDataFlow(i));
@@ -71,21 +71,20 @@ void LoopBack::compile(int numThreads) {
     diff = high_resolution_clock::now() - s;
     LoopBack::schedulingTime = diff.count() * 1000;
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../loopback_files/%s.cgra",dfs[0]->getName().c_str());
+        sprintf(filename, "../loopback_files/%s.cgra", dfs[0]->getName().c_str());
         LoopBack::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../loopback_files/%s.dot",dfs[0]->getName().c_str());
+        sprintf(filename, "../loopback_files/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);
     }
-    for (auto df:dfs){
+    for (auto df:dfs) {
         delete df;
     }
 }
 
-void LoopBack::benchmarking(int numThreads) {
+void LoopBack::benchmarking(int numThreads,int data_size) {
 
-    int data_size = 134217727; 
     unsigned short ***data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;

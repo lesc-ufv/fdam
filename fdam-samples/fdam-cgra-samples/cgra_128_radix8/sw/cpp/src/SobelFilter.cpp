@@ -15,7 +15,7 @@ SobelFilter::SobelFilter(Cgra *cgraHw, CgraArch *cgraArch) {
 
 SobelFilter::~SobelFilter() = default;
 
-void SobelFilter::benchmarking(int numThread) {
+void SobelFilter::benchmarking(int numThread, int img_width, int img_height) {
     char file_in[8][100] = {
             {"../sobel_files/img.rgb"},
             {"../sobel_files/img.rgb"},
@@ -52,8 +52,8 @@ void SobelFilter::benchmarking(int numThread) {
     byte **contour_img_cpu;
     byte **contour_img_cgra;
 
-    int width = 10200;
-    int height = 10200;
+    int width = img_width;
+    int height = img_height;
     int gray_size = width * height;
     int rgb_size = gray_size * 3;
 
@@ -145,10 +145,10 @@ void SobelFilter::runCGRA(byte **gray, byte **contour_img, int width, int gray_s
 void SobelFilter::runCPU(byte **gray, byte **contour_img, int width, int gray_size, int num_img) {
 
     byte sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1},
-         sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+            sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 
-    auto **sobel_h_res = new byte*[num_img];
-    auto **sobel_v_res = new byte*[num_img];
+    auto **sobel_h_res = new byte *[num_img];
+    auto **sobel_v_res = new byte *[num_img];
 
     for (int j = 0; j < num_img; ++j) {
         sobel_h_res[j] = new byte[gray_size];
@@ -180,8 +180,8 @@ void SobelFilter::runCPU(byte **gray, byte **contour_img, int width, int gray_si
 void SobelFilter::rgbToGray(byte *rgb, byte *gray, int gray_size) {
     byte *p_rgb = rgb;
     byte *p_gray = gray;
-    for(int i=0; i<gray_size; i++) {
-        *p_gray = (byte)(0.30*p_rgb[0] + 0.59*p_rgb[1] + 0.11*p_rgb[2]);
+    for (int i = 0; i < gray_size; i++) {
+        *p_gray = (byte) (0.30 * p_rgb[0] + 0.59 * p_rgb[1] + 0.11 * p_rgb[2]);
         p_rgb += 3;
         p_gray++;
     }
@@ -230,17 +230,17 @@ void SobelFilter::makeOpMemCGRA(byte *buffer, int buffer_size, int width, short 
         int right = (cindex + 1) % width == 0;
         short zero = 0;
 
-        op_mem[0][cindex] = !bottom && !left ? (short)buffer[cindex - width - 1] : zero;
-        op_mem[1][cindex] = !bottom ? (short)buffer[cindex - width] : zero;
-        op_mem[2][cindex] = !bottom && !right ? (short)buffer[cindex - width + 1] : zero;
+        op_mem[0][cindex] = !bottom && !left ? (short) buffer[cindex - width - 1] : zero;
+        op_mem[1][cindex] = !bottom ? (short) buffer[cindex - width] : zero;
+        op_mem[2][cindex] = !bottom && !right ? (short) buffer[cindex - width + 1] : zero;
 
-        op_mem[3][cindex] = !left ? (short)buffer[cindex - 1] : zero;
+        op_mem[3][cindex] = !left ? (short) buffer[cindex - 1] : zero;
         //op_mem[4][cindex] = buffer[cindex];
-        op_mem[4][cindex] = !right ? (short)buffer[cindex + 1] : zero;
+        op_mem[4][cindex] = !right ? (short) buffer[cindex + 1] : zero;
 
-        op_mem[5][cindex] = !top && !left ? (short)buffer[cindex + width - 1] : zero;
-        op_mem[6][cindex] = !top ? (short)buffer[cindex + width] : zero;
-        op_mem[7][cindex] = !top && !right ? (short)buffer[cindex + width + 1] : zero;
+        op_mem[5][cindex] = !top && !left ? (short) buffer[cindex + width - 1] : zero;
+        op_mem[6][cindex] = !top ? (short) buffer[cindex + width] : zero;
+        op_mem[7][cindex] = !top && !right ? (short) buffer[cindex + width + 1] : zero;
     }
 }
 
@@ -265,9 +265,9 @@ void SobelFilter::makeOpMemCPU(const byte *buffer, int buffer_size, int width, i
     op_mem[8] = !top && !right ? buffer[cindex + width + 1] : zero;
 }
 
-void SobelFilter::contour(const byte *sobel_h,const byte *sobel_v, int gray_size, byte *contour_img) {
+void SobelFilter::contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img) {
     for (int i = 0; i < gray_size; i++) {
-        contour_img[i] = 255 - (byte)sqrt(pow2(sobel_h[i]) + pow2(sobel_v[i]));
+        contour_img[i] = 255 - (byte) sqrt(pow2(sobel_h[i]) + pow2(sobel_v[i]));
     }
 }
 
