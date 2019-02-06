@@ -85,7 +85,7 @@ void LoopBack::compile(int numThreads) {
 
 void LoopBack::benchmarking(int numThreads) {
 
-    int data_size = 32;
+    int data_size = 134217727; 
     unsigned short ***data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
