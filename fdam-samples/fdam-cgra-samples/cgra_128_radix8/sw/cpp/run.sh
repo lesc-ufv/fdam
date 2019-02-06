@@ -1,5 +1,6 @@
 #!/bin/sh
 
+DATA_SIZE=1048576
 
 rm -rf build $1
 mkdir $1
@@ -11,17 +12,18 @@ make
 echo "fpgaconf..."
 fpgaconf ../../../hw/synth/cgra_128_radix8.gbs
 
-#echo "running loopback..."
-#./main "loopback" > $1/loopback_out.txt 8 1000000
+echo "running paeth..."
+./main "paeth" > ../$1/paeth_out.txt 8 $DATA_SIZE
 
-echo "running sobel..."
-./main "sobel" > $1/sobel_out.txt 8 10200 10200
+echo "running loopback..."
+./main "loopback" > ../$1/loopback_out.txt 8 $DATA_SIZE
 
 echo "running kmeans..."
-./main "kmeans" > $1/kmeans_out.txt 8 134217728
+./main "kmeans" > ../$1/kmeans_out.txt 8 $DATA_SIZE
 
 echo "running fir..."
-./main "fir" > $1/fir_out.txt 8 134217728
+./main "fir" > ../$1/fir_out.txt 8 $DATA_SIZE
 
-echo "running paeth..."
-./main "paeth" > $1/paeth_out.txt 8 134217728
+echo "running sobel..."
+./main "sobel" > ../$1/sobel_out.txt 8 1333 1333
+

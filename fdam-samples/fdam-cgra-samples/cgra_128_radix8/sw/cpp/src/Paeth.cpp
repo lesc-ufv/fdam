@@ -298,9 +298,9 @@ void Paeth::benchmarking(int numThreads,int data_size) {
     for (int t = 0; t < numThreads; ++t) {
         for (int c = 0; c < 2; ++c) {
             for (int i = 0; i < data_size; ++i) {
-                data_in[t][c][0][i] = 1;
-                data_in[t][c][1][i] = 2;
-                data_in[t][c][2][i] = 3;
+                data_in[t][c][0][i] = (unsigned short)(random()%256);
+                data_in[t][c][1][i] = (unsigned short)(random()%256);
+                data_in[t][c][2][i] = (unsigned short)(random()%256);
 
                 data_out_cpu[t][c][i] = 0;
                 data_out_cgra[t][c][i] = 0;
