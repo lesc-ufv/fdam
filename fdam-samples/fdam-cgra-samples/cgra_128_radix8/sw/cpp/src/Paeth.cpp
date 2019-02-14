@@ -166,6 +166,7 @@ DataFlow *Paeth::createDataFlow(int id) {
         auto muxCBA = new Mux(idx++);
         auto regAnd0 = new PassA(idx++);
         auto regMuxCB = new PassA(idx++);
+
         df->connect(inA[i], regA1, regA1->getPortB());
         df->connect(regA1, regA2, regA2->getPortB());
         df->connect(regA2, regA3, regA3->getPortB());
@@ -264,7 +265,7 @@ void Paeth::printStatistics() {
     delete df;
 }
 
-void Paeth::benchmarking(int numThreads,int data_size) {
+void Paeth::benchmarking(int numThreads, int data_size) {
 
     unsigned short ****data_in;
     unsigned short ***data_out_cpu;
@@ -275,9 +276,9 @@ void Paeth::benchmarking(int numThreads,int data_size) {
     data_out_cgra = new unsigned short **[numThreads];
 
     for (int i = 0; i < numThreads; ++i) {
-        data_in[i] = new unsigned short**[2];
-        data_in[i][0] = new unsigned short*[3];
-        data_in[i][1] = new unsigned short*[3];
+        data_in[i] = new unsigned short **[2];
+        data_in[i][0] = new unsigned short *[3];
+        data_in[i][1] = new unsigned short *[3];
         data_in[i][0][0] = new unsigned short[data_size];
         data_in[i][0][1] = new unsigned short[data_size];
         data_in[i][0][2] = new unsigned short[data_size];
@@ -286,8 +287,8 @@ void Paeth::benchmarking(int numThreads,int data_size) {
         data_in[i][1][1] = new unsigned short[data_size];
         data_in[i][1][2] = new unsigned short[data_size];
 
-        data_out_cpu[i] = new unsigned short*[2];
-        data_out_cgra[i] = new unsigned short*[2];
+        data_out_cpu[i] = new unsigned short *[2];
+        data_out_cgra[i] = new unsigned short *[2];
 
         data_out_cpu[i][0] = new unsigned short[data_size];
         data_out_cpu[i][1] = new unsigned short[data_size];
@@ -298,9 +299,9 @@ void Paeth::benchmarking(int numThreads,int data_size) {
     for (int t = 0; t < numThreads; ++t) {
         for (int c = 0; c < 2; ++c) {
             for (int i = 0; i < data_size; ++i) {
-                data_in[t][c][0][i] = (unsigned short)(random()%256);
-                data_in[t][c][1][i] = (unsigned short)(random()%256);
-                data_in[t][c][2][i] = (unsigned short)(random()%256);
+                data_in[t][c][0][i] = (unsigned short) (random() % 256);
+                data_in[t][c][1][i] = (unsigned short) (random() % 256);
+                data_in[t][c][2][i] = (unsigned short) (random() % 256);
 
                 data_out_cpu[t][c][i] = 0;
                 data_out_cgra[t][c][i] = 0;
@@ -308,22 +309,23 @@ void Paeth::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    if(Paeth::compile(numThreads)) {
+    if (Paeth::compile(numThreads)) {
         Paeth::runCGRA(data_in, data_out_cgra, data_size, numThreads);
         Paeth::runCPU(data_in, data_out_cpu, data_size, numThreads);
-    }else{
-        printf("Compilation failed!\n");
-    }
-    for (int t = 0; t < numThreads; ++t) {
-        for (int c = 0; c < 2; ++c) {
-            for (int i = 0; i < data_size; ++i) {
-                if (data_out_cpu[t][c][i] != data_out_cgra[t][c][i]) {
-                    printf("Error: Thread %d, copy %d, index %d, expected %d found %d!\n", t,c,i, data_out_cpu[t][c][i],
-                           data_out_cgra[t][c][i]);
-                    break;
+        for (int t = 0; t < numThreads; ++t) {
+            for (int c = 0; c < 2; ++c) {
+                for (int i = 0; i < data_size; ++i) {
+                    if (data_out_cpu[t][c][i] != data_out_cgra[t][c][i]) {
+                        printf("Error: Thread %d, copy %d, index %d, expected %d found %d!\n", t, c, i,
+                               data_out_cpu[t][c][i],
+                               data_out_cgra[t][c][i]);
+                        break;
+                    }
                 }
             }
         }
+    } else {
+        printf("Compilation failed!\n");
     }
     for (int i = 0; i < numThreads; ++i) {
         delete data_in[i][0][0];

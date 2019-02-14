@@ -311,7 +311,7 @@ void Kmeans::printStatistics() {
     delete df;
 }
 
-void Kmeans::benchmarking(int numThreads,int data_size) {
+void Kmeans::benchmarking(int numThreads, int data_size) {
 
     unsigned short ***data_in;
     unsigned short **data_out_cpu;
@@ -351,46 +351,20 @@ void Kmeans::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    if(Kmeans::compile(numThreads)) {
+    if (Kmeans::compile(numThreads)) {
         Kmeans::runCGRA(data_in, data_out_cgra, centroids_cgra, data_size, numThreads);
         Kmeans::runCPU(data_in, data_out_cpu, centroids_cpu, data_size, numThreads);
-    }else{
+        for (int k = 0; k < numThreads; ++k) {
+            for (int j = 0; j < data_size; ++j) {
+                if (data_out_cpu[k][j] != data_out_cgra[k][j]) {
+                    printf("Error: Thread %d, index %d, expected %d found %d!\n", k, j, data_out_cpu[k][j],
+                           data_out_cgra[k][j]);
+                    break;
+                }
+            }
+        }
+    } else {
         printf("Compilation failed!\n");
-    }
-    /*
-    for (int m = 0; m < numThreads; ++m) {
-        for (int i = 0; i < Kmeans::num_dim; ++i) {
-            for (int l = 0; l < data_size; ++l) {
-                printf("%d ", data_in[m][i][l]);
-            }
-            printf("\n");
-        }
-        printf("\n");
-    }
-
-    for (int m = 0; m < numThreads; ++m) {
-        for (int l = 0; l < data_size; ++l) {
-            printf("%d ", data_out_cpu[m][l]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    for (int m = 0; m < numThreads; ++m) {
-        for (int l = 0; l < data_size; ++l) {
-            printf("%d ", data_out_cgra[m][l]);
-        }
-        printf("\n");
-    }
-    */
-
-    for (int k = 0; k < numThreads; ++k) {
-        for (int j = 0; j < data_size; ++j) {
-            if (data_out_cpu[k][j] != data_out_cgra[k][j]) {
-                printf("Error: Thread %d, index %d, expected %d found %d!\n", k, j, data_out_cpu[k][j],
-                       data_out_cgra[k][j]);
-                break;
-            }
-        }
     }
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < Kmeans::num_dim; ++j) {

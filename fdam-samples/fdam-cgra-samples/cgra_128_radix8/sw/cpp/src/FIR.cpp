@@ -117,7 +117,8 @@ void FIR::runCGRA(unsigned short **data_in, unsigned short **data_out, int data_
     FIR::cgraHw->loadCgraProgram("../fir_files/fir.cgra");
     for (int i = 0; i < numThreads; ++i) {
         FIR::cgraHw->setCgraProgramInputStreamByID(i, 0, data_in[i], sizeof(unsigned short) * data_size);
-        FIR::cgraHw->setCgraProgramOutputStreamByID(i, 1, data_out[i], sizeof(unsigned short) * (data_size - FIR::size));
+        FIR::cgraHw->setCgraProgramOutputStreamByID(i, 1, data_out[i],
+                                                    sizeof(unsigned short) * (data_size - FIR::size));
     }
     s = high_resolution_clock::now();
     FIR::cgraHw->syncExecute(0);
@@ -175,13 +176,13 @@ void FIR::printStatistics() {
     delete df;
 }
 
-void FIR::benchmarking(int numThreads,int data_size) {
+void FIR::benchmarking(int numThreads, int data_size) {
 
     unsigned short **data_in;
     unsigned short **data_out_cgra;
     unsigned short **data_out_cpu;
 
-    if(data_size < FIR::size){
+    if (data_size < FIR::size) {
         data_size = FIR::size + 1;
     }
 
@@ -202,28 +203,26 @@ void FIR::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    if(FIR::compile(numThreads)) {
+    if (FIR::compile(numThreads)) {
         FIR::runCGRA(data_in, data_out_cgra, data_size, numThreads);
         FIR::runCPU(data_in, data_out_cpu, data_size, numThreads);
-    }
-    else{
-        printf("Compilation failed!\n");
-    }
-    for (int k = 0; k < numThreads; ++k) {
-        for (int j = 0; j < data_size - FIR::size; ++j) {
-            if (data_out_cpu[k][j] != data_out_cgra[k][j]) {
-                printf("Error: Thread %d, index %d, expected %d found %d!\n", k, j, data_out_cpu[k][j],
-                       data_out_cgra[k][j]);
-                break;
+        for (int k = 0; k < numThreads; ++k) {
+            for (int j = 0; j < data_size - FIR::size; ++j) {
+                if (data_out_cpu[k][j] != data_out_cgra[k][j]) {
+                    printf("Error: Thread %d, index %d, expected %d found %d!\n", k, j, data_out_cpu[k][j],
+                           data_out_cgra[k][j]);
+                    break;
+                }
             }
         }
+    } else {
+        printf("Compilation failed!\n");
     }
     for (int i = 0; i < numThreads; ++i) {
         delete data_in[i];
         delete data_out_cgra[i];
         delete data_out_cpu[i];
     }
-
     delete data_in;
     delete data_out_cgra;
     delete data_out_cpu;

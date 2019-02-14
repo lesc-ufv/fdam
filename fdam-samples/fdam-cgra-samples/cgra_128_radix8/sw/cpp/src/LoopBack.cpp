@@ -84,7 +84,7 @@ bool LoopBack::compile(int numThreads) {
     return r == SCHEDULE_SUCCESS;
 }
 
-void LoopBack::benchmarking(int numThreads,int data_size) {
+void LoopBack::benchmarking(int numThreads, int data_size) {
 
     unsigned short ***data_in;
     unsigned short ***data_out_cpu;
@@ -115,25 +115,23 @@ void LoopBack::benchmarking(int numThreads,int data_size) {
         }
     }
 
-    if(LoopBack::compile(numThreads)) {
+    if (LoopBack::compile(numThreads)) {
         LoopBack::runCGRA(data_in, data_out_cgra, data_size, numThreads);
         LoopBack::runCPU(data_in, data_out_cpu, data_size, numThreads);
-    }else{
-        printf("Compilation failed!\n");
-    }
-
-
-    for (int k = 0; k < numThreads; ++k) {
-        for (int i = 0; i < 8; ++i) {
-            for (int j = 0; j < data_size; ++j) {
-                if (data_out_cpu[k][i][j] != data_out_cgra[k][i][j]) {
-                    printf("Error: Thread %d, queue %d, index %d, expected %d found %d!\n", k, i, j,
-                           data_out_cpu[k][i][j],
-                           data_out_cgra[k][i][j]);
-                    break;
+        for (int k = 0; k < numThreads; ++k) {
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < data_size; ++j) {
+                    if (data_out_cpu[k][i][j] != data_out_cgra[k][i][j]) {
+                        printf("Error: Thread %d, queue %d, index %d, expected %d found %d!\n", k, i, j,
+                               data_out_cpu[k][i][j],
+                               data_out_cgra[k][i][j]);
+                        break;
+                    }
                 }
             }
         }
+    } else {
+        printf("Compilation failed!\n");
     }
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < 8; ++j) {

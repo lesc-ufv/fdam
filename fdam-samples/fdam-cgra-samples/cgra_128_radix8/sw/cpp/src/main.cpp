@@ -5,10 +5,10 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-    auto cgra = new Cgra();
+    Cgra *cgra = new Cgra();
     auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
 
-    int num_thread = 8;//atoi(argv[2]);
+    int num_thread = atoi(argv[2]);
     int data_size = atoi(argv[3]);
 
     if (std::strcmp("loopback", argv[1]) == 0) {

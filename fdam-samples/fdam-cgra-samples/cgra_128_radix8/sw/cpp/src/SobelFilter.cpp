@@ -73,10 +73,10 @@ void SobelFilter::benchmarking(int numThread, int img_width, int img_height) {
         rgbToGray(rgb[j], gray[j], gray_size);
     }
 
-    if(SobelFilter::compile(numThread)) {
+    if (SobelFilter::compile(numThread)) {
         SobelFilter::runCGRA(gray, contour_img_cgra, width, gray_size, numThread);
         SobelFilter::runCPU(gray, contour_img_cpu, width, gray_size, numThread);
-    } else{
+    } else {
         printf("Compilation failed!\n");
     }
     for (int k = 0; k < numThread; ++k) {

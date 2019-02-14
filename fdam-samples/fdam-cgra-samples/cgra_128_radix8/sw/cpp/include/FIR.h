@@ -15,7 +15,7 @@
 
 using namespace std::chrono;
 
-#define NUM_THREADS 8
+#define NUM_THREADS 1
 
 class FIR {
 private:
