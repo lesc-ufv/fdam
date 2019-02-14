@@ -1,59 +1,3 @@
-Error: Thread 1, queue 0, index 0, expected 0 found 247!
-Error: Thread 1, queue 1, index 0, expected 0 found 78!
-Error: Thread 1, queue 2, index 0, expected 0 found 268!
-Error: Thread 1, queue 3, index 0, expected 0 found 759!
-Error: Thread 1, queue 4, index 0, expected 0 found 676!
-Error: Thread 1, queue 5, index 0, expected 0 found 362!
-Error: Thread 1, queue 6, index 0, expected 0 found 173!
-Error: Thread 1, queue 7, index 0, expected 0 found 981!
-Error: Thread 2, queue 0, index 0, expected 0 found 172!
-Error: Thread 2, queue 1, index 0, expected 0 found 605!
-Error: Thread 2, queue 2, index 0, expected 0 found 907!
-Error: Thread 2, queue 3, index 0, expected 0 found 289!
-Error: Thread 2, queue 4, index 0, expected 0 found 967!
-Error: Thread 2, queue 5, index 0, expected 0 found 336!
-Error: Thread 2, queue 6, index 0, expected 0 found 374!
-Error: Thread 2, queue 7, index 0, expected 0 found 440!
-Error: Thread 3, queue 0, index 0, expected 0 found 171!
-Error: Thread 3, queue 1, index 0, expected 0 found 628!
-Error: Thread 3, queue 2, index 0, expected 0 found 579!
-Error: Thread 3, queue 3, index 0, expected 0 found 122!
-Error: Thread 3, queue 4, index 0, expected 0 found 961!
-Error: Thread 3, queue 5, index 0, expected 0 found 455!
-Error: Thread 3, queue 6, index 0, expected 0 found 453!
-Error: Thread 3, queue 7, index 0, expected 0 found 567!
-Error: Thread 4, queue 0, index 0, expected 0 found 378!
-Error: Thread 4, queue 1, index 0, expected 0 found 995!
-Error: Thread 4, queue 2, index 0, expected 0 found 172!
-Error: Thread 4, queue 3, index 0, expected 0 found 632!
-Error: Thread 4, queue 4, index 0, expected 0 found 345!
-Error: Thread 4, queue 5, index 0, expected 0 found 501!
-Error: Thread 4, queue 6, index 0, expected 0 found 962!
-Error: Thread 4, queue 7, index 0, expected 0 found 255!
-Error: Thread 5, queue 0, index 0, expected 0 found 190!
-Error: Thread 5, queue 1, index 0, expected 0 found 537!
-Error: Thread 5, queue 2, index 0, expected 0 found 483!
-Error: Thread 5, queue 3, index 0, expected 0 found 107!
-Error: Thread 5, queue 4, index 0, expected 0 found 277!
-Error: Thread 5, queue 5, index 0, expected 0 found 539!
-Error: Thread 5, queue 6, index 0, expected 0 found 872!
-Error: Thread 5, queue 7, index 0, expected 0 found 16!
-Error: Thread 6, queue 0, index 0, expected 0 found 433!
-Error: Thread 6, queue 1, index 0, expected 0 found 920!
-Error: Thread 6, queue 2, index 0, expected 0 found 773!
-Error: Thread 6, queue 3, index 0, expected 0 found 818!
-Error: Thread 6, queue 4, index 0, expected 0 found 346!
-Error: Thread 6, queue 5, index 0, expected 0 found 795!
-Error: Thread 6, queue 6, index 0, expected 0 found 275!
-Error: Thread 6, queue 7, index 0, expected 0 found 406!
-Error: Thread 7, queue 0, index 0, expected 0 found 667!
-Error: Thread 7, queue 1, index 0, expected 0 found 907!
-Error: Thread 7, queue 2, index 0, expected 0 found 957!
-Error: Thread 7, queue 3, index 0, expected 0 found 921!
-Error: Thread 7, queue 4, index 0, expected 0 found 547!
-Error: Thread 7, queue 5, index 0, expected 0 found 972!
-Error: Thread 7, queue 6, index 0, expected 0 found 160!
-Error: Thread 7, queue 7, index 0, expected 0 found 804!
   [FDAM]  INFO LoopBack Statictics
   [FDAM]  INFO CGRA target architecture:
   [FDAM]  INFO Number of Threads: 8
@@ -69,43 +13,43 @@ Error: Thread 7, queue 7, index 0, expected 0 found 804!
   [FDAM]  INFO Num input nodes: 8
   [FDAM]  INFO Num output nodes: 8
   [FDAM]  INFO Num total nodes: 128
-  [FDAM]  INFO Scheduling time: 67.8944ms
-  [FDAM]  INFO CGRA total execution time: 34935.2ms
-  [FDAM]  INFO CGRA execution time: 336.86ms
-  [FDAM]  INFO CPU execution time: 24.8328ms
+  [FDAM]  INFO Scheduling time: 8.5684ms
+  [FDAM]  INFO CGRA total execution time: 3035ms
+  [FDAM]  INFO CGRA execution time: 336.818ms
+  [FDAM]  INFO CPU execution time: 54.7502ms
   [FDAM]  INFO Accelerator:
   [FDAM]  ID: 0
   [FDAM]  Amount of input queues: 8
   [FDAM]  Amount of output queues: 8
   [FDAM]  Status: Done
   [FDAM]  INFO Input Queues:
-  [FDAM]  Queue ID: 0, State: Done, Bytes read: 134266368
-  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 4, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 6, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 7, State: Not done, Bytes read: 134217728
+  [FDAM]  Queue ID: 0, State: Done, Bytes read: 16783552
+  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 16777216
+  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 16777216
+  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 16777216
+  [FDAM]  Queue ID: 4, State: Not done, Bytes read: 16777216
+  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 16777216
+  [FDAM]  Queue ID: 6, State: Not done, Bytes read: 16777216
+  [FDAM]  Queue ID: 7, State: Not done, Bytes read: 16777216
   [FDAM]  INFO Output Queues:
-  [FDAM]  Queue ID: 0 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 1 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 2 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 3 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 4 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 5 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 6 State: Not done, Written bytes: 134218944
-  [FDAM]  Queue ID: 7 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 0 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 1 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 2 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 3 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 4 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 5 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 6 State: Not done, Written bytes: 16778432
+  [FDAM]  Queue ID: 7 State: Not done, Written bytes: 16778432
   [FDAM]  INFO: Accelerator Management
   [FDAM]  INFO: TARGET:[real device]
   [FDAM]  INFO: Frequency: 200 MHz
   [FDAM]  INFO: Number of accelerators: 1
   [FDAM]  INFO: Total number of input queues: 8
   [FDAM]  INFO: Total number of output queues: 8
-  [FDAM]  INFO: Total clock: 6.72158e+07
-  [FDAM]  INFO: Total bytes read: 1.07379e+09
-  [FDAM]  INFO: Total written bytes: 1.07374e+09
-  [FDAM]  INFO: Approximate throughput: 6093.95MB/s
-  [FDAM]  INFO: VTP PT walk cycles: 172938
+  [FDAM]  INFO: Total clock: 6.72074e+07
+  [FDAM]  INFO: Total bytes read: 1.34224e+08
+  [FDAM]  INFO: Total written bytes: 1.34218e+08
+  [FDAM]  INFO: Approximate throughput: 761.841MB/s
+  [FDAM]  INFO: VTP PT walk cycles: 3663
   [FDAM]  INFO: VTP L2 4KB hit / miss: 1 / 1
-  [FDAM]  INFO: VTP L2 2MB hit / miss: 3948 / 1025
+  [FDAM]  INFO: VTP L2 2MB hit / miss: 255 / 129

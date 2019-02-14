@@ -13,24 +13,24 @@
   [FDAM]  INFO Num input nodes: 5
   [FDAM]  INFO Num output nodes: 1
   [FDAM]  INFO Num total nodes: 116
-  [FDAM]  INFO Scheduling time: 79.6518ms
-  [FDAM]  INFO CGRA total execution time: 13285.7ms
-  [FDAM]  INFO CGRA execution time: 336.876ms
-  [FDAM]  INFO CPU execution time: 754.886ms
+  [FDAM]  INFO Scheduling time: 83.2463ms
+  [FDAM]  INFO CGRA total execution time: 13247.4ms
+  [FDAM]  INFO CGRA execution time: 336.879ms
+  [FDAM]  INFO CPU execution time: 507.833ms
   [FDAM]  INFO Accelerator:
   [FDAM]  ID: 0
   [FDAM]  Amount of input queues: 8
   [FDAM]  Amount of output queues: 8
   [FDAM]  Status: Done
   [FDAM]  INFO Input Queues:
-  [FDAM]  Queue ID: 0, State: Done, Bytes read: 52416
-  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 0
-  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 134217728
+  [FDAM]  Queue ID: 0, State: Done, Bytes read: 134270720
+  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 134217728
+  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 0
+  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 0
   [FDAM]  Queue ID: 4, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 134217728
+  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 0
   [FDAM]  Queue ID: 6, State: Not done, Bytes read: 134217728
-  [FDAM]  Queue ID: 7, State: Not done, Bytes read: 0
+  [FDAM]  Queue ID: 7, State: Not done, Bytes read: 134217728
   [FDAM]  INFO Output Queues:
   [FDAM]  Queue ID: 0 State: Not done, Written bytes: 16128
   [FDAM]  Queue ID: 1 State: Not done, Written bytes: 16128
@@ -46,10 +46,10 @@
   [FDAM]  INFO: Number of accelerators: 1
   [FDAM]  INFO: Total number of input queues: 8
   [FDAM]  INFO: Total number of output queues: 8
-  [FDAM]  INFO: Total clock: 6.72189e+07
-  [FDAM]  INFO: Total bytes read: 6.71141e+08
-  [FDAM]  INFO: Total written bytes: 1.34219e+08
-  [FDAM]  INFO: Approximate throughput: 2285.22MB/s
-  [FDAM]  INFO: VTP PT walk cycles: 12933
-  [FDAM]  INFO: VTP L2 4KB hit / miss: 61 / 14
-  [FDAM]  INFO: VTP L2 2MB hit / miss: 1158 / 384
+  [FDAM]  INFO: Total clock: 6.72197e+07
+  [FDAM]  INFO: Total bytes read: 6.71142e+08
+  [FDAM]  INFO: Total written bytes: 1.34218e+08
+  [FDAM]  INFO: Approximate throughput: 2285.2MB/s
+  [FDAM]  INFO: VTP PT walk cycles: 12785
+  [FDAM]  INFO: VTP L2 4KB hit / miss: 1 / 1
+  [FDAM]  INFO: VTP L2 2MB hit / miss: 1074 / 385
