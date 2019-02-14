@@ -1,0 +1,119 @@
+Error: Thread 0, queue 0, index 2870384, expected 520 found 0!
+Error: Thread 0, queue 1, index 2870400, expected 10 found 0!
+Error: Thread 0, queue 2, index 2870416, expected 946 found 0!
+Error: Thread 0, queue 3, index 2870416, expected 807 found 0!
+Error: Thread 0, queue 4, index 2870400, expected 872 found 0!
+Error: Thread 0, queue 5, index 2870400, expected 111 found 0!
+Error: Thread 0, queue 6, index 2870400, expected 144 found 0!
+Error: Thread 0, queue 7, index 2870400, expected 220 found 0!
+Error: Thread 1, queue 0, index 2870384, expected 39 found 0!
+Error: Thread 1, queue 1, index 2870400, expected 312 found 0!
+Error: Thread 1, queue 2, index 2870416, expected 450 found 0!
+Error: Thread 1, queue 3, index 2870416, expected 847 found 0!
+Error: Thread 1, queue 4, index 2870400, expected 77 found 0!
+Error: Thread 1, queue 5, index 2870400, expected 644 found 0!
+Error: Thread 1, queue 6, index 2870400, expected 287 found 0!
+Error: Thread 1, queue 7, index 2870400, expected 513 found 0!
+Error: Thread 2, queue 0, index 2870384, expected 975 found 520!
+Error: Thread 2, queue 1, index 2870400, expected 69 found 0!
+Error: Thread 2, queue 2, index 2870404, expected 897 found 354!
+Error: Thread 2, queue 3, index 2870404, expected 417 found 585!
+Error: Thread 2, queue 4, index 2870400, expected 351 found 0!
+Error: Thread 2, queue 5, index 2870400, expected 731 found 0!
+Error: Thread 2, queue 6, index 2870400, expected 167 found 0!
+Error: Thread 2, queue 7, index 2870400, expected 103 found 0!
+Error: Thread 3, queue 0, index 2870384, expected 477 found 39!
+Error: Thread 3, queue 1, index 2870400, expected 514 found 0!
+Error: Thread 3, queue 2, index 2870416, expected 350 found 0!
+Error: Thread 3, queue 3, index 2870416, expected 58 found 0!
+Error: Thread 3, queue 4, index 2870400, expected 605 found 0!
+Error: Thread 3, queue 5, index 2870400, expected 516 found 0!
+Error: Thread 3, queue 6, index 2870400, expected 785 found 0!
+Error: Thread 3, queue 7, index 2870400, expected 599 found 0!
+Error: Thread 4, queue 0, index 2870384, expected 805 found 975!
+Error: Thread 4, queue 1, index 2870400, expected 708 found 0!
+Error: Thread 4, queue 2, index 2870416, expected 925 found 0!
+Error: Thread 4, queue 3, index 2870416, expected 145 found 0!
+Error: Thread 4, queue 4, index 2870400, expected 682 found 0!
+Error: Thread 4, queue 5, index 2870400, expected 522 found 0!
+Error: Thread 4, queue 6, index 2870400, expected 38 found 0!
+Error: Thread 4, queue 7, index 2870400, expected 483 found 0!
+Error: Thread 5, queue 0, index 2870384, expected 143 found 477!
+Error: Thread 5, queue 1, index 2870400, expected 701 found 0!
+Error: Thread 5, queue 2, index 2870416, expected 984 found 0!
+Error: Thread 5, queue 3, index 2870416, expected 777 found 0!
+Error: Thread 5, queue 4, index 2870400, expected 178 found 0!
+Error: Thread 5, queue 5, index 2870400, expected 33 found 0!
+Error: Thread 5, queue 6, index 2870400, expected 267 found 0!
+Error: Thread 5, queue 7, index 2870400, expected 31 found 0!
+Error: Thread 6, queue 0, index 2870384, expected 88 found 805!
+Error: Thread 6, queue 1, index 2870400, expected 7 found 0!
+Error: Thread 6, queue 2, index 2870416, expected 335 found 0!
+Error: Thread 6, queue 3, index 2870416, expected 686 found 0!
+Error: Thread 6, queue 4, index 2870400, expected 984 found 0!
+Error: Thread 6, queue 5, index 2870400, expected 179 found 0!
+Error: Thread 6, queue 6, index 2870400, expected 541 found 0!
+Error: Thread 6, queue 7, index 2870400, expected 753 found 0!
+Error: Thread 7, queue 0, index 2870384, expected 93 found 143!
+Error: Thread 7, queue 1, index 2870393, expected 702 found 479!
+Error: Thread 7, queue 2, index 2870393, expected 543 found 934!
+Error: Thread 7, queue 3, index 2870393, expected 160 found 451!
+Error: Thread 7, queue 4, index 2870393, expected 421 found 187!
+Error: Thread 7, queue 5, index 2870393, expected 89 found 539!
+Error: Thread 7, queue 6, index 2870393, expected 599 found 74!
+Error: Thread 7, queue 7, index 2870393, expected 314 found 257!
+  [FDAM]  INFO LoopBack Statictics
+  [FDAM]  INFO CGRA target architecture:
+  [FDAM]  INFO Number of Threads: 8
+  [FDAM]  INFO Number of PEs: 128
+  [FDAM]  INFO Number of input PEs: 8
+  [FDAM]  INFO Number of output PEs: 8
+  [FDAM]  INFO Omega net PEs size: 256
+  [FDAM]  INFO Omega net PEs radix: 8
+  [FDAM]  INFO Omega net branch size: 128
+  [FDAM]  INFO Omega net branch radix: 8
+  [FDAM]  INFO Word size(bits): 16
+  [FDAM]  INFO DataFlow:
+  [FDAM]  INFO Num input nodes: 8
+  [FDAM]  INFO Num output nodes: 8
+  [FDAM]  INFO Num total nodes: 128
+  [FDAM]  INFO Scheduling time: 67.7263ms
+  [FDAM]  INFO CGRA total execution time: 34948.6ms
+  [FDAM]  INFO CGRA execution time: 336.939ms
+  [FDAM]  INFO CPU execution time: 80.1777ms
+  [FDAM]  INFO Accelerator:
+  [FDAM]  ID: 0
+  [FDAM]  Amount of input queues: 8
+  [FDAM]  Amount of output queues: 8
+  [FDAM]  Status: Done
+  [FDAM]  INFO Input Queues:
+  [FDAM]  Queue ID: 0, State: Done, Bytes read: 134266240
+  [FDAM]  Queue ID: 1, State: Not done, Bytes read: 134217728
+  [FDAM]  Queue ID: 2, State: Not done, Bytes read: 134217728
+  [FDAM]  Queue ID: 3, State: Not done, Bytes read: 134217664
+  [FDAM]  Queue ID: 4, State: Not done, Bytes read: 134217536
+  [FDAM]  Queue ID: 5, State: Not done, Bytes read: 134217472
+  [FDAM]  Queue ID: 6, State: Not done, Bytes read: 134217472
+  [FDAM]  Queue ID: 7, State: Not done, Bytes read: 134217664
+  [FDAM]  INFO Output Queues:
+  [FDAM]  Queue ID: 0 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 1 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 2 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 3 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 4 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 5 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 6 State: Not done, Written bytes: 134218944
+  [FDAM]  Queue ID: 7 State: Not done, Written bytes: 134218944
+  [FDAM]  INFO: Accelerator Management
+  [FDAM]  INFO: TARGET:[real device]
+  [FDAM]  INFO: Frequency: 200 MHz
+  [FDAM]  INFO: Number of accelerators: 1
+  [FDAM]  INFO: Total number of input queues: 8
+  [FDAM]  INFO: Total number of output queues: 8
+  [FDAM]  INFO: Total clock: 6.72314e+07
+  [FDAM]  INFO: Total bytes read: 1.07379e+09
+  [FDAM]  INFO: Total written bytes: 1.07374e+09
+  [FDAM]  INFO: Approximate throughput: 6092.53MB/s
+  [FDAM]  INFO: VTP PT walk cycles: 136658
+  [FDAM]  INFO: VTP L2 4KB hit / miss: 1 / 1
+  [FDAM]  INFO: VTP L2 2MB hit / miss: 3828 / 1023
