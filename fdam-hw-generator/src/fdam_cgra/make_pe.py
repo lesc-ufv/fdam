@@ -5,8 +5,8 @@ from veriloggen import *
 from common.make_cgra_counter import make_thread_counter, make_ignore_counter
 from common.make_mux import make_mux
 from fdam_cgra.make_alu import make_alu
+from fdam_cgra.make_conf_reader_pe import make_conf_reader_pe
 from fdam_cgra.make_inst_decode import make_inst_decode
-from make_conf_reader_pe import make_conf_reader_pe
 
 
 def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_depth):
@@ -65,7 +65,7 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
     pc_max_we = m.Wire('pc_max_we')
     pc_loop_mem = m.Wire('pc_loop_mem', conf_depth)
     pc_loop_we = m.Wire('pc_loop_we')
-    ignore_mem = m.Wire('ignore_mem', conf_depth)
+    ignore_mem = m.Wire('ignore_mem', 16)
     ignore_we = m.Wire('ignore_we')
     qtd_we_low = m.Wire('qtd_we_low')
     qtd_mem_low = m.Wire('qtd_mem_low', 32)
@@ -89,7 +89,7 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
     branch_out_alu = m.Wire('branch_out_alu')
     pc_max = m.Wire('pc_max', conf_depth, num_thread)
     pc_loop = m.Wire('pc_loop', conf_depth, num_thread)
-    ignore = m.Wire('ignore', conf_depth, num_thread)
+    ignore = m.Wire('ignore', 16, num_thread)
     pc_out = m.Wire('pc_out', conf_depth, num_thread)
     mux_pc_out = m.Wire('mux_pc_out', conf_depth)
     reg_alu_in_a_out = m.Wire('reg_alu_in_a_out', data_width)
@@ -168,14 +168,14 @@ def make_pe(cgra_id, type, num_thread, pc, memory, reg_pipe, data_width, conf_de
         qtd_end_counters = ''
 
     if type == 1 or type == 2:
-        param = [('NUM_STAGES', 1), ('DATA_WIDTH', conf_depth)]
+        param = [('NUM_STAGES', 1), ('DATA_WIDTH', 16)]
         con = [('clk', clk), ('rst', rst), ('en', thread_id_dec[genv] & ignore_we), ('in', ignore_mem),
                ('out', ignore[genv])]
         genfor = m.GenerateFor(genv(0), genv < num_thread, genv.inc(), 'ignore_reg_inst')
         genfor.Instance(reg_pipe, 'ignore_reg', param, con)
 
         ignore_counter = make_ignore_counter()
-        param = [('WIDTH', conf_depth)]
+        param = [('WIDTH', 16)]
         con = [('clk', clk), ('rst', rst), ('en', thread_idx_dec_ignore_counter[genv] & ignore_en & en),
                ('limit', ignore[genv]),
                ('end_counter', ignore_end_counters[genv])]

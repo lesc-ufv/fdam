@@ -28,7 +28,7 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
     pc_loop_we = m.OutputReg('pc_loop_we')
     thread_id = m.OutputReg('thread_id', int(ceil(log(num_thread, 2))))
 
-    ignore_data = m.OutputReg('ignore_data', conf_depth)
+    ignore_data = m.OutputReg('ignore_data', 16)
     ignore_we = m.OutputReg('ignore_we')
     qtd_low = m.OutputReg('qtd_low', 32)
     qtd_we_low = m.OutputReg('qtd_we_low')
