@@ -115,7 +115,7 @@ void SobelFilter::runCGRA(byte **gray, byte **contour_img, int width, int gray_s
         }
         SobelFilter::makeOpMemCGRA(gray[l], gray_size, width, inputs[l]);
     }
-    SobelFilter::cgraHw->loadCgraProgram("../sobel_files/sobel_filter.cgra");
+    SobelFilter::cgraHw->loadCgraProgram("../cgra_bitstreams/sobel_filter.cgra");
     for (int m = 0; m < num_img; ++m) {
         for (int i = 0; i < 8; ++i) {
             SobelFilter::cgraHw->setCgraProgramInputStreamByID(m, i, inputs[m][i], sizeof(short) * gray_size);
@@ -293,9 +293,9 @@ bool SobelFilter::compile(int numThreads) {
     SobelFilter::schedulingTime = diff.count() * 1000;
 
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../sobel_files/%s.cgra", dfs[0]->getName().c_str());
+        sprintf(filename, "../cgra_bitstreams/%s.cgra", dfs[0]->getName().c_str());
         SobelFilter::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../sobel_files/%s.dot", dfs[0]->getName().c_str());
+        sprintf(filename, "../dot_dataflows/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);

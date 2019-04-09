@@ -1,0 +1,103 @@
+digraph Qspline{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = IN3 ]
+ 4 [ label = IN4 ]
+ 5 [ label = IN5 ]
+ 6 [ label = IN6 ]
+ 7 [ label = REG]
+ 8 [ label = REG]
+ 9 [ label = REG]
+ 10 [ label = REG]
+ 11 [ label = REG]
+ 12 [ label = REG]
+ 13 [ label = REG]
+ 14 [ label = MULT]
+ 15 [ label = MULT]
+ 16 [ label = MULTi, VALUE = 6]
+ "16.6"[ label = 6 ]
+ 17 [ label = MULT]
+ 18 [ label = MULTi, VALUE = 4]
+ "18.4"[ label = 4 ]
+ 19 [ label = MULT]
+ 20 [ label = MULTi, VALUE = 4]
+ "20.4"[ label = 4 ]
+ 21 [ label = MULT]
+ 22 [ label = MULT]
+ 23 [ label = MULT]
+ 24 [ label = MULT]
+ 25 [ label = MULT]
+ 26 [ label = MULT]
+ 27 [ label = MULT]
+ 28 [ label = MULT]
+ 29 [ label = MULT]
+ 30 [ label = MULT]
+ 31 [ label = MULT]
+ 32 [ label = MULT]
+ 33 [ label = MULT]
+ 34 [ label = MULT]
+ 35 [ label = REG]
+ 36 [ label = MULT]
+ 37 [ label = REG]
+ 38 [ label = REG]
+ 40 [ label = OUT40 ]
+ 0 -> 18
+ 1 -> 14
+ 1 -> 15
+ 1 -> 17
+ 1 -> 7
+ 2 -> 20
+ 3 -> 16
+ 4 -> 14
+ 5 -> 19
+ 5 -> 15
+ 5 -> 17
+ 5 -> 10
+ 6 -> 20
+ 7 -> 8
+ 7 -> 21
+ 8 -> 9
+ 8 -> 26
+ 8 -> 27
+ 9 -> 31
+ 9 -> 32
+ 9 -> 34
+ 10 -> 11
+ 10 -> 24
+ 10 -> 25
+ 11 -> 12
+ 11 -> 29
+ 11 -> 30
+ 12 -> 13
+ 13 -> 33
+ 13 -> 36
+ 14 -> 21
+ 15 -> 28
+ "16.6" -> 16
+ 16 -> 22
+ 17 -> 22
+ 17 -> 23
+ "18.4" -> 18
+ 18 -> 23
+ 19 -> 24
+ "20.4" -> 20
+ 20 -> 25
+ 21 -> 26
+ 22 -> 28
+ 23 -> 27
+ 24 -> 29
+ 25 -> 30
+ 26 -> 31
+ 27 -> 32
+ 28 -> 35
+ 29 -> 33
+ 30 -> 34
+ 31 -> 38
+ 33 -> 35
+ 34 -> 36
+ 35 -> 37
+ 36 -> 37
+ 37 -> 38
+ 38 -> 40
+}

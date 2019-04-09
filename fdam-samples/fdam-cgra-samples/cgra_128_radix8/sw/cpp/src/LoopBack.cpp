@@ -20,7 +20,7 @@ void LoopBack::runCGRA(unsigned short ***data_in, unsigned short ***data_out, in
     high_resolution_clock::time_point s;
     duration<double> diff = {};
 
-    LoopBack::cgraHw->loadCgraProgram("../loopback_files/loopback.cgra");
+    LoopBack::cgraHw->loadCgraProgram("../cgra_bitstreams/loopback.cgra");
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < 8; ++j) {
             LoopBack::cgraHw->setCgraProgramInputStreamByID(i, j, data_in[i][j], sizeof(short) * data_size);
@@ -71,9 +71,9 @@ bool LoopBack::compile(int numThreads) {
     diff = high_resolution_clock::now() - s;
     LoopBack::schedulingTime = diff.count() * 1000;
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../loopback_files/%s.cgra", dfs[0]->getName().c_str());
+        sprintf(filename, "../cgra_bitstreams/%s.cgra", dfs[0]->getName().c_str());
         LoopBack::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../loopback_files/%s.dot", dfs[0]->getName().c_str());
+        sprintf(filename, "../dot_dataflows/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);

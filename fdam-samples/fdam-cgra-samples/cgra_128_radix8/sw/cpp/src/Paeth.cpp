@@ -20,7 +20,7 @@ void Paeth::runCGRA(unsigned short ****data_in, unsigned short ***data_out, int 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
 
-    Paeth::cgraHw->loadCgraProgram("../paeth_files/paeth.cgra");
+    Paeth::cgraHw->loadCgraProgram("../cgra_bitstreams/paeth.cgra");
     for (int i = 0; i < numThreads; ++i) {
         Paeth::cgraHw->setCgraProgramInputStreamByID(i, 0, data_in[i][0][0], sizeof(short) * data_size);
         Paeth::cgraHw->setCgraProgramInputStreamByID(i, 1, data_in[i][0][1], sizeof(short) * data_size);
@@ -89,9 +89,9 @@ bool Paeth::compile(int numThreads) {
     Paeth::schedulingTime = diff.count() * 1000;
 
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../paeth_files/%s.cgra", dfs[0]->getName().c_str());
+        sprintf(filename, "../cgra_bitstreams/%s.cgra", dfs[0]->getName().c_str());
         Paeth::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../paeth_files/%s.dot", dfs[0]->getName().c_str());
+        sprintf(filename, "../dot_dataflows/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);

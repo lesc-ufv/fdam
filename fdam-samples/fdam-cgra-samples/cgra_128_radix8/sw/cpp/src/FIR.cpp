@@ -98,9 +98,9 @@ bool FIR::compile(int numThreads) {
     FIR::schedulingTime = diff.count() * 1000;
 
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../fir_files/%s.cgra", dfs[0]->getName().c_str());
+        sprintf(filename, "../cgra_bitstreams/%s.cgra", dfs[0]->getName().c_str());
         FIR::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../fir_files/%s.dot", dfs[0]->getName().c_str());
+        sprintf(filename, "../dot_dataflows/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);
@@ -114,7 +114,7 @@ bool FIR::compile(int numThreads) {
 void FIR::runCGRA(unsigned short **data_in, unsigned short **data_out, int data_size, int numThreads) {
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-    FIR::cgraHw->loadCgraProgram("../fir_files/fir.cgra");
+    FIR::cgraHw->loadCgraProgram("../cgra_bitstreams/fir.cgra");
     for (int i = 0; i < numThreads; ++i) {
         FIR::cgraHw->setCgraProgramInputStreamByID(i, 0, data_in[i], sizeof(unsigned short) * data_size);
         FIR::cgraHw->setCgraProgramOutputStreamByID(i, 1, data_out[i],

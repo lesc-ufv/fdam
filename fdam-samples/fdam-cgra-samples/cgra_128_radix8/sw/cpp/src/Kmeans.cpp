@@ -202,7 +202,7 @@ void Kmeans::runCGRA(unsigned short ***data_in, unsigned short **data_out, unsig
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-    Kmeans::cgraHw->loadCgraProgram("../kmeans_files/kmeans.cgra");
+    Kmeans::cgraHw->loadCgraProgram("../cgra_bitstreams/kmeans.cgra");
     for (int m = 0; m < numThread; ++m) {
         Kmeans::helpKmeansUpdateConstants(Kmeans::cgraHw->getCgraProgram(), m, centroids[m]);
         for (int i = 0; i < num_dim; ++i) {
@@ -271,9 +271,9 @@ bool Kmeans::compile(int numThreads) {
     Kmeans::schedulingTime = diff.count() * 1000;
 
     if (r == SCHEDULE_SUCCESS) {
-        sprintf(filename, "../kmeans_files/%s.cgra", dfs[0]->getName().c_str());
+        sprintf(filename, "../cgra_bitstreams/%s.cgra", dfs[0]->getName().c_str());
         Kmeans::cgraArch->writeCgraProgram(filename);
-        sprintf(filename, "../kmeans_files/%s.dot", dfs[0]->getName().c_str());
+        sprintf(filename, "../dot_dataflows/%s.dot", dfs[0]->getName().c_str());
         dfs[0]->toDot(filename);
     } else {
         printf("Error on scheduling: Code %d\n", r);

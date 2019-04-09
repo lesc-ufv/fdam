@@ -11,10 +11,9 @@
 #include <fdam/cgra/cgra_arch.h>
 #include <fdam/cgra/scheduler.h>
 #include <fdam/cgra/scheduler_defs.h>
+#include <conf.h>
 
 using namespace std::chrono;
-
-#define NUM_THREADS 8
 
 #define SOBEL_OP_SIZE 9
 #define pow2(x) (x)*(x)
@@ -50,14 +49,14 @@ private:
 
     void contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img);
 
-    DataFlow *createDataFlow(int id);
-
     bool compile(int numThreads);
 
 public:
     SobelFilter(Cgra *cgraHw, CgraArch *cgraArch);
 
     ~SobelFilter();
+
+    DataFlow *createDataFlow(int id);
 
     void benchmarking(int numThreads, int img_width, int img_height);
 

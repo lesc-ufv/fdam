@@ -12,10 +12,9 @@
 #include <fdam/cgra/cgra_arch.h>
 #include <fdam/cgra/scheduler.h>
 #include <fdam/cgra/scheduler_defs.h>
+#include <conf.h>
 
 using namespace std::chrono;
-
-#define NUM_THREADS 8
 
 class FIR {
 private:
@@ -34,14 +33,14 @@ private:
 
     void runCPU(unsigned short **data_in, unsigned short **data_out, int data_size, int numThreads);
 
-    DataFlow *createDataFlow(int thread);
-
     bool compile(int numThreads);
 
 public:
     FIR(Cgra *cgraHw, CgraArch *cgraArch, int size);
 
     ~FIR();
+
+    DataFlow *createDataFlow(int thread);
 
     void benchmarking(int numThreads, int data_size);
 
