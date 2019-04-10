@@ -33,6 +33,9 @@ DataFlow *Mibench::createDataFlow(int id) {
     auto reg7 = new PassB(idx++);
     auto reg8 = new PassB(idx++);
 
+    auto reg9 = new PassB(idx++);
+    auto reg10 = new PassB(idx++);
+
     auto mult1 = new Multi(idx++, 9);
     auto mult2 = new Multi(idx++, 6);
     auto mult3 = new Multi(idx++, 2);
@@ -59,7 +62,7 @@ DataFlow *Mibench::createDataFlow(int id) {
 
     df->connect(in1, mult3, mult3->getPortA());
     df->connect(in1, reg3, reg3->getPortA());
-    df->connect(reg4, reg4, reg4->getPortA());
+    df->connect(reg3, reg4, reg4->getPortA());
     df->connect(reg4, reg5, reg5->getPortA());
 
     df->connect(in2, reg6, reg6->getPortA());
@@ -90,7 +93,9 @@ DataFlow *Mibench::createDataFlow(int id) {
     df->connect(mult6, add6, add6->getPortB());
 
     df->connect(add6, add7, add7->getPortA());
-    df->connect(mult4, add7, add7->getPortB());
+    df->connect(mult4, reg9, reg9->getPortA());
+    df->connect(reg9, reg10, reg10->getPortA());
+    df->connect(reg10, add7, add7->getPortB());
 
     df->connect(add7, out, out->getPortA());
     return df;
