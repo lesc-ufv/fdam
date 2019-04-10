@@ -16,7 +16,7 @@ Qspline::Qspline(Cgra *cgra, CgraArch *cgraArch) {
 Qspline::~Qspline() = default;
 
 DataFlow *Qspline::createDataFlow(int id) {
-    auto df = new DataFlow(id, "Qspline");
+    auto df = new DataFlow(id, "Qslpine");
     int idx = 0;
     auto in1 = new InputStream(idx++);
     auto in2 = new InputStream(idx++);
@@ -29,11 +29,22 @@ DataFlow *Qspline::createDataFlow(int id) {
     auto reg1 = new PassB(idx++);
     auto reg2 = new PassB(idx++);
     auto reg3 = new PassB(idx++);
-
+    auto reg8 = new PassB(idx++);
+    auto reg9 = new PassB(idx++);
     auto reg4 = new PassB(idx++);
     auto reg5 = new PassB(idx++);
     auto reg6 = new PassB(idx++);
     auto reg7 = new PassB(idx++);
+    auto reg10 = new PassB(idx++);
+    auto reg11 = new PassB(idx++);
+    auto reg12 = new PassB(idx++);
+    auto reg13 = new PassB(idx++);
+    auto reg14 = new PassB(idx++);
+    auto reg15 = new PassB(idx++);
+    auto reg16 = new PassB(idx++);
+    auto reg17 = new PassB(idx++);
+    auto reg18 = new PassB(idx++);
+    auto reg19 = new PassB(idx++);
 
     auto mult1 = new Mult(idx++);
     auto mult2 = new Mult(idx++);
@@ -60,12 +71,10 @@ DataFlow *Qspline::createDataFlow(int id) {
     auto mult20 = new Mult(idx++);
     auto mult21 = new Mult(idx++);
 
-    auto add1 = new PassB(idx++);
+    auto add1 = new Add(idx++);
     auto mult22 = new Mult(idx++);
-
-    auto add2 = new PassB(idx++);
-    auto add3 = new PassB(idx++);
-    auto add4 = new PassB(idx++);
+    auto add2 = new Add(idx++);
+    auto add3 = new Add(idx++);
 
     auto out = new OutputStream(idx++);
 
@@ -73,6 +82,8 @@ DataFlow *Qspline::createDataFlow(int id) {
     df->connect(in2, mult1, mult1->getPortA());
     df->connect(in2, mult2, mult2->getPortA());
     df->connect(in2, mult4, mult4->getPortA());
+    df->connect(in2, reg8, reg8->getPortA());
+    df->connect(reg8, reg9, reg9->getPortA());
     df->connect(in2, reg1, reg1->getPortA());
     df->connect(reg1, reg2, reg2->getPortA());
     df->connect(reg2, reg3, reg3->getPortA());
@@ -83,10 +94,12 @@ DataFlow *Qspline::createDataFlow(int id) {
     df->connect(in6, mult2, mult2->getPortB());
     df->connect(in6, mult4, mult4->getPortB());
     df->connect(in6, reg4, reg4->getPortA());
+    df->connect(in6, reg10, reg10->getPortA());
+    df->connect(reg10, reg11, reg11->getPortA());
     df->connect(reg4, reg5, reg5->getPortA());
     df->connect(reg5, reg6, reg6->getPortA());
     df->connect(reg6, reg7, reg7->getPortA());
-    df->connect(in7, mult7, mult7->getPortA());
+    df->connect(in7, mult6, mult6->getPortA());
 
     df->connect(reg1, mult8, mult8->getPortA());
     df->connect(mult1, mult8, mult8->getPortB());
@@ -97,36 +110,44 @@ DataFlow *Qspline::createDataFlow(int id) {
     df->connect(mult6, mult11, mult11->getPortA());
     df->connect(reg4, mult11, mult11->getPortB());
     df->connect(mult7, mult12, mult12->getPortA());
-    df->connect(reg4, mult12, mult12->getPortB());
+    df->connect(reg10, mult12, mult12->getPortB());
 
     df->connect(reg2, mult13, mult13->getPortA());
     df->connect(mult8, mult13, mult13->getPortB());
     df->connect(mult10, mult14, mult14->getPortA());
-    df->connect(reg2, mult14, mult14->getPortB());
-    df->connect(mult2, mult15, mult15->getPortA());
+    df->connect(reg9, mult14, mult14->getPortB());
+    df->connect(mult2, reg15, reg15->getPortA());
+    df->connect(reg15, mult15, mult15->getPortA());
     df->connect(mult9, mult15, mult15->getPortB());
     df->connect(mult11, mult16, mult16->getPortA());
     df->connect(reg5, mult16, mult16->getPortB());
     df->connect(mult12, mult17, mult17->getPortA());
-    df->connect(reg5, mult17, mult17->getPortB());
+    df->connect(reg11, mult17, mult17->getPortB());
 
     df->connect(reg3, mult18, mult18->getPortA());
     df->connect(mult13, mult18, mult18->getPortB());
     df->connect(reg3, mult19, mult19->getPortA());
     df->connect(mult14, mult19, mult19->getPortB());
     df->connect(reg7, mult20, mult20->getPortA());
-    df->connect(mult16, mult20, mult20->getPortB());
+    df->connect(mult16, reg18, reg18->getPortB());
+    df->connect(reg18, mult20, mult20->getPortA());
     df->connect(mult17, mult21, mult21->getPortA());
     df->connect(reg3, mult21, mult21->getPortB());
 
-    df->connect(mult15, add1, add1->getPortA());
+    df->connect(mult15, reg16, reg16->getPortA());
+    df->connect(reg16, reg17, reg17->getPortA());
+    df->connect(reg17, add1, add1->getPortA());
     df->connect(mult20, add1, add1->getPortB());
     df->connect(mult21, mult22, mult22->getPortA());
     df->connect(reg7, mult22, mult22->getPortB());
 
-    df->connect(mult22, add2, add2->getPortA());
+    df->connect(mult22, reg19, reg19->getPortA());
+    df->connect(reg19, add2, add2->getPortA());
     df->connect(add1, add2, add2->getPortB());
-    df->connect(mult18, add3, add3->getPortA());
+    df->connect(mult18, reg12, reg12->getPortA());
+    df->connect(reg12, reg13, reg13->getPortA());
+    df->connect(reg13, reg14, reg14->getPortA());
+    df->connect(reg14, add3, add3->getPortA());
     df->connect(add2, add3, add3->getPortB());
 
     df->connect(add3, out, out->getPortA());

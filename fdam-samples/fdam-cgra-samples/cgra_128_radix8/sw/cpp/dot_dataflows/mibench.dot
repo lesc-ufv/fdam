@@ -1,4 +1,4 @@
-digraph mibench{
+digraph Mibench{
  0 [ label = IN0 ]
  1 [ label = IN1 ]
  2 [ label = IN2 ]
@@ -37,7 +37,7 @@ digraph mibench{
  2 -> 3
  3 -> 4
  4 -> 17
- 6 -> 6
+ 5 -> 6
  6 -> 7
  6 -> 18
  7 -> 20

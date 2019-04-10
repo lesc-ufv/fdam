@@ -88,7 +88,7 @@ void generate_dataflows(){
     mibench.createDataFlow(0)->toDot("../dot_dataflows/mibench.dot");
 
     Poly5 poly5(nullptr,cgraArch);
-    poly5.createDataFlow(0)->toDot("../dot_dataflows/poly.dot");
+    poly5.createDataFlow(0)->toDot("../dot_dataflows/poly5.dot");
 
     Qspline qspline(nullptr,cgraArch);
     qspline.createDataFlow(0)->toDot("../dot_dataflows/qspline.dot");

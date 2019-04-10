@@ -1,8 +1,5 @@
 #!/bin/sh
 
-DATA_SIZE=1048576
-NUM_THREAD=8
-
 rm -rf build $1
 mkdir $1
 mkdir build
