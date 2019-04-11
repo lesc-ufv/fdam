@@ -25,6 +25,7 @@ DataFlow *Chebyshev::createDataFlow(int id) {
     auto reg4 = new PassB(idx++);
     auto reg5 = new PassB(idx++);
     auto reg6 = new PassB(idx++);
+    auto reg7 = new PassB(idx++);
     auto mult1 = new Multi(idx++, 16);
     auto mult2 = new Mult(idx++);
     auto sub1 = new Subi(idx++, 20);
@@ -41,12 +42,11 @@ DataFlow *Chebyshev::createDataFlow(int id) {
     df->connect(reg5, reg3, reg3->getPortA());
     df->connect(reg3, reg6, reg6->getPortA());
     df->connect(reg6, reg4, reg4->getPortA());
-    df->connect(reg2, reg3, reg3->getPortA());
-    df->connect(reg3, reg4, reg4->getPortA());
     df->connect(reg1, mult2, mult2->getPortA());
     df->connect(mult1, mult2, mult2->getPortB());
     df->connect(mult2, sub1, sub1->getPortA());
-    df->connect(reg2, mult3, mult3->getPortA());
+    df->connect(reg2, reg7, reg7->getPortA());
+    df->connect(reg7, mult3, mult3->getPortA());
     df->connect(sub1, mult3, mult3->getPortB());
     df->connect(reg3, mult4, mult4->getPortA());
     df->connect(mult3, mult4, mult4->getPortB());
