@@ -44,7 +44,7 @@ DataFlow *Poly8::createDataFlow(int id) {
     auto reg18 = new PassB(idx++);
 
     auto reg19 = new PassB(idx++);
-    auto reg20 = new PassB(idx++);
+    //auto reg20 = new PassB(idx++);
     auto reg21 = new PassB(idx++);
     auto reg22 = new PassB(idx++);
     auto reg23 = new PassB(idx++);
@@ -63,7 +63,7 @@ DataFlow *Poly8::createDataFlow(int id) {
     auto add3 = new Addi(idx++,6912);
     auto add4 = new Addi(idx++, 1728);
     auto add5 = new Add(idx++);
-    auto add6 = new Add(idx++, 55296);
+    auto add6 = new Addi(idx++, 55296);
     auto add7 = new Add(idx++);
     auto add8 = new Add(idx++);
     auto add9 = new Add(idx++);

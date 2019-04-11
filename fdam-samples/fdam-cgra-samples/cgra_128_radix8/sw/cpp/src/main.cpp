@@ -67,7 +67,7 @@ void generate_dataflows(){
     auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
 
     LoopBack loopBack(nullptr, cgraArch);
-    loopBack.createDataFlow(0)->toDot("../dot_dataflows/loopBack.dot");
+    loopBack.createDataFlow(0)->toDot("../dot_dataflows/loopback.dot");
 
     FIR fir64(nullptr, cgraArch, 64);
     fir64.createDataFlow(0)->toDot("../dot_dataflows/fir64.dot");
@@ -89,6 +89,9 @@ void generate_dataflows(){
 
     Poly5 poly5(nullptr,cgraArch);
     poly5.createDataFlow(0)->toDot("../dot_dataflows/poly5.dot");
+
+    Poly8 poly8(nullptr,cgraArch);
+    poly8.createDataFlow(0)->toDot("../dot_dataflows/poly8.dot");
 
     Qspline qspline(nullptr,cgraArch);
     qspline.createDataFlow(0)->toDot("../dot_dataflows/qspline.dot");
