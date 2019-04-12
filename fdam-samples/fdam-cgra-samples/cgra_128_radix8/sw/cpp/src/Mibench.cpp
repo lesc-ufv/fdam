@@ -161,7 +161,7 @@ Mibench::runCPU(unsigned short ****data_in, unsigned short ***data_out, int data
 
 void Mibench::benchmarking(int numThreads, int data_size) {
 
-    int copies = 2;
+    int copies = 1;
     unsigned short ****data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
@@ -269,7 +269,7 @@ bool Mibench::compile(int numThreads, int copies) {
 }
 
 void Mibench::printStatistics() {
-    int copies = 2;
+    int copies = 1;
     auto df = Mibench::createDataFlow(0, copies);
     MSG("INFO Paeth Statictics");
     MSG("INFO CGRA target architecture:");

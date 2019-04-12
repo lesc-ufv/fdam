@@ -24,9 +24,9 @@ private:
     double cgraExecTime;
     double cgraConfTime;
 
-    void runCGRA(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads);
+    void runCGRA(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads, int copies);
 
-    void runCPU(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads);
+    void runCPU(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads, int copies);
 
 public:
 
@@ -34,11 +34,11 @@ public:
 
     ~Paeth();
 
-    DataFlow *createDataFlow(int id);
+    DataFlow *createDataFlow(int id, int copies);
 
     void benchmarking(int numThreads, int data_size);
 
-    bool compile(int numThreads);
+    bool compile(int numThreads, int copies);
 
     void printStatistics();
 };

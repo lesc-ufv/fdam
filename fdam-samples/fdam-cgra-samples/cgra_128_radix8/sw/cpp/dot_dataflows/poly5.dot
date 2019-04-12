@@ -1,12 +1,12 @@
-digraph Poly5{
+digraph poly5{
  0 [ label = IN0 ]
  1 [ label = IN1 ]
  2 [ label = IN2 ]
- 3 [ label = REG]
- 4 [ label = REG]
- 5 [ label = REG]
- 6 [ label = REG]
- 7 [ label = REG]
+ 3 [ label = OUT3 ]
+ 4 [ label = IN4 ]
+ 5 [ label = IN5 ]
+ 6 [ label = IN6 ]
+ 7 [ label = OUT7 ]
  8 [ label = REG]
  9 [ label = REG]
  10 [ label = REG]
@@ -22,119 +22,315 @@ digraph Poly5{
  20 [ label = REG]
  21 [ label = REG]
  22 [ label = REG]
- 23 [ label = ADD]
- 24 [ label = SUBi, VALUE = 432]
- "24.432"[ label = 432 ]
- 25 [ label = SUBi, VALUE = 207]
- "25.207"[ label = 207 ]
- 26 [ label = MULTi, VALUE = 78]
- "26.78"[ label = 78 ]
- 27 [ label = MULTi, VALUE = 288]
- "27.288"[ label = 288 ]
- 28 [ label = MULTi, VALUE = 2]
- "28.2"[ label = 2 ]
- 29 [ label = ADDi, VALUE = 144]
- "29.144"[ label = 144 ]
- 30 [ label = SUBi, VALUE = 9504]
- "30.9504"[ label = 9504 ]
- 31 [ label = SUBi, VALUE = 5184]
- "31.5184"[ label = 5184 ]
- 32 [ label = MULT]
- 33 [ label = MULT]
- 34 [ label = SUB]
- 35 [ label = ADDi, VALUE = 62208]
- "35.62208"[ label = 62208 ]
- 36 [ label = MULT]
- 37 [ label = MULT]
- 38 [ label = ADDi, VALUE = 3456]
- "38.3456"[ label = 3456 ]
- 39 [ label = MULT]
- 40 [ label = MULT]
- 41 [ label = SUB]
- 42 [ label = ADD]
- 43 [ label = SUBi, VALUE = 298584]
- "43.298584"[ label = 298584 ]
- 44 [ label = SUBi, VALUE = 248832]
- "44.248832"[ label = 248832 ]
- 45 [ label = MULT]
- 46 [ label = MULT]
- 47 [ label = MULT]
- 48 [ label = SUB]
- 49 [ label = SUB]
- 50 [ label = MULT]
- 51 [ label = OUT51 ]
- 0 -> 7
- 1 -> 29
- 1 -> 13
- 2 -> 24
- 2 -> 25
- 2 -> 26
- 2 -> 27
- 2 -> 28
- 2 -> 3
- 3 -> 4
- 3 -> 32
- 3 -> 33
- 4 -> 5
- 5 -> 6
- 6 -> 36
- 6 -> 39
- 7 -> 8
- 8 -> 9
- 9 -> 10
- 9 -> 37
- 9 -> 39
- 10 -> 11
- 11 -> 12
- 11 -> 45
- 12 -> 46
- 13 -> 14
- 14 -> 15
- 15 -> 16
- 16 -> 17
- 16 -> 47
- 17 -> 18
- 18 -> 19
- 19 -> 20
- 20 -> 21
- 21 -> 50
- 22 -> 48
- 23 -> 48
- "24.432" -> 24
- 24 -> 32
- "25.207" -> 25
- 25 -> 33
- "26.78" -> 26
- 26 -> 30
- "27.288" -> 27
+ 23 [ label = REG]
+ 24 [ label = REG]
+ 25 [ label = REG]
+ 26 [ label = REG]
+ 27 [ label = REG]
+ 28 [ label = REG]
+ 29 [ label = REG]
+ 30 [ label = REG]
+ 31 [ label = REG]
+ 32 [ label = REG]
+ 33 [ label = REG]
+ 34 [ label = REG]
+ 35 [ label = REG]
+ 36 [ label = REG]
+ 37 [ label = REG]
+ 38 [ label = REG]
+ 39 [ label = REG]
+ 40 [ label = REG]
+ 41 [ label = REG]
+ 42 [ label = REG]
+ 43 [ label = SUBi, VALUE = 432]
+ "43.432"[ label = 432 ]
+ 44 [ label = SUBi, VALUE = 207]
+ "44.207"[ label = 207 ]
+ 45 [ label = MULTi, VALUE = 78]
+ "45.78"[ label = 78 ]
+ 46 [ label = MULTi, VALUE = 288]
+ "46.288"[ label = 288 ]
+ 47 [ label = MULTi, VALUE = 2]
+ "47.2"[ label = 2 ]
+ 48 [ label = ADDi, VALUE = 144]
+ "48.144"[ label = 144 ]
+ 49 [ label = SUBi, VALUE = 9504]
+ "49.9504"[ label = 9504 ]
+ 50 [ label = SUBi, VALUE = 5184]
+ "50.5184"[ label = 5184 ]
+ 51 [ label = MULT]
+ 52 [ label = MULT]
+ 53 [ label = SUB]
+ 54 [ label = ADDi, VALUE = 62208]
+ "54.62208"[ label = 62208 ]
+ 55 [ label = MULT]
+ 56 [ label = MULT]
+ 57 [ label = ADDi, VALUE = 3456]
+ "57.3456"[ label = 3456 ]
+ 58 [ label = MULT]
+ 59 [ label = SUB]
+ 60 [ label = SUBi, VALUE = 298584]
+ "60.298584"[ label = 298584 ]
+ 61 [ label = SUBi, VALUE = 248832]
+ "61.248832"[ label = 248832 ]
+ 62 [ label = MULT]
+ 63 [ label = MULT]
+ 64 [ label = ADD]
+ 65 [ label = ADD]
+ 66 [ label = ADD]
+ 67 [ label = MULT]
+ 68 [ label = MULT]
+ 69 [ label = REG]
+ 70 [ label = REG]
+ 71 [ label = REG]
+ 72 [ label = REG]
+ 73 [ label = REG]
+ 74 [ label = REG]
+ 75 [ label = REG]
+ 76 [ label = REG]
+ 77 [ label = REG]
+ 78 [ label = REG]
+ 79 [ label = REG]
+ 80 [ label = REG]
+ 81 [ label = REG]
+ 82 [ label = REG]
+ 83 [ label = REG]
+ 84 [ label = REG]
+ 85 [ label = REG]
+ 86 [ label = REG]
+ 87 [ label = REG]
+ 88 [ label = REG]
+ 89 [ label = REG]
+ 90 [ label = REG]
+ 91 [ label = REG]
+ 92 [ label = REG]
+ 93 [ label = REG]
+ 94 [ label = REG]
+ 95 [ label = REG]
+ 96 [ label = REG]
+ 97 [ label = REG]
+ 98 [ label = REG]
+ 99 [ label = REG]
+ 100 [ label = REG]
+ 101 [ label = REG]
+ 102 [ label = REG]
+ 103 [ label = REG]
+ 104 [ label = SUBi, VALUE = 432]
+ "104.432"[ label = 432 ]
+ 105 [ label = SUBi, VALUE = 207]
+ "105.207"[ label = 207 ]
+ 106 [ label = MULTi, VALUE = 78]
+ "106.78"[ label = 78 ]
+ 107 [ label = MULTi, VALUE = 288]
+ "107.288"[ label = 288 ]
+ 108 [ label = MULTi, VALUE = 2]
+ "108.2"[ label = 2 ]
+ 109 [ label = ADDi, VALUE = 144]
+ "109.144"[ label = 144 ]
+ 110 [ label = SUBi, VALUE = 9504]
+ "110.9504"[ label = 9504 ]
+ 111 [ label = SUBi, VALUE = 5184]
+ "111.5184"[ label = 5184 ]
+ 112 [ label = MULT]
+ 113 [ label = MULT]
+ 114 [ label = SUB]
+ 115 [ label = ADDi, VALUE = 62208]
+ "115.62208"[ label = 62208 ]
+ 116 [ label = MULT]
+ 117 [ label = MULT]
+ 118 [ label = ADDi, VALUE = 3456]
+ "118.3456"[ label = 3456 ]
+ 119 [ label = MULT]
+ 120 [ label = SUB]
+ 121 [ label = SUBi, VALUE = 298584]
+ "121.298584"[ label = 298584 ]
+ 122 [ label = SUBi, VALUE = 248832]
+ "122.248832"[ label = 248832 ]
+ 123 [ label = MULT]
+ 124 [ label = MULT]
+ 125 [ label = ADD]
+ 126 [ label = ADD]
+ 127 [ label = ADD]
+ 128 [ label = MULT]
+ 129 [ label = MULT]
+ 0 -> 12
+ 0 -> 13
+ 0 -> 14
+ 0 -> 15
+ 1 -> 48
+ 1 -> 16
+ 1 -> 17
+ 2 -> 8
+ 2 -> 9
+ 2 -> 43
+ 2 -> 10
+ 2 -> 45
+ 2 -> 46
+ 2 -> 11
+ 2 -> 44
+ 2 -> 47
+ 4 -> 73
+ 4 -> 74
+ 4 -> 75
+ 4 -> 76
+ 5 -> 109
+ 5 -> 77
+ 5 -> 78
+ 6 -> 69
+ 6 -> 70
+ 6 -> 104
+ 6 -> 71
+ 6 -> 106
+ 6 -> 107
+ 6 -> 72
+ 6 -> 105
+ 6 -> 108
+ 8 -> 18
+ 9 -> 51
+ 10 -> 19
+ 11 -> 51
+ 12 -> 20
+ 13 -> 21
+ 14 -> 22
+ 15 -> 23
+ 16 -> 24
+ 17 -> 25
+ 18 -> 26
+ 19 -> 52
+ 20 -> 55
+ 21 -> 27
+ 22 -> 56
+ 23 -> 28
+ 24 -> 29
+ 25 -> 30
+ 26 -> 58
  27 -> 31
- "28.2" -> 28
- 28 -> 42
- "29.144" -> 29
- 29 -> 42
- "30.9504" -> 30
- 30 -> 36
- "31.5184" -> 31
+ 28 -> 32
+ 29 -> 33
+ 30 -> 34
+ 31 -> 62
  32 -> 35
- 33 -> 38
+ 33 -> 36
  34 -> 37
- "35.62208" -> 35
- 35 -> 39
- 36 -> 41
- 37 -> 41
- "38.3456" -> 38
- 38 -> 42
- 40 -> 43
- 41 -> 44
- 42 -> 39
- 42 -> 45
- "43.298584" -> 43
- 43 -> 49
- "44.248832" -> 44
- 44 -> 46
- 45 -> 47
- 46 -> 49
- 47 -> 22
- 49 -> 50
- 50 -> 51
+ 35 -> 63
+ 36 -> 67
+ 37 -> 39
+ 38 -> 65
+ 39 -> 41
+ 40 -> 66
+ 41 -> 42
+ 42 -> 68
+ "43.432" -> 43
+ 43 -> 51
+ "44.207" -> 44
+ 44 -> 51
+ "45.78" -> 45
+ 45 -> 49
+ "46.288" -> 46
+ 46 -> 50
+ "47.2" -> 47
+ 47 -> 53
+ "48.144" -> 48
+ 48 -> 53
+ "49.9504" -> 49
+ 49 -> 52
+ "50.5184" -> 50
+ 50 -> 55
+ 51 -> 54
+ 51 -> 57
+ 52 -> 64
+ 53 -> 56
+ "54.62208" -> 54
+ 54 -> 58
+ 55 -> 64
+ 56 -> 59
+ "57.3456" -> 57
+ 57 -> 59
+ 58 -> 60
+ 59 -> 62
+ "60.298584" -> 60
+ 60 -> 38
+ "61.248832" -> 61
+ 61 -> 63
+ 62 -> 67
+ 63 -> 65
+ 64 -> 61
+ 65 -> 66
+ 66 -> 68
+ 67 -> 40
+ 68 -> 3
+ 69 -> 79
+ 70 -> 112
+ 71 -> 80
+ 72 -> 112
+ 73 -> 81
+ 74 -> 82
+ 75 -> 83
+ 76 -> 84
+ 77 -> 85
+ 78 -> 86
+ 79 -> 87
+ 80 -> 113
+ 81 -> 116
+ 82 -> 88
+ 83 -> 117
+ 84 -> 89
+ 85 -> 90
+ 86 -> 91
+ 87 -> 119
+ 88 -> 92
+ 89 -> 93
+ 90 -> 94
+ 91 -> 95
+ 92 -> 123
+ 93 -> 96
+ 94 -> 97
+ 95 -> 98
+ 96 -> 124
+ 97 -> 128
+ 98 -> 100
+ 99 -> 126
+ 100 -> 102
+ 101 -> 127
+ 102 -> 103
+ 103 -> 129
+ "104.432" -> 104
+ 104 -> 112
+ "105.207" -> 105
+ 105 -> 112
+ "106.78" -> 106
+ 106 -> 110
+ "107.288" -> 107
+ 107 -> 111
+ "108.2" -> 108
+ 108 -> 114
+ "109.144" -> 109
+ 109 -> 114
+ "110.9504" -> 110
+ 110 -> 113
+ "111.5184" -> 111
+ 111 -> 116
+ 112 -> 115
+ 112 -> 118
+ 113 -> 125
+ 114 -> 117
+ "115.62208" -> 115
+ 115 -> 119
+ 116 -> 125
+ 117 -> 120
+ "118.3456" -> 118
+ 118 -> 120
+ 119 -> 121
+ 120 -> 123
+ "121.298584" -> 121
+ 121 -> 99
+ "122.248832" -> 122
+ 122 -> 124
+ 123 -> 128
+ 124 -> 126
+ 125 -> 122
+ 126 -> 127
+ 127 -> 129
+ 128 -> 101
+ 129 -> 7
 }

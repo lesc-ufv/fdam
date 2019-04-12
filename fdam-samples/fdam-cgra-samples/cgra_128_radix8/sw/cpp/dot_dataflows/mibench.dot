@@ -2,70 +2,139 @@ digraph mibench{
  0 [ label = IN0 ]
  1 [ label = IN1 ]
  2 [ label = IN2 ]
- 3 [ label = REG]
- 4 [ label = REG]
- 5 [ label = REG]
- 6 [ label = REG]
- 7 [ label = REG]
+ 3 [ label = OUT3 ]
+ 4 [ label = IN4 ]
+ 5 [ label = IN5 ]
+ 6 [ label = IN6 ]
+ 7 [ label = OUT7 ]
  8 [ label = REG]
  9 [ label = REG]
  10 [ label = REG]
  11 [ label = REG]
  12 [ label = REG]
- 13 [ label = MULTi, VALUE = 9]
- "13.9"[ label = 9 ]
- 14 [ label = MULTi, VALUE = 6]
- "14.6"[ label = 6 ]
- 15 [ label = MULTi, VALUE = 2]
- "15.2"[ label = 2 ]
- 16 [ label = ADDi, VALUE = 1]
- "16.1"[ label = 1 ]
- 17 [ label = ADDi, VALUE = 43]
- "17.43"[ label = 43 ]
- 18 [ label = ADD]
- 19 [ label = MULT]
- 20 [ label = ADD]
- 21 [ label = ADD]
- 22 [ label = MULT]
- 23 [ label = MULT]
- 24 [ label = ADD]
+ 13 [ label = REG]
+ 14 [ label = REG]
+ 15 [ label = REG]
+ 16 [ label = REG]
+ 17 [ label = REG]
+ 18 [ label = MULTi, VALUE = 9]
+ "18.9"[ label = 9 ]
+ 19 [ label = MULTi, VALUE = 6]
+ "19.6"[ label = 6 ]
+ 20 [ label = MULTi, VALUE = 2]
+ "20.2"[ label = 2 ]
+ 21 [ label = ADDi, VALUE = 1]
+ "21.1"[ label = 1 ]
+ 22 [ label = ADDi, VALUE = 43]
+ "22.43"[ label = 43 ]
+ 23 [ label = ADD]
+ 24 [ label = MULT]
  25 [ label = ADD]
- 26 [ label = OUT26 ]
- 0 -> 15
- 0 -> 5
- 1 -> 8
- 2 -> 13
- 2 -> 14
- 2 -> 3
- 3 -> 4
- 4 -> 19
- 5 -> 6
- 6 -> 7
- 6 -> 20
- 7 -> 22
+ 26 [ label = ADD]
+ 27 [ label = MULT]
+ 28 [ label = MULT]
+ 29 [ label = ADD]
+ 30 [ label = ADD]
+ 31 [ label = REG]
+ 32 [ label = REG]
+ 33 [ label = REG]
+ 34 [ label = REG]
+ 35 [ label = REG]
+ 36 [ label = REG]
+ 37 [ label = REG]
+ 38 [ label = REG]
+ 39 [ label = REG]
+ 40 [ label = REG]
+ 41 [ label = MULTi, VALUE = 9]
+ "41.9"[ label = 9 ]
+ 42 [ label = MULTi, VALUE = 6]
+ "42.6"[ label = 6 ]
+ 43 [ label = MULTi, VALUE = 2]
+ "43.2"[ label = 2 ]
+ 44 [ label = ADDi, VALUE = 1]
+ "44.1"[ label = 1 ]
+ 45 [ label = ADDi, VALUE = 43]
+ "45.43"[ label = 43 ]
+ 46 [ label = ADD]
+ 47 [ label = MULT]
+ 48 [ label = ADD]
+ 49 [ label = ADD]
+ 50 [ label = MULT]
+ 51 [ label = MULT]
+ 52 [ label = ADD]
+ 53 [ label = ADD]
+ 0 -> 20
+ 0 -> 10
+ 1 -> 13
+ 2 -> 18
+ 2 -> 19
+ 2 -> 8
+ 4 -> 43
+ 4 -> 33
+ 5 -> 36
+ 6 -> 41
+ 6 -> 42
+ 6 -> 31
  8 -> 9
- 8 -> 18
- 9 -> 10
- 10 -> 23
+ 9 -> 24
+ 10 -> 11
  11 -> 12
- 12 -> 25
- "13.9" -> 13
- 13 -> 16
- "14.6" -> 14
- 14 -> 17
- "15.2" -> 15
- 15 -> 18
- "16.1" -> 16
- 16 -> 19
- "17.43" -> 17
- 17 -> 20
- 17 -> 21
+ 11 -> 25
+ 12 -> 27
+ 13 -> 14
+ 13 -> 23
+ 14 -> 15
+ 15 -> 28
+ 16 -> 17
+ 17 -> 30
+ "18.9" -> 18
  18 -> 21
- 19 -> 11
- 20 -> 22
- 21 -> 23
- 22 -> 24
- 23 -> 24
- 24 -> 25
- 25 -> 26
+ "19.6" -> 19
+ 19 -> 22
+ "20.2" -> 20
+ 20 -> 23
+ "21.1" -> 21
+ 21 -> 24
+ "22.43" -> 22
+ 22 -> 25
+ 22 -> 26
+ 23 -> 26
+ 24 -> 16
+ 25 -> 27
+ 26 -> 28
+ 27 -> 29
+ 28 -> 29
+ 29 -> 30
+ 30 -> 3
+ 31 -> 32
+ 32 -> 47
+ 33 -> 34
+ 34 -> 35
+ 34 -> 48
+ 35 -> 50
+ 36 -> 37
+ 36 -> 46
+ 37 -> 38
+ 38 -> 51
+ 39 -> 40
+ 40 -> 53
+ "41.9" -> 41
+ 41 -> 44
+ "42.6" -> 42
+ 42 -> 45
+ "43.2" -> 43
+ 43 -> 46
+ "44.1" -> 44
+ 44 -> 47
+ "45.43" -> 45
+ 45 -> 48
+ 45 -> 49
+ 46 -> 49
+ 47 -> 39
+ 48 -> 50
+ 49 -> 51
+ 50 -> 52
+ 51 -> 52
+ 52 -> 53
+ 53 -> 7
 }

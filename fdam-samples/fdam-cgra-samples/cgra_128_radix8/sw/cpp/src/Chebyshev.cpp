@@ -147,7 +147,7 @@ bool Chebyshev::compile(int numThreads, int copies) {
 
 void Chebyshev::benchmarking(int numThreads, int data_size) {
 
-    int copies = 5;
+    int copies = 1;
     unsigned short ***data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
@@ -211,7 +211,7 @@ void Chebyshev::benchmarking(int numThreads, int data_size) {
 }
 
 void Chebyshev::printStatistics() {
-    auto df = Chebyshev::createDataFlow(0, 5);
+    auto df = Chebyshev::createDataFlow(0, 1);
     MSG("INFO Chebyshev Statictics");
     MSG("INFO CGRA target architecture:");
     MSG("INFO Number of Threads: " << Chebyshev::cgraArch->getNumThreads());

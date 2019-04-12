@@ -1,10 +1,10 @@
-digraph Sgfilter{
+digraph sgfilter{
  0 [ label = IN0 ]
  1 [ label = IN1 ]
- 2 [ label = REG]
- 3 [ label = REG]
- 4 [ label = REG]
- 5 [ label = REG]
+ 2 [ label = OUT2 ]
+ 3 [ label = IN3 ]
+ 4 [ label = IN4 ]
+ 5 [ label = OUT5 ]
  6 [ label = REG]
  7 [ label = REG]
  8 [ label = REG]
@@ -16,85 +16,183 @@ digraph Sgfilter{
  14 [ label = REG]
  15 [ label = REG]
  16 [ label = REG]
- 17 [ label = MULTi, VALUE = 92]
- "17.92"[ label = 92 ]
- 18 [ label = MULTi, VALUE = -984]
- "18.-984"[ label = -984 ]
- 19 [ label = MULTi, VALUE = -76]
- "19.-76"[ label = -76 ]
- 20 [ label = MULTi, VALUE = 7]
- "20.7"[ label = 7 ]
- 21 [ label = SUBi, VALUE = 46]
- "21.46"[ label = 46 ]
- 22 [ label = SUBi, VALUE = 39]
- "22.39"[ label = 39 ]
- 23 [ label = ADD]
- 24 [ label = MULT]
- 25 [ label = MULT]
- 26 [ label = ADDi, VALUE = 7]
- "26.7"[ label = 7 ]
- 27 [ label = SUBi, VALUE = 46]
- "27.46"[ label = 46 ]
+ 17 [ label = REG]
+ 18 [ label = REG]
+ 19 [ label = REG]
+ 20 [ label = REG]
+ 21 [ label = MULTi, VALUE = 92]
+ "21.92"[ label = 92 ]
+ 22 [ label = MULTi, VALUE = -984]
+ "22.-984"[ label = -984 ]
+ 23 [ label = MULTi, VALUE = -76]
+ "23.-76"[ label = -76 ]
+ 24 [ label = MULTi, VALUE = 7]
+ "24.7"[ label = 7 ]
+ 25 [ label = SUBi, VALUE = 46]
+ "25.46"[ label = 46 ]
+ 26 [ label = SUBi, VALUE = 39]
+ "26.39"[ label = 39 ]
+ 27 [ label = ADD]
  28 [ label = MULT]
  29 [ label = MULT]
- 30 [ label = ADD]
- 31 [ label = ADDi, VALUE = 7]
- "31.7"[ label = 7 ]
+ 30 [ label = ADDi, VALUE = 7]
+ "30.7"[ label = 7 ]
+ 31 [ label = SUBi, VALUE = 46]
+ "31.46"[ label = 46 ]
  32 [ label = MULT]
- 33 [ label = ADD]
- 34 [ label = SUBi, VALUE = 75]
- "34.75"[ label = 75 ]
- 35 [ label = OUT35 ]
- 0 -> 17
- 0 -> 18
- 0 -> 19
- 0 -> 12
- 0 -> 2
- 1 -> 20
- 1 -> 6
- 2 -> 3
- 3 -> 4
- 3 -> 25
- 4 -> 5
- 5 -> 29
+ 33 [ label = MULT]
+ 34 [ label = ADD]
+ 35 [ label = ADDi, VALUE = 7]
+ "35.7"[ label = 7 ]
+ 36 [ label = MULT]
+ 37 [ label = ADD]
+ 38 [ label = SUBi, VALUE = 75]
+ "38.75"[ label = 75 ]
+ 39 [ label = REG]
+ 40 [ label = REG]
+ 41 [ label = REG]
+ 42 [ label = REG]
+ 43 [ label = REG]
+ 44 [ label = REG]
+ 45 [ label = REG]
+ 46 [ label = REG]
+ 47 [ label = REG]
+ 48 [ label = REG]
+ 49 [ label = REG]
+ 50 [ label = REG]
+ 51 [ label = REG]
+ 52 [ label = REG]
+ 53 [ label = REG]
+ 54 [ label = MULTi, VALUE = 92]
+ "54.92"[ label = 92 ]
+ 55 [ label = MULTi, VALUE = -984]
+ "55.-984"[ label = -984 ]
+ 56 [ label = MULTi, VALUE = -76]
+ "56.-76"[ label = -76 ]
+ 57 [ label = MULTi, VALUE = 7]
+ "57.7"[ label = 7 ]
+ 58 [ label = SUBi, VALUE = 46]
+ "58.46"[ label = 46 ]
+ 59 [ label = SUBi, VALUE = 39]
+ "59.39"[ label = 39 ]
+ 60 [ label = ADD]
+ 61 [ label = MULT]
+ 62 [ label = MULT]
+ 63 [ label = ADDi, VALUE = 7]
+ "63.7"[ label = 7 ]
+ 64 [ label = SUBi, VALUE = 46]
+ "64.46"[ label = 46 ]
+ 65 [ label = MULT]
+ 66 [ label = MULT]
+ 67 [ label = ADD]
+ 68 [ label = ADDi, VALUE = 7]
+ "68.7"[ label = 7 ]
+ 69 [ label = MULT]
+ 70 [ label = ADD]
+ 71 [ label = SUBi, VALUE = 75]
+ "71.75"[ label = 75 ]
+ 0 -> 21
+ 0 -> 22
+ 0 -> 23
+ 0 -> 16
+ 0 -> 6
+ 1 -> 24
+ 1 -> 10
+ 3 -> 54
+ 3 -> 55
+ 3 -> 56
+ 3 -> 49
+ 3 -> 39
+ 4 -> 57
+ 4 -> 43
  6 -> 7
  7 -> 8
+ 7 -> 29
  8 -> 9
- 8 -> 28
- 9 -> 10
+ 9 -> 33
  10 -> 11
- 11 -> 32
+ 11 -> 12
  12 -> 13
- 13 -> 24
- 14 -> 30
- 15 -> 16
- 16 -> 33
- "17.92" -> 17
- 17 -> 22
- "18.-984" -> 18
- 18 -> 21
- "19.-76" -> 19
- 19 -> 23
- "20.7" -> 20
- 20 -> 23
- "21.46" -> 21
- 21 -> 24
- "22.39" -> 22
+ 12 -> 32
+ 13 -> 14
+ 14 -> 15
+ 15 -> 36
+ 16 -> 17
+ 17 -> 28
+ 18 -> 34
+ 19 -> 20
+ 20 -> 37
+ "21.92" -> 21
+ 21 -> 26
+ "22.-984" -> 22
  22 -> 25
- 23 -> 26
+ "23.-76" -> 23
+ 23 -> 27
+ "24.7" -> 24
  24 -> 27
- 25 -> 14
- "26.7" -> 26
- 26 -> 28
- "27.46" -> 27
- 27 -> 29
- 28 -> 30
- 29 -> 15
- 30 -> 31
- "31.7" -> 31
- 31 -> 32
- 32 -> 33
- 33 -> 34
- "34.75" -> 34
+ "25.46" -> 25
+ 25 -> 28
+ "26.39" -> 26
+ 26 -> 29
+ 27 -> 30
+ 28 -> 31
+ 29 -> 18
+ "30.7" -> 30
+ 30 -> 32
+ "31.46" -> 31
+ 31 -> 33
+ 32 -> 34
+ 33 -> 19
  34 -> 35
+ "35.7" -> 35
+ 35 -> 36
+ 36 -> 37
+ 37 -> 38
+ "38.75" -> 38
+ 38 -> 2
+ 39 -> 40
+ 40 -> 41
+ 40 -> 62
+ 41 -> 42
+ 42 -> 66
+ 43 -> 44
+ 44 -> 45
+ 45 -> 46
+ 45 -> 65
+ 46 -> 47
+ 47 -> 48
+ 48 -> 69
+ 49 -> 50
+ 50 -> 61
+ 51 -> 67
+ 52 -> 53
+ 53 -> 70
+ "54.92" -> 54
+ 54 -> 59
+ "55.-984" -> 55
+ 55 -> 58
+ "56.-76" -> 56
+ 56 -> 60
+ "57.7" -> 57
+ 57 -> 60
+ "58.46" -> 58
+ 58 -> 61
+ "59.39" -> 59
+ 59 -> 62
+ 60 -> 63
+ 61 -> 64
+ 62 -> 51
+ "63.7" -> 63
+ 63 -> 65
+ "64.46" -> 64
+ 64 -> 66
+ 65 -> 67
+ 66 -> 52
+ 67 -> 68
+ "68.7" -> 68
+ 68 -> 69
+ 69 -> 70
+ 70 -> 71
+ "71.75" -> 71
+ 71 -> 5
 }

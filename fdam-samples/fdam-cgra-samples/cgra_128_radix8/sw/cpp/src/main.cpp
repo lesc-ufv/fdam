@@ -83,19 +83,19 @@ void generate_dataflows() {
     kmeans.createDataFlow(0)->toDot("../dot_dataflows/kmeans.dot");
 
     Paeth paeth(nullptr, cgraArch);
-    paeth.createDataFlow(0)->toDot("../dot_dataflows/paeth.dot");
+    paeth.createDataFlow(0,1)->toDot("../dot_dataflows/paeth.dot");
 
     SobelFilter sobel_filter(nullptr, cgraArch);
     sobel_filter.createDataFlow(0)->toDot("../dot_dataflows/sobel_filter.dot");
 
     Chebyshev chebyshev(nullptr, cgraArch);
-    chebyshev.createDataFlow(0, 5)->toDot("../dot_dataflows/chebyshev.dot");
+    chebyshev.createDataFlow(0,1)->toDot("../dot_dataflows/chebyshev.dot");
 
     Mibench mibench(nullptr, cgraArch);
-    mibench.createDataFlow(0, 2)->toDot("../dot_dataflows/mibench.dot");
+    mibench.createDataFlow(0, 1)->toDot("../dot_dataflows/mibench.dot");
 
     Poly5 poly5(nullptr, cgraArch);
-    poly5.createDataFlow(0)->toDot("../dot_dataflows/poly5.dot");
+    poly5.createDataFlow(0,1)->toDot("../dot_dataflows/poly5.dot");
 
     Poly8 poly8(nullptr, cgraArch);
     poly8.createDataFlow(0)->toDot("../dot_dataflows/poly8.dot");
@@ -104,7 +104,7 @@ void generate_dataflows() {
     qspline.createDataFlow(0)->toDot("../dot_dataflows/qspline.dot");
 
     Sgfilter sgfilter(nullptr, cgraArch);
-    sgfilter.createDataFlow(0,2)->toDot("../dot_dataflows/sgfilter.dot");
+    sgfilter.createDataFlow(0,1)->toDot("../dot_dataflows/sgfilter.dot");
 
     delete cgraArch;
 

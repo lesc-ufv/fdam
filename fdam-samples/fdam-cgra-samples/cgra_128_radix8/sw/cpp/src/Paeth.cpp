@@ -15,22 +15,19 @@ Paeth::Paeth(Cgra *cgra, CgraArch *cgraArch) {
 
 Paeth::~Paeth() = default;
 
-void Paeth::runCGRA(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads) {
+void Paeth::runCGRA(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads, int copies) {
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
 
     Paeth::cgraHw->loadCgraProgram("../cgra_bitstreams/paeth.cgra");
     for (int i = 0; i < numThreads; ++i) {
-        Paeth::cgraHw->setCgraProgramInputStreamByID(i, 0, data_in[i][0][0], sizeof(short) * data_size);
-        Paeth::cgraHw->setCgraProgramInputStreamByID(i, 1, data_in[i][0][1], sizeof(short) * data_size);
-        Paeth::cgraHw->setCgraProgramInputStreamByID(i, 2, data_in[i][0][2], sizeof(short) * data_size);
-        Paeth::cgraHw->setCgraProgramOutputStreamByID(i, 3, data_out[i][0], sizeof(short) * data_size);
-
-        Paeth::cgraHw->setCgraProgramInputStreamByID(i, 4, data_in[i][1][0], sizeof(short) * data_size);
-        Paeth::cgraHw->setCgraProgramInputStreamByID(i, 5, data_in[i][1][1], sizeof(short) * data_size);
-        Paeth::cgraHw->setCgraProgramInputStreamByID(i, 6, data_in[i][1][2], sizeof(short) * data_size);
-        Paeth::cgraHw->setCgraProgramOutputStreamByID(i, 7, data_out[i][1], sizeof(short) * data_size);
+        for (int j = 0; j < copies; ++j) {
+            Paeth::cgraHw->setCgraProgramInputStreamByID(i, j * 4, data_in[i][j][0], sizeof(short) * data_size);
+            Paeth::cgraHw->setCgraProgramInputStreamByID(i, (j * 4) + 1, data_in[i][j][1], sizeof(short) * data_size);
+            Paeth::cgraHw->setCgraProgramInputStreamByID(i, (j * 4) + 2, data_in[i][j][2], sizeof(short) * data_size);
+            Paeth::cgraHw->setCgraProgramOutputStreamByID(i, (j * 4) + 3, data_out[i][j], sizeof(short) * data_size);
+        }
     }
     s = high_resolution_clock::now();
     Paeth::cgraHw->syncExecute(0);
@@ -39,7 +36,7 @@ void Paeth::runCGRA(unsigned short ****data_in, unsigned short ***data_out, int 
 
 }
 
-void Paeth::runCPU(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads) {
+void Paeth::runCPU(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads, int copies) {
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
@@ -47,7 +44,7 @@ void Paeth::runCPU(unsigned short ****data_in, unsigned short ***data_out, int d
 #pragma omp parallel
 #pragma omp for
     for (int j = 0; j < NUM_THREADS; j++) {
-        for (int k = 0; k < 2; ++k) {
+        for (int k = 0; k < copies; ++k) {
             for (int i = 0; i < data_size; ++i) {
                 int pas, pbs, pcs;
                 bool test_1, test_2, test_3, test_4;
@@ -69,14 +66,14 @@ void Paeth::runCPU(unsigned short ****data_in, unsigned short ***data_out, int d
     Paeth::cpuExecTime = diff.count() * 1000;
 }
 
-bool Paeth::compile(int numThreads) {
+bool Paeth::compile(int numThreads, int copies) {
     Scheduler scheduler(Paeth::cgraArch);
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     char filename[100];
     std::vector<DataFlow *> dfs;
     for (int i = 0; i < numThreads; ++i) {
-        dfs.push_back(Paeth::createDataFlow(i));
+        dfs.push_back(Paeth::createDataFlow(i,copies));
         scheduler.addDataFlow(dfs[i], i, 0);
         Paeth::cgraArch->getNetBranch(i)->createRouteTable();
         Paeth::cgraArch->getNet(i)->createRouteTable();
@@ -102,20 +99,20 @@ bool Paeth::compile(int numThreads) {
     return r == SCHEDULE_SUCCESS;
 }
 
-DataFlow *Paeth::createDataFlow(int id) {
+DataFlow *Paeth::createDataFlow(int id, int copies) {
     auto df = new DataFlow(id, "paeth");
     int idx = 0;
     Operator *inA[2];
     Operator *inB[2];
     Operator *inC[2];
     Operator *out[2];
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < copies; ++i) {
         inA[i] = new InputStream(idx++);
         inB[i] = new InputStream(idx++);
         inC[i] = new InputStream(idx++);
         out[i] = new OutputStream(idx++);
     }
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < copies; ++i) {
         auto sub1 = new Sub(idx++);
         auto sub2 = new Sub(idx++);
         auto sub3 = new Sub(idx++);
@@ -240,7 +237,7 @@ DataFlow *Paeth::createDataFlow(int id) {
 }
 
 void Paeth::printStatistics() {
-    auto df = Paeth::createDataFlow(0);
+    auto df = Paeth::createDataFlow(0,1);
     MSG("INFO Paeth Statictics");
     MSG("INFO CGRA target architecture:");
     MSG("INFO Number of Threads: " << Paeth::cgraArch->getNumThreads());
@@ -267,6 +264,7 @@ void Paeth::printStatistics() {
 
 void Paeth::benchmarking(int numThreads, int data_size) {
 
+    int copies = 1;
     unsigned short ****data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
@@ -276,28 +274,21 @@ void Paeth::benchmarking(int numThreads, int data_size) {
     data_out_cgra = new unsigned short **[numThreads];
 
     for (int i = 0; i < numThreads; ++i) {
-        data_in[i] = new unsigned short **[2];
-        data_in[i][0] = new unsigned short *[3];
-        data_in[i][1] = new unsigned short *[3];
-        data_in[i][0][0] = new unsigned short[data_size];
-        data_in[i][0][1] = new unsigned short[data_size];
-        data_in[i][0][2] = new unsigned short[data_size];
-
-        data_in[i][1][0] = new unsigned short[data_size];
-        data_in[i][1][1] = new unsigned short[data_size];
-        data_in[i][1][2] = new unsigned short[data_size];
-
-        data_out_cpu[i] = new unsigned short *[2];
-        data_out_cgra[i] = new unsigned short *[2];
-
-        data_out_cpu[i][0] = new unsigned short[data_size];
-        data_out_cpu[i][1] = new unsigned short[data_size];
-        data_out_cgra[i][0] = new unsigned short[data_size];
-        data_out_cgra[i][1] = new unsigned short[data_size];
+        data_in[i] = new unsigned short **[copies];
+        data_out_cpu[i] = new unsigned short *[copies];
+        data_out_cgra[i] = new unsigned short *[copies];
+        for (int j = 0; j < copies; ++j) {
+            data_in[i][j] = new unsigned short *[3];
+            data_in[i][j][0] = new unsigned short[data_size];
+            data_in[i][j][1] = new unsigned short[data_size];
+            data_in[i][j][2] = new unsigned short[data_size];
+            data_out_cpu[i][j] = new unsigned short[data_size];
+            data_out_cgra[i][j] = new unsigned short[data_size];
+        }
     }
 
     for (int t = 0; t < numThreads; ++t) {
-        for (int c = 0; c < 2; ++c) {
+        for (int c = 0; c < copies; ++c) {
             for (int i = 0; i < data_size; ++i) {
                 data_in[t][c][0][i] = (unsigned short) (random() % 256);
                 data_in[t][c][1][i] = (unsigned short) (random() % 256);
@@ -309,11 +300,11 @@ void Paeth::benchmarking(int numThreads, int data_size) {
         }
     }
 
-    if (Paeth::compile(numThreads)) {
-        Paeth::runCGRA(data_in, data_out_cgra, data_size, numThreads);
-        Paeth::runCPU(data_in, data_out_cpu, data_size, numThreads);
+    if (Paeth::compile(numThreads,copies)) {
+        Paeth::runCGRA(data_in, data_out_cgra, data_size, numThreads,copies);
+        Paeth::runCPU(data_in, data_out_cpu, data_size, numThreads,copies);
         for (int t = 0; t < numThreads; ++t) {
-            for (int c = 0; c < 2; ++c) {
+            for (int c = 0; c < copies; ++c) {
                 for (int i = 0; i < data_size; ++i) {
                     if (data_out_cpu[t][c][i] != data_out_cgra[t][c][i]) {
                         printf("Error: Thread %d, copy %d, index %d, expected %d found %d!\n", t, c, i,
@@ -328,21 +319,14 @@ void Paeth::benchmarking(int numThreads, int data_size) {
         printf("Compilation failed!\n");
     }
     for (int i = 0; i < numThreads; ++i) {
-        delete data_in[i][0][0];
-        delete data_in[i][0][1];
-        delete data_in[i][0][2];
-        delete data_in[i][1][0];
-        delete data_in[i][1][1];
-        delete data_in[i][1][2];
-
-        delete data_in[i][0];
-        delete data_in[i][1];
-
-        delete data_out_cpu[i][0];
-        delete data_out_cpu[i][1];
-        delete data_out_cgra[i][0];
-        delete data_out_cgra[i][1];
-
+        for (int j = 0; j < copies; ++j) {
+            delete data_in[i][j][0];
+            delete data_in[i][j][1];
+            delete data_in[i][j][2];
+            delete data_in[i][j];
+            delete data_out_cpu[i][j];
+            delete data_out_cgra[i][j];
+        }
         delete data_in[i];
         delete data_out_cpu[i];
         delete data_out_cgra[i];
