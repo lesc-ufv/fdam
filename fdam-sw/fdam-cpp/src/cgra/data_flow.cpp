@@ -117,7 +117,6 @@ void DataFlow::updateOpLevel() {
                     }
                     q.push(child);
                 }
-
             }
         }
     }

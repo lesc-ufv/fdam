@@ -60,7 +60,7 @@ DataFlow *Poly8::createDataFlow(int id) {
 
     auto add1 = new Addi(idx++, 72);
     auto add2 = new Add(idx++);
-    auto add3 = new Addi(idx++,6912);
+    auto add3 = new Addi(idx++, 6912);
     auto add4 = new Addi(idx++, 1728);
     auto add5 = new Add(idx++);
     auto add6 = new Addi(idx++, 55296);
@@ -74,7 +74,7 @@ DataFlow *Poly8::createDataFlow(int id) {
     auto mult3 = new Multi(idx++, 432);
     auto mult4 = new Mult(idx++);
     auto mult5 = new Mult(idx++);
-    auto mult6 = new Multi(idx++,360);
+    auto mult6 = new Multi(idx++, 360);
     auto mult7 = new Mult(idx++);
     auto mult8 = new Multi(idx++, 71);
     auto mult9 = new Mult(idx++);

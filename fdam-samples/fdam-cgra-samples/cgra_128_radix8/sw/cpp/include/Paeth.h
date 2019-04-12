@@ -28,8 +28,6 @@ private:
 
     void runCPU(unsigned short ****data_in, unsigned short ***data_out, int data_size, int numThreads);
 
-    bool compile(int numThreads);
-
 public:
 
     Paeth(Cgra *cgra, CgraArch *cgraArch);
@@ -39,6 +37,8 @@ public:
     DataFlow *createDataFlow(int id);
 
     void benchmarking(int numThreads, int data_size);
+
+    bool compile(int numThreads);
 
     void printStatistics();
 };

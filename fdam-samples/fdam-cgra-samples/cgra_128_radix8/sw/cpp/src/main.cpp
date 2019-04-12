@@ -6,8 +6,8 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
     int num_thread = 1;
-    int data_size = 32;
-    if(argc > 3) {
+    int data_size = 64;
+    if (argc > 3) {
         num_thread = atoi(argv[2]);
         data_size = atoi(argv[3]);
     }
@@ -56,13 +56,20 @@ int main(int argc, char *argv[]) {
         paeth.printStatistics();
         delete cgra;
         delete cgraArch;
+    } else if (std::strcmp("chebyshev", argv[1]) == 0) {
+        auto cgra = new Cgra();
+        auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
+        Chebyshev chebyshev(cgra, cgraArch);
+        chebyshev.benchmarking(num_thread, data_size);
+        chebyshev.printStatistics();
+        delete cgra;
+        delete cgraArch;
     }
-
 
     return 0;
 }
 
-void generate_dataflows(){
+void generate_dataflows() {
 
     auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
 
@@ -82,22 +89,22 @@ void generate_dataflows(){
     sobel_filter.createDataFlow(0)->toDot("../dot_dataflows/sobel_filter.dot");
 
     Chebyshev chebyshev(nullptr, cgraArch);
-    chebyshev.createDataFlow(0)->toDot("../dot_dataflows/chebyshev.dot");
+    chebyshev.createDataFlow(0, 5)->toDot("../dot_dataflows/chebyshev.dot");
 
     Mibench mibench(nullptr, cgraArch);
-    mibench.createDataFlow(0)->toDot("../dot_dataflows/mibench.dot");
+    mibench.createDataFlow(0, 2)->toDot("../dot_dataflows/mibench.dot");
 
-    Poly5 poly5(nullptr,cgraArch);
+    Poly5 poly5(nullptr, cgraArch);
     poly5.createDataFlow(0)->toDot("../dot_dataflows/poly5.dot");
 
-    Poly8 poly8(nullptr,cgraArch);
+    Poly8 poly8(nullptr, cgraArch);
     poly8.createDataFlow(0)->toDot("../dot_dataflows/poly8.dot");
 
-    Qspline qspline(nullptr,cgraArch);
+    Qspline qspline(nullptr, cgraArch);
     qspline.createDataFlow(0)->toDot("../dot_dataflows/qspline.dot");
 
-    Sgfilter sgfilter(nullptr,cgraArch);
-    sgfilter.createDataFlow(0)->toDot("../dot_dataflows/sgfilter.dot");
+    Sgfilter sgfilter(nullptr, cgraArch);
+    sgfilter.createDataFlow(0,2)->toDot("../dot_dataflows/sgfilter.dot");
 
     delete cgraArch;
 
