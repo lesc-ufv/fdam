@@ -6,6 +6,7 @@
 #include <Chebyshev.h>
 #include <Mibench.h>
 #include <Poly5.h>
+#include <Poly6.h>
 #include <Poly8.h>
 #include <Qspline.h>
 #include <Sgfilter.h>
