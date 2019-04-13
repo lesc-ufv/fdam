@@ -86,7 +86,7 @@ const char op_label[19][8]{
         "SGT",
         "ADD",
         "SUB",
-        "MULT",
+        "MUL",
         "XOR",
         "AND",
         "OR",
