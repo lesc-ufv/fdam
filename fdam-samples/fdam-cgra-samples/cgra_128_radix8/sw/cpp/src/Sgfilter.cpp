@@ -270,7 +270,7 @@ void Sgfilter::benchmarking(int numThreads, int data_size) {
 void Sgfilter::printStatistics() {
     int copies = 1;
     auto df = Sgfilter::createDataFlow(0, copies);
-    MSG("INFO Paeth Statictics");
+    MSG("INFO Sgfilter Statictics");
     MSG("INFO CGRA target architecture:");
     MSG("INFO Number of Threads: " << Sgfilter::cgraArch->getNumThreads());
     MSG("INFO Number of PEs: " << Sgfilter::cgraArch->getNumPe());

@@ -339,7 +339,7 @@ bool Poly5::compile(int numThreads, int copies) {
 void Poly5::printStatistics() {
     int copies = 1;
     auto df = Poly5::createDataFlow(0, copies);
-    MSG("INFO Paeth Statictics");
+    MSG("INFO Poly5 Statictics");
     MSG("INFO CGRA target architecture:");
     MSG("INFO Number of Threads: " << Poly5::cgraArch->getNumThreads());
     MSG("INFO Number of PEs: " << Poly5::cgraArch->getNumPe());

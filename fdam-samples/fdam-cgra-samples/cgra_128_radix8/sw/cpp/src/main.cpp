@@ -87,6 +87,14 @@ int main(int argc, char *argv[]) {
         sgfilter.printStatistics();
         delete cgra;
         delete cgraArch;
+    } else if (std::strcmp("qspline", argv[1]) == 0) {
+        auto cgra = new Cgra();
+        auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
+        Qspline qspline(cgra, cgraArch);
+        qspline.benchmarking(num_thread, data_size);
+        qspline.printStatistics();
+        delete cgra;
+        delete cgraArch;
     }
     return 0;
 }
@@ -126,7 +134,7 @@ void generate_dataflows() {
     poly8.createDataFlow(0)->toDot("../dot_dataflows/poly8.dot");
 
     Qspline qspline(nullptr, cgraArch);
-    qspline.createDataFlow(0)->toDot("../dot_dataflows/qspline.dot");
+    qspline.createDataFlow(0, 1)->toDot("../dot_dataflows/qspline.dot");
 
     Sgfilter sgfilter(nullptr, cgraArch);
     sgfilter.createDataFlow(0, 1)->toDot("../dot_dataflows/sgfilter.dot");

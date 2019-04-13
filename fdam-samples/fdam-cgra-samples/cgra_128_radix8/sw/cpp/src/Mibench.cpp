@@ -271,7 +271,7 @@ bool Mibench::compile(int numThreads, int copies) {
 void Mibench::printStatistics() {
     int copies = 1;
     auto df = Mibench::createDataFlow(0, copies);
-    MSG("INFO Paeth Statictics");
+    MSG("INFO Mibench Statictics");
     MSG("INFO CGRA target architecture:");
     MSG("INFO Number of Threads: " << Mibench::cgraArch->getNumThreads());
     MSG("INFO Number of PEs: " << Mibench::cgraArch->getNumPe());
