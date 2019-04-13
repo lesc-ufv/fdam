@@ -66,6 +66,7 @@ DataFlow *Poly6::createDataFlow(int id) {
     auto add1 = new Addi(idx++, 216);
     auto add2 = new Add(idx++);
     auto add3 = new Addi(idx++, 6912);
+    auto add31 = new Add(idx++);
     auto add4 = new Addi(idx++, 1728);
 
     auto add5 = new Add(idx++);
