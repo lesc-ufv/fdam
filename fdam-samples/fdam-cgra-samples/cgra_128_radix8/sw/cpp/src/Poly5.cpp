@@ -300,7 +300,6 @@ void Poly5::benchmarking(int numThreads, int data_size) {
     delete data_in;
     delete data_out_cpu;
     delete data_out_cgra;
-
 }
 
 bool Poly5::compile(int numThreads, int copies) {
