@@ -241,5 +241,6 @@ DataFlow *Poly8::createDataFlow(int id) {
     df->connect(i2_n3, sub_lmm_13824_n34, sub_lmm_13824_n34->getPortA());
     df->connect(sub_lmm_13824_n34, mul_n30, mul_n30->getPortB());
 
+
     return df;
 }
