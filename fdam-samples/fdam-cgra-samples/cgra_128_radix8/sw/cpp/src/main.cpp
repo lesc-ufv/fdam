@@ -128,7 +128,7 @@ void generate_dataflows() {
     poly5.createDataFlow(0, 1)->toDot("../dot_dataflows/poly5.dot");
 
     Poly6 poly6(nullptr, cgraArch);
-    poly5.createDataFlow(0, 1)->toDot("../dot_dataflows/poly6.dot");
+    poly6.createDataFlow(0, 1)->toDot("../dot_dataflows/poly6.dot");
 
     Poly8 poly8(nullptr, cgraArch);
     poly8.createDataFlow(0)->toDot("../dot_dataflows/poly8.dot");
