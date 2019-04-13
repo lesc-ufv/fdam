@@ -29,7 +29,7 @@ public:
 
     ~Poly6();
 
-    DataFlow *createDataFlow(int id);
+    DataFlow *createDataFlow(int id, int copies);
 };
 
 
