@@ -1,5 +1,4 @@
 #include <main.h>
-#include <algorithm>
 
 using namespace std;
 
@@ -64,8 +63,31 @@ int main(int argc, char *argv[]) {
         chebyshev.printStatistics();
         delete cgra;
         delete cgraArch;
+    } else if (std::strcmp("mibench", argv[1]) == 0) {
+        auto cgra = new Cgra();
+        auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
+        Mibench mibench(cgra, cgraArch);
+        mibench.benchmarking(num_thread, data_size);
+        mibench.printStatistics();
+        delete cgra;
+        delete cgraArch;
+    } else if (std::strcmp("poly5", argv[1]) == 0) {
+        auto cgra = new Cgra();
+        auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
+        Poly5 poly5(cgra, cgraArch);
+        poly5.benchmarking(num_thread, data_size);
+        poly5.printStatistics();
+        delete cgra;
+        delete cgraArch;
+    } else if (std::strcmp("sgfilter", argv[1]) == 0) {
+        auto cgra = new Cgra();
+        auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
+        Sgfilter sgfilter(cgra, cgraArch);
+        sgfilter.benchmarking(num_thread, data_size);
+        sgfilter.printStatistics();
+        delete cgra;
+        delete cgraArch;
     }
-
     return 0;
 }
 
@@ -83,22 +105,22 @@ void generate_dataflows() {
     kmeans.createDataFlow(0)->toDot("../dot_dataflows/kmeans.dot");
 
     Paeth paeth(nullptr, cgraArch);
-    paeth.createDataFlow(0,1)->toDot("../dot_dataflows/paeth.dot");
+    paeth.createDataFlow(0, 1)->toDot("../dot_dataflows/paeth.dot");
 
     SobelFilter sobel_filter(nullptr, cgraArch);
     sobel_filter.createDataFlow(0)->toDot("../dot_dataflows/sobel_filter.dot");
 
     Chebyshev chebyshev(nullptr, cgraArch);
-    chebyshev.createDataFlow(0,1)->toDot("../dot_dataflows/chebyshev.dot");
+    chebyshev.createDataFlow(0, 1)->toDot("../dot_dataflows/chebyshev.dot");
 
     Mibench mibench(nullptr, cgraArch);
     mibench.createDataFlow(0, 1)->toDot("../dot_dataflows/mibench.dot");
 
     Poly5 poly5(nullptr, cgraArch);
-    poly5.createDataFlow(0,1)->toDot("../dot_dataflows/poly5.dot");
+    poly5.createDataFlow(0, 1)->toDot("../dot_dataflows/poly5.dot");
 
     Poly6 poly6(nullptr, cgraArch);
-    poly5.createDataFlow(0,1)->toDot("../dot_dataflows/poly6.dot");
+    poly5.createDataFlow(0, 1)->toDot("../dot_dataflows/poly6.dot");
 
     Poly8 poly8(nullptr, cgraArch);
     poly8.createDataFlow(0)->toDot("../dot_dataflows/poly8.dot");
@@ -107,7 +129,7 @@ void generate_dataflows() {
     qspline.createDataFlow(0)->toDot("../dot_dataflows/qspline.dot");
 
     Sgfilter sgfilter(nullptr, cgraArch);
-    sgfilter.createDataFlow(0,1)->toDot("../dot_dataflows/sgfilter.dot");
+    sgfilter.createDataFlow(0, 1)->toDot("../dot_dataflows/sgfilter.dot");
 
     delete cgraArch;
 

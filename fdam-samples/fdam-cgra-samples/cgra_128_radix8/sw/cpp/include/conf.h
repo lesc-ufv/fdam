@@ -5,6 +5,6 @@
 #ifndef MAIN_CONF_H
 #define MAIN_CONF_H
 
-#define NUM_THREADS 8
+#define NUM_THREADS 1
 
 #endif //MAIN_CONF_H

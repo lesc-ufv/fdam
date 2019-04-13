@@ -23,7 +23,7 @@ find_library(LIB_OPAE NAMES opae-c REQUIRED)
 find_library(LIB_OPAE_ASE NAMES opae-c-ase REQUIRED)
 find_library(LIB_UUID NAMES uuid REQUIRED)
 find_library(LIB_MPF NAMES MPF REQUIRED)
-find_library(LIB_FDAM NAMES fdam REQUIRED)
+#find_library(LIB_FDAM NAMES fdam REQUIRED)
 
 file(GLOB_RECURSE CPP_SRCS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE H_SRCS ${CMAKE_SOURCE_DIR}/include/*.h)
