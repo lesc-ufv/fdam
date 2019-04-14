@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
             generate_dataflows();
 
         } else if (argc > 3) {
-            auto cgra = new Cgra();
+            auto cgra = nullptr;//new Cgra();
             auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
             int num_thread = atoi(argv[2]);
             int data_size = atoi(argv[3]);
@@ -40,8 +40,12 @@ int main(int argc, char *argv[]) {
                 paeth.printStatistics();
             } else if (std::strcmp("chebyshev", argv[1]) == 0) {
                 Chebyshev chebyshev(cgra, cgraArch);
-                chebyshev.benchmarking(num_thread, data_size);
-                chebyshev.printStatistics();
+                while (!chebyshev.compile(8, 8))
+                    cout << "deu ruim :(" << endl;
+
+                cout << "deu bom :)" << endl;
+                //chebyshev.benchmarking(num_thread, data_size);
+                //chebyshev.printStatistics();
             } else if (std::strcmp("mibench", argv[1]) == 0) {
                 Mibench mibench(cgra, cgraArch);
                 mibench.benchmarking(num_thread, data_size);
@@ -67,7 +71,7 @@ int main(int argc, char *argv[]) {
                 qspline.benchmarking(num_thread, data_size);
                 qspline.printStatistics();
             }
-            delete cgra;
+            //delete cgra;
             delete cgraArch;
         }
     } else {
