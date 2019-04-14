@@ -12,8 +12,7 @@ Poly8::Poly8(Cgra *cgra, CgraArch *cgraArch) {
     Poly8::cgraExecTime = 0;
     Poly8::cgraConfTime = 0;
     for (int i = 0; i < 12; ++i) {
-        //Poly8::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
-        Poly8::constants.push_back(1);
+        Poly8::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
     }
 }
 
@@ -322,9 +321,14 @@ bool Poly8::compile(int numThreads, int copies) {
         Poly8::cgraArch->getNet(i)->createRouteTable();
     }
 
-    s = high_resolution_clock::now();
-    int r = scheduler.scheduling();
-    diff = high_resolution_clock::now() - s;
+    int r = 0;
+    for (int j = 0; j < 100; ++j) {
+        s = high_resolution_clock::now();
+        r = scheduler.scheduling();
+        diff = high_resolution_clock::now() - s;
+        if(r == SCHEDULE_SUCCESS )
+            break;
+    }
 
     Poly8::schedulingTime = diff.count() * 1000;
 

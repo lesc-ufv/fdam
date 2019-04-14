@@ -66,9 +66,15 @@ bool LoopBack::compile(int numThreads) {
         LoopBack::cgraArch->getNetBranch(i)->createRouteTable();
         LoopBack::cgraArch->getNet(i)->createRouteTable();
     }
-    s = high_resolution_clock::now();
-    int r = scheduler.scheduling();
-    diff = high_resolution_clock::now() - s;
+    int r = 0;
+    for (int j = 0; j < 100; ++j) {
+        s = high_resolution_clock::now();
+        r = scheduler.scheduling();
+        diff = high_resolution_clock::now() - s;
+        if(r == SCHEDULE_SUCCESS )
+            break;
+    }
+
     LoopBack::schedulingTime = diff.count() * 1000;
     if (r == SCHEDULE_SUCCESS) {
         sprintf(filename, "../cgra_bitstreams/%s.cgra", dfs[0]->getName().c_str());

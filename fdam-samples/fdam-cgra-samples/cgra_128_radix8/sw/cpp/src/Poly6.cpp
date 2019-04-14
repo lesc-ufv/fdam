@@ -12,8 +12,7 @@ Poly6::Poly6(Cgra *cgra, CgraArch *cgraArch) {
     Poly6::cgraExecTime = 0;
     Poly6::cgraConfTime = 0;
     for (int i = 0; i < 17; ++i) {
-        //Poly5::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
-        Poly6::constants.push_back(1);
+        Poly6::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
     }
 }
 
@@ -406,9 +405,14 @@ bool Poly6::compile(int numThreads, int copies) {
         Poly6::cgraArch->getNet(i)->createRouteTable();
     }
 
-    s = high_resolution_clock::now();
-    int r = scheduler.scheduling();
-    diff = high_resolution_clock::now() - s;
+    int r = 0;
+    for (int j = 0; j < 100; ++j) {
+        s = high_resolution_clock::now();
+        r = scheduler.scheduling();
+        diff = high_resolution_clock::now() - s;
+        if(r == SCHEDULE_SUCCESS )
+            break;
+    }
 
     Poly6::schedulingTime = diff.count() * 1000;
 

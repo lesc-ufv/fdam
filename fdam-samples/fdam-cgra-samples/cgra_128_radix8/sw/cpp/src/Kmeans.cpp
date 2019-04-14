@@ -264,9 +264,14 @@ bool Kmeans::compile(int numThreads) {
         Kmeans::cgraArch->getNet(i)->createRouteTable();
     }
 
-    s = high_resolution_clock::now();
-    int r = scheduler.scheduling();
-    diff = high_resolution_clock::now() - s;
+    int r = 0;
+    for (int j = 0; j < 100; ++j) {
+        s = high_resolution_clock::now();
+        r = scheduler.scheduling();
+        diff = high_resolution_clock::now() - s;
+        if(r == SCHEDULE_SUCCESS )
+            break;
+    }
 
     Kmeans::schedulingTime = diff.count() * 1000;
 

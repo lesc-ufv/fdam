@@ -13,8 +13,7 @@ Poly5::Poly5(Cgra *cgra, CgraArch *cgraArch) {
     Poly5::cgraConfTime = 0;
 
     for (int i = 0; i < 12; ++i) {
-        //Poly5::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
-        Poly5::constants.push_back(1);
+        Poly5::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
     }
 }
 
@@ -222,7 +221,6 @@ void Poly5::runCPU(unsigned short ****data_in, unsigned short ***data_out, int d
                                     Poly5::constants[10] * data_in[j][k][1][i];
             }
         }
-
     }
     diff = high_resolution_clock::now() - s;
     Poly5::cpuExecTime = diff.count() * 1000;
@@ -315,9 +313,14 @@ bool Poly5::compile(int numThreads, int copies) {
         Poly5::cgraArch->getNet(i)->createRouteTable();
     }
 
-    s = high_resolution_clock::now();
-    int r = scheduler.scheduling();
-    diff = high_resolution_clock::now() - s;
+    int r = 0;
+    for (int j = 0; j < 1000; ++j) {
+        s = high_resolution_clock::now();
+        r = scheduler.scheduling();
+        diff = high_resolution_clock::now() - s;
+        if(r == SCHEDULE_SUCCESS )
+            break;
+    }
 
     Poly5::schedulingTime = diff.count() * 1000;
 
