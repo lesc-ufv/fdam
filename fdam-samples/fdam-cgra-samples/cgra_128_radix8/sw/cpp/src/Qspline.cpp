@@ -16,7 +16,7 @@ Qspline::Qspline(Cgra *cgra, CgraArch *cgraArch) {
 Qspline::~Qspline() = default;
 
 DataFlow *Qspline::createDataFlow(int id, int copies) {
-    auto df = new DataFlow(id, "qslpine");
+    auto df = new DataFlow(id, "qspline");
     int idx = 0;
     // level 1
     std::vector<Operator *> i0_n1;
@@ -28,79 +28,77 @@ DataFlow *Qspline::createDataFlow(int id, int copies) {
     std::vector<Operator *> i6_n7;
     std::vector<Operator *> o0_n34;
     for (int i = 0; i < copies; ++i) {
-        i0_n1.push_back(new InputStream(idx++));
-        i1_n2.push_back(new InputStream(idx++));
-        i2_n3.push_back(new InputStream(idx++));
-        i3_n4.push_back(new InputStream(idx++));
-        i4_n5.push_back(new InputStream(idx++));
-        i5_n6.push_back(new InputStream(idx++));
-        i6_n7.push_back(new InputStream(idx++));
-        o0_n34.push_back(new OutputStream(idx++));
+        i0_n1.push_back(new InputStream(idx++));//0
+        i1_n2.push_back(new InputStream(idx++));//1
+        i2_n3.push_back(new InputStream(idx++));//2
+        i3_n4.push_back(new InputStream(idx++));//3
+        i4_n5.push_back(new InputStream(idx++));//4
+        i5_n6.push_back(new InputStream(idx++));//5
+        i6_n7.push_back(new InputStream(idx++));//6
+        o0_n34.push_back(new OutputStream(idx++));//7
     }
     for (int j = 0; j < copies; ++j) {
-        auto reg1 = new PassA(idx++);
-        auto reg2 = new PassA(idx++);
-        auto reg3 = new PassA(idx++);
-        auto reg4 = new PassA(idx++);
-        auto reg5 = new PassA(idx++);
-        auto reg6 = new PassA(idx++);
-        auto reg7 = new PassA(idx++);
-        auto reg8 = new PassA(idx++);
-        auto reg9 = new PassA(idx++);
-        auto reg10 = new PassA(idx++);
-        auto reg11 = new PassA(idx++);
-        auto reg12 = new PassA(idx++);
-        auto reg13 = new PassA(idx++);
-        auto reg14 = new PassA(idx++);
-        auto reg15 = new PassA(idx++);
-        auto reg16 = new PassA(idx++);
-        auto reg17 = new PassA(idx++);
-        auto reg18 = new PassA(idx++);
-        auto reg19 = new PassA(idx++);
-        auto reg20 = new PassA(idx++);
-        auto reg21 = new PassA(idx++);
-        auto reg22 = new PassA(idx++);
-        auto reg23 = new PassA(idx++);
-        auto reg24 = new PassA(idx++);
-        auto reg25 = new PassA(idx++);
-        auto reg27 = new PassA(idx++);
-        auto reg28 = new PassA(idx++);
-        auto reg29 = new PassA(idx++);
-        auto reg30 = new PassA(idx++);
-        auto reg31 = new PassA(idx++);
-        auto reg32 = new PassA(idx++);
-        auto reg33 = new PassA(idx++);
-        auto reg34 = new PassA(idx++);
-        auto reg35 = new PassA(idx++);
-        auto reg36 = new PassA(idx++);
-
-        auto mul_n8 = new Mult(idx++);
-        auto mul_n9 = new Mult(idx++);
-        auto mul_n11 = new Mult(idx++);
-        auto mul_n13 = new Mult(idx++);
-        auto mul_n29 = new Mult(idx++);
-        auto mul_n25 = new Mult(idx++);
-        auto mul_n23 = new Mult(idx++);
-        auto mul_n24 = new Mult(idx++);
-        auto mul_n18 = new Mult(idx++);
-        auto mul_n10 = new Mult(idx++);
-        auto mul_n28 = new Mult(idx++);
-        auto mul_n20 = new Mult(idx++);
-        auto mul_n21 = new Mult(idx++);
-        auto mul_n14 = new Mult(idx++);
-        auto mul_n15 = new Mult(idx++);
-        auto mul_n12 = new Mult(idx++);
-        auto mul_n26 = new Mult(idx++);
-        auto mul_n19 = new Mult(idx++);
-        auto mul_n17 = new Mult(idx++);
-        auto add_n30 = new Add(idx++);
-        auto add_n31 = new Add(idx++);
-        auto add_n32 = new Add(idx++);
-        auto add_n33 = new Add(idx++);
-
-        auto mul_lmm_6_n27 = new Multi(idx++, 6);
-        auto mul_lmm_4_n22 = new Multi(idx++, 4);
-        auto mul_lmm_4_n16 = new Multi(idx++, 4);
+        auto reg1 = new PassA(idx++);//8
+        auto reg2 = new PassA(idx++);//9
+        auto reg3 = new PassA(idx++);//10
+        auto reg4 = new PassA(idx++);//11
+        auto reg5 = new PassA(idx++);//12
+        auto reg6 = new PassA(idx++);//13
+        auto reg7 = new PassA(idx++);//14
+        auto reg8 = new PassA(idx++);//15
+        auto reg9 = new PassA(idx++);//16
+        auto reg10 = new PassA(idx++);//17
+        auto reg11 = new PassA(idx++);//18
+        auto reg12 = new PassA(idx++);//19
+        auto reg13 = new PassA(idx++);//20
+        auto reg14 = new PassA(idx++);//21
+        auto reg15 = new PassA(idx++);//22
+        auto reg16 = new PassA(idx++);//23
+        auto reg17 = new PassA(idx++);//24
+        auto reg18 = new PassA(idx++);//25
+        auto reg19 = new PassA(idx++);//26
+        auto reg20 = new PassA(idx++);//27
+        auto reg21 = new PassA(idx++);//28
+        auto reg22 = new PassA(idx++);//29
+        auto reg23 = new PassA(idx++);//30
+        auto reg24 = new PassA(idx++);//31
+        auto reg25 = new PassA(idx++);//32
+        auto reg27 = new PassA(idx++);//33
+        auto reg28 = new PassA(idx++);//34
+        auto reg29 = new PassA(idx++);//35
+        auto reg30 = new PassA(idx++);//36
+        auto reg31 = new PassA(idx++);//37
+        auto reg32 = new PassA(idx++);//38
+        auto reg33 = new PassA(idx++);//39
+        auto reg34 = new PassA(idx++);//40
+        auto reg35 = new PassA(idx++);//41
+        auto reg36 = new PassA(idx++);//42
+        auto mul_n8 = new Mult(idx++);//43
+        auto mul_n9 = new Mult(idx++);//44
+        auto mul_n11 = new Mult(idx++);//45
+        auto mul_n13 = new Mult(idx++);//46
+        auto mul_n29 = new Mult(idx++);//47
+        auto mul_n25 = new Mult(idx++);//48
+        auto mul_n23 = new Mult(idx++);//49
+        auto mul_n24 = new Mult(idx++);//50
+        auto mul_n18 = new Mult(idx++);//51
+        auto mul_n10 = new Mult(idx++);//52
+        auto mul_n28 = new Mult(idx++);//53
+        auto mul_n20 = new Mult(idx++);//54
+        auto mul_n21 = new Mult(idx++);//55
+        auto mul_n14 = new Mult(idx++);//56
+        auto mul_n15 = new Mult(idx++);//57
+        auto mul_n12 = new Mult(idx++);//58
+        auto mul_n26 = new Mult(idx++);//59
+        auto mul_n19 = new Mult(idx++);//60
+        auto mul_n17 = new Mult(idx++);//61
+        auto add_n30 = new Add(idx++);//62
+        auto add_n31 = new Add(idx++);//63
+        auto add_n32 = new Add(idx++);//64
+        auto add_n33 = new Add(idx++);//65
+        auto mul_lmm_6_n27 = new Multi(idx++, 6);//66
+        auto mul_lmm_4_n22 = new Multi(idx++, 4);//67
+        auto mul_lmm_4_n16 = new Multi(idx++, 4);//68
 
 
         df->connect(i4_n5[j], mul_n13, mul_n13->getPortA());
@@ -161,7 +159,7 @@ DataFlow *Qspline::createDataFlow(int id, int copies) {
         df->connect(reg20, add_n31, add_n31->getPortA());
 
         df->connect(add_n31, add_n32, add_n32->getPortA());
-        df->connect(add_n32, add_n33, add_n33->getPortA());
+        df->connect(add_n32, add_n33, add_n33->getPortB());
 
         df->connect(mul_n18, reg19, reg19->getPortA());
         df->connect(reg19, mul_n9, mul_n9->getPortB());
@@ -180,7 +178,7 @@ DataFlow *Qspline::createDataFlow(int id, int copies) {
         df->connect(mul_n15, mul_n12, mul_n12->getPortA());
         df->connect(mul_n12, mul_n26, mul_n26->getPortA());
 
-        df->connect(mul_n26, add_n31, add_n31->getPortA());
+        df->connect(mul_n26, add_n31, add_n31->getPortB());
 
         df->connect(i5_n6[j], mul_n18, mul_n18->getPortB());
         df->connect(i5_n6[j], mul_n10, mul_n10->getPortA());
@@ -409,6 +407,7 @@ void Qspline::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << Qspline::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << Qspline::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << Qspline::cgraHw->getTimeExec() << "ms");

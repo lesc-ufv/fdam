@@ -12,7 +12,7 @@ Poly8::Poly8(Cgra *cgra, CgraArch *cgraArch) {
     Poly8::cgraExecTime = 0;
     Poly8::cgraConfTime = 0;
     for (int i = 0; i < 12; ++i) {
-        //Poly5::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
+        //Poly8::constants.push_back(static_cast<unsigned short &&>(random() % 256 + 1));
         Poly8::constants.push_back(1);
     }
 }
@@ -20,7 +20,7 @@ Poly8::Poly8(Cgra *cgra, CgraArch *cgraArch) {
 Poly8::~Poly8() = default;
 
 DataFlow *Poly8::createDataFlow(int id, int copies) {
-    auto df = new DataFlow(id, "Poly8");
+    auto df = new DataFlow(id, "poly8");
     int idx = 0;
 
     std::vector<Operator *> i0_n1;
@@ -164,7 +164,7 @@ DataFlow *Poly8::createDataFlow(int id, int copies) {
         df->connect(sub_lmm_4312_n25, mul_n31, mul_n31->getPortA());
         df->connect(mul_n31, add_lmm_55296_n33, add_lmm_55296_n33->getPortA());
         df->connect(add_lmm_55296_n33, reg39, reg39->getPortA());
-        df->connect(reg39, add_n32, add_n32->getPortA());
+        df->connect(reg39, add_n32, add_n32->getPortB());
         df->connect(reg36, mul_n31, mul_n31->getPortB());
         df->connect(i2_n3[i], mul_lmm_464_n13, mul_lmm_464_n13->getPortA());
         df->connect(mul_lmm_464_n13, sub_lmm_13824_n29, sub_lmm_13824_n29->getPortA());
@@ -360,6 +360,7 @@ void Poly8::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << Poly8::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << Poly8::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << Poly8::cgraHw->getTimeExec() << "ms");
@@ -368,11 +369,4 @@ void Poly8::printStatistics() {
     Poly8::cgraHw->getAccManagement()->printHwInfo();
 
     delete df;
-}
-
-unsigned short Poly8::pot(unsigned short num, unsigned short exp) {
-    unsigned short i = 0, res = 1;
-    for (i = 0; i < exp; i++)
-        res = res * num;
-    return res;
 }

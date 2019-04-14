@@ -396,6 +396,7 @@ void SobelFilter::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << SobelFilter::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << SobelFilter::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << SobelFilter::cgraHw->getTimeExec() << "ms");

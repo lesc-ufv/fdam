@@ -12,6 +12,7 @@ FIR::FIR(Cgra *cgraHw, CgraArch *cgraArch, int size) {
     FIR::cpuExecTime = 0;
     FIR::cgraExecTime = 0;
     FIR::cgraConfTime = 0;
+
     FIR::coef = new unsigned short *[cgraArch->getNumThreads()];
 
     for (int j = 0; j < cgraArch->getNumThreads(); ++j) {
@@ -167,6 +168,7 @@ void FIR::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << FIR::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << FIR::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << FIR::cgraHw->getTimeExec() << "ms");

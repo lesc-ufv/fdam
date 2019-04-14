@@ -197,7 +197,7 @@ bool Sgfilter::compile(int numThreads, int copies) {
 }
 
 void Sgfilter::benchmarking(int numThreads, int data_size) {
-    int copies = 1;
+    int copies = 3;
     unsigned short ****data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
@@ -268,7 +268,7 @@ void Sgfilter::benchmarking(int numThreads, int data_size) {
 }
 
 void Sgfilter::printStatistics() {
-    int copies = 1;
+    int copies = 3;
     auto df = Sgfilter::createDataFlow(0, copies);
     MSG("INFO Sgfilter Statictics");
     MSG("INFO CGRA target architecture:");
@@ -285,6 +285,7 @@ void Sgfilter::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << Sgfilter::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << Sgfilter::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << Sgfilter::cgraHw->getTimeExec() << "ms");

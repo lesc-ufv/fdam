@@ -78,6 +78,8 @@ public:
     int getNumOpOut() const;
 
     int getNumOp() const;
+
+    int getNumEdges() const;
 };
 
 

@@ -302,6 +302,7 @@ void Kmeans::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << Kmeans::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << Kmeans::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << Kmeans::cgraHw->getTimeExec() << "ms");

@@ -56,7 +56,7 @@ public:
 
     std::vector<int> &getDst();
 
-    void compute();
+    //virtual void compute() = 0;
 
     int getConstant() const;
 

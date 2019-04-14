@@ -163,3 +163,11 @@ int DataFlow::getNumOp() const {
 void DataFlow::setId(int id) {
     DataFlow::id = id;
 }
+
+int DataFlow::getNumEdges() const {
+    int num_edges = 0;
+    for(const auto &v:DataFlow::graph){
+        num_edges+=v.second.size();
+    }
+    return num_edges;
+}

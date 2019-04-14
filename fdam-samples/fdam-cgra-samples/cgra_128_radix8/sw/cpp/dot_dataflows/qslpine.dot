@@ -1,4 +1,4 @@
-digraph qspline{
+digraph qslpine{
  0 [ label = IN0 ]
  1 [ label = IN1 ]
  2 [ label = IN2 ]

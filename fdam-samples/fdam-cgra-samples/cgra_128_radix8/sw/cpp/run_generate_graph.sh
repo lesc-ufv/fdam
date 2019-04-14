@@ -1,7 +1,6 @@
 #!/bin/sh
 
-rm -rf build $1
-mkdir $1
+rm -rf build
 mkdir build
 cd build
 
@@ -11,3 +10,9 @@ make -j16
 echo "generate graphs..."
 ./main "gen_dot"
 echo "done!"
+
+for entry in "dot_dataflows"/*.dot
+do
+  dot -Tpdf $entry -o ${entry//.dot/.pdf}
+  echo  ${entry//.dot/.pdf}
+done

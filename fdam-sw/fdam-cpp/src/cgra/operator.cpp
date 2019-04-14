@@ -11,10 +11,6 @@ Operator::~Operator() {
     Operator::dst.clear();
 }
 
-void Operator::compute() {
-
-}
-
 int Operator::getId() const {
     return id;
 }

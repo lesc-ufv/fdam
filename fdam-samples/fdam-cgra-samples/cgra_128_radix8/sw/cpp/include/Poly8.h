@@ -44,7 +44,6 @@ public:
 
     void printStatistics();
 
-    unsigned short pot(unsigned short num, unsigned short exp);
 };
 
 

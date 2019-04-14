@@ -229,7 +229,7 @@ void Poly5::runCPU(unsigned short ****data_in, unsigned short ***data_out, int d
 }
 
 void Poly5::benchmarking(int numThreads, int data_size) {
-    int copies = 1;
+    int copies = 2;
     unsigned short ****data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
@@ -336,7 +336,7 @@ bool Poly5::compile(int numThreads, int copies) {
 }
 
 void Poly5::printStatistics() {
-    int copies = 1;
+    int copies = 2;
     auto df = Poly5::createDataFlow(0, copies);
     MSG("INFO Poly5 Statictics");
     MSG("INFO CGRA target architecture:");
@@ -353,6 +353,7 @@ void Poly5::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << Poly5::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << Poly5::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << Poly5::cgraHw->getTimeExec() << "ms");

@@ -197,6 +197,7 @@ void LoopBack::printStatistics() {
     MSG("INFO Num input nodes: " << df->getNumOpIn());
     MSG("INFO Num output nodes: " << df->getNumOpOut());
     MSG("INFO Num total nodes: " << df->getNumOp());
+    MSG("INFO Num total edges: " << df->getNumEdges());
     MSG("INFO Scheduling time: " << LoopBack::schedulingTime << "ms");
     MSG("INFO CGRA total execution time: " << LoopBack::cgraExecTime << "ms");
     MSG("INFO CGRA execution time: " << LoopBack::cgraHw->getTimeExec() << "ms");

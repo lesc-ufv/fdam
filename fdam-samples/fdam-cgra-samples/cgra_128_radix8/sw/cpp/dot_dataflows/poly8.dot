@@ -1,4 +1,4 @@
-digraph Poly8{
+digraph poly8{
  0 [ label = IN0 ]
  1 [ label = IN1 ]
  2 [ label = IN2 ]
