@@ -1,7 +1,7 @@
 #!/bin/sh
 
-DATA_SIZE=1048576
-NUM_THREAD=8
+DATA_SIZE=1
+NUM_THREAD=1
 
 rm -rf build $1
 mkdir $1
@@ -30,7 +30,7 @@ echo "running loopback..."
 ./main "loopback" > ../$1/loopback_out.txt $NUM_THREAD $DATA_SIZE
 
 echo "running sobel..."
-./main "sobel" > ../$1/sobel_out.txt $NUM_THREAD 1333 1333
+./main "sobel" > ../$1/sobel_out.txt $NUM_THREAD 3 3
 
 echo "running chebyshev..."
 ./main "chebyshev" > ../$1/chebyshev.txt $NUM_THREAD $DATA_SIZE

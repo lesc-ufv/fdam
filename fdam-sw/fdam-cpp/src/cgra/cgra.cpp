@@ -244,7 +244,8 @@ void Cgra::syncExecute(long waitTime) {
     cp->cgra_intial_conf.qtd_conf = static_cast<unsigned int>(cp->initial_conf.size());
     size_t cgra_intial_conf_bytes = sizeof(cgra_intial_conf_t);
     size_t conf_bytes = cp->cgra_intial_conf.qtd_conf * sizeof(initial_conf_t);
-
+    printf("INITIAL CONF SIZE: %d\n",cgra_intial_conf_bytes);
+    printf("CONF SIZE: %d\n",conf_bytes);
     auto cgra_intial_conf_bytes_align = static_cast<size_t >((std::ceil(cgra_intial_conf_bytes / 64.0)) * 64.0);
     auto conf_bytes_align = static_cast<size_t>((std::ceil(conf_bytes / 64.0)) * 64.0);
 

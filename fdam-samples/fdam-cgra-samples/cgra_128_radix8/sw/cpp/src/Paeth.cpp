@@ -237,7 +237,7 @@ DataFlow *Paeth::createDataFlow(int id, int copies) {
 }
 
 void Paeth::printStatistics() {
-    auto df = Paeth::createDataFlow(0,1);
+    auto df = Paeth::createDataFlow(0,2);
     MSG("INFO Paeth Statictics");
     MSG("INFO CGRA target architecture:");
     MSG("INFO Number of Threads: " << Paeth::cgraArch->getNumThreads());
@@ -265,7 +265,7 @@ void Paeth::printStatistics() {
 
 void Paeth::benchmarking(int numThreads, int data_size) {
 
-    int copies = 1;
+    int copies = 2;
     unsigned short ****data_in;
     unsigned short ***data_out_cpu;
     unsigned short ***data_out_cgra;
