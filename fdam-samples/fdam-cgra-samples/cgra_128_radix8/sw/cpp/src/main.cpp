@@ -40,12 +40,12 @@ int main(int argc, char *argv[]) {
                 paeth.printStatistics();
             } else if (std::strcmp("chebyshev", argv[1]) == 0) {
                 Chebyshev chebyshev(cgra, cgraArch);
-                while (!chebyshev.compile(8, 8))
+                while (!chebyshev.compile(num_thread, 8))
                     cout << "deu ruim :(" << endl;
 
                 cout << "deu bom :)" << endl;
-                //chebyshev.benchmarking(num_thread, data_size);
-                //chebyshev.printStatistics();
+                chebyshev.benchmarking(num_thread, data_size);
+                chebyshev.printStatistics();
             } else if (std::strcmp("mibench", argv[1]) == 0) {
                 Mibench mibench(cgra, cgraArch);
                 mibench.benchmarking(num_thread, data_size);

@@ -175,7 +175,7 @@ void Chebyshev::benchmarking(int numThreads, int data_size) {
             }
         }
     }
-    if (Chebyshev::compile(numThreads, copies)) {
+    //if (Chebyshev::compile(numThreads, copies)) {
         Chebyshev::runCGRA(data_in, data_out_cgra, data_size, numThreads, copies);
         Chebyshev::runCPU(data_in, data_out_cpu, data_size, numThreads, copies);
         for (int k = 0; k < numThreads; ++k) {
@@ -190,9 +190,9 @@ void Chebyshev::benchmarking(int numThreads, int data_size) {
                 }
             }
         }
-    } else {
-        printf("Compilation failed!\n");
-    }
+    //} else {
+    //    printf("Compilation failed!\n");
+    //  }
     for (int i = 0; i < numThreads; ++i) {
         for (int j = 0; j < copies; ++j) {
             delete data_in[i][j];
