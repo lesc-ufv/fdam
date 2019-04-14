@@ -171,6 +171,10 @@ void Chebyshev::benchmarking(int numThreads, int data_size) {
             data_out_cgra[i][j] = new unsigned short[data_size];
         }
     }
+    printf("NUM THREAD: %d\n",numThreads);
+    printf("NUM COPIES: %d\n",copies);
+    printf("NUM DATA: %d\n",data_size);
+    
     for (int k = 0; k < numThreads; ++k) {
         for (int j = 0; j < copies; ++j) {
             for (int i = 0; i < data_size; ++i) {
@@ -182,7 +186,7 @@ void Chebyshev::benchmarking(int numThreads, int data_size) {
         }
     }
     if (Chebyshev::compile(numThreads, copies)) {
-        Chebyshev::runCGRA(data_in, data_out_cgra, data_size, numThreads, copies);
+        //Chebyshev::runCGRA(data_in, data_out_cgra, data_size, numThreads, copies);
         Chebyshev::runCPU(data_in, data_out_cpu, data_size, numThreads, copies);
 //    for (int k = 0; k < numThreads; ++k) {
 //        for (int i = 0; i < copies; ++i) {
