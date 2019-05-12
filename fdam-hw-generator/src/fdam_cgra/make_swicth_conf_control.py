@@ -1,5 +1,6 @@
 from math import ceil, log
 
+from make_swicth_conf_reader import make_swicth_conf_reader
 from veriloggen import *
 
 from common.make_cgra_counter import make_thread_counter
@@ -7,12 +8,11 @@ from common.make_memory import make_memory
 from common.make_mux import make_mux
 from common.make_program_counter import make_program_counter
 from common.make_reg_pipe import make_reg_pipe
-from make_swicth_conf_reader import make_swicth_conf_reader
 
 
 def make_swicth_conf_control(num_thread, swicth_conf_width, conf_net_depth, is_net_branch):
     name = 'swicth_conf_control_%d_%d' % (swicth_conf_width, conf_net_depth)
-    if(is_net_branch):
+    if (is_net_branch):
         name = 'swicth_conf_control_branch_%d_%d' % (swicth_conf_width, conf_net_depth)
 
     m = Module(name)

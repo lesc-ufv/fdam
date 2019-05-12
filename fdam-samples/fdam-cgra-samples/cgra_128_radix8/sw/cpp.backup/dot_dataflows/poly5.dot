@@ -1,0 +1,132 @@
+digraph poly5{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = OUT3 ]
+ 4 [ label = REG]
+ 5 [ label = REG]
+ 6 [ label = REG]
+ 7 [ label = REG]
+ 8 [ label = REG]
+ 9 [ label = REG]
+ 10 [ label = REG]
+ 11 [ label = REG]
+ 12 [ label = REG]
+ 13 [ label = REG]
+ 14 [ label = REG]
+ 15 [ label = REG]
+ 16 [ label = REG]
+ 17 [ label = REG]
+ 18 [ label = SUBi, VALUE = 138]
+ "18.138"[ label = 138 ]
+ 19 [ label = SUBi, VALUE = 110]
+ "19.110"[ label = 110 ]
+ 20 [ label = MULi, VALUE = 117]
+ "20.117"[ label = 117 ]
+ 21 [ label = MULi, VALUE = 28]
+ "21.28"[ label = 28 ]
+ 22 [ label = MULi, VALUE = 180]
+ "22.180"[ label = 180 ]
+ 23 [ label = ADDi, VALUE = 240]
+ "23.240"[ label = 240 ]
+ 24 [ label = MUL]
+ 25 [ label = SUBi, VALUE = 92]
+ "25.92"[ label = 92 ]
+ 26 [ label = SUBi, VALUE = 179]
+ "26.179"[ label = 179 ]
+ 27 [ label = MUL]
+ 28 [ label = SUB]
+ 29 [ label = ADDi, VALUE = 34]
+ "29.34"[ label = 34 ]
+ 30 [ label = MUL]
+ 31 [ label = MUL]
+ 32 [ label = ADDi, VALUE = 195]
+ "32.195"[ label = 195 ]
+ 33 [ label = MUL]
+ 34 [ label = MUL]
+ 35 [ label = ADD]
+ 36 [ label = SUB]
+ 37 [ label = SUBi, VALUE = 198]
+ "37.198"[ label = 198 ]
+ 38 [ label = SUBi, VALUE = 155]
+ "38.155"[ label = 155 ]
+ 39 [ label = MUL]
+ 40 [ label = MUL]
+ 41 [ label = MUL]
+ 42 [ label = REG]
+ 43 [ label = REG]
+ 44 [ label = ADD]
+ 45 [ label = ADD]
+ 46 [ label = MUL]
+ 0 -> 4
+ 0 -> 31
+ 0 -> 33
+ 1 -> 23
+ 1 -> 7
+ 2 -> 18
+ 2 -> 20
+ 2 -> 21
+ 2 -> 19
+ 2 -> 22
+ 2 -> 15
+ 4 -> 5
+ 5 -> 39
+ 5 -> 6
+ 6 -> 41
+ 6 -> 40
+ 7 -> 8
+ 8 -> 9
+ 9 -> 10
+ 10 -> 11
+ 11 -> 12
+ 12 -> 13
+ 13 -> 14
+ 14 -> 46
+ 15 -> 24
+ 15 -> 27
+ 15 -> 16
+ 16 -> 30
+ 16 -> 17
+ 17 -> 34
+ "18.138" -> 18
+ 18 -> 24
+ "19.110" -> 19
+ 19 -> 27
+ "20.117" -> 20
+ 20 -> 25
+ "21.28" -> 21
+ 21 -> 26
+ "22.180" -> 22
+ 22 -> 28
+ "23.240" -> 23
+ 23 -> 28
+ 24 -> 29
+ "25.92" -> 25
+ 25 -> 30
+ "26.179" -> 26
+ 26 -> 31
+ 27 -> 32
+ 28 -> 33
+ "29.34" -> 29
+ 29 -> 34
+ 30 -> 35
+ 31 -> 35
+ "32.195" -> 32
+ 32 -> 36
+ 33 -> 36
+ 34 -> 37
+ 35 -> 38
+ 36 -> 39
+ "37.198" -> 37
+ 37 -> 42
+ "38.155" -> 38
+ 38 -> 40
+ 39 -> 41
+ 40 -> 44
+ 41 -> 43
+ 42 -> 44
+ 43 -> 45
+ 44 -> 45
+ 45 -> 46
+ 46 -> 3
+}

@@ -4,14 +4,11 @@ from veriloggen import *
 
 from common.make_reg_pipe import make_reg_pipe
 from common.utils import bit_rotate_rigth, bit_rotate_left
-from make_swicth_conf_control import make_swicth_conf_control
-from make_switch_box import make_swicth_box
+from fdam_cgra.make_swicth_conf_control import make_swicth_conf_control
+from fdam_cgra.make_switch_box import make_swicth_box
 
-
-# net conf pack = {id }
 
 def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net_branch, print_status=False):
-
     swicth_conf_width = int(ceil(log(radix, 2)) * radix)
     num_stages = int(ceil(log(size, radix)) + num_extra_stages)
     num_swicth_stages = int(ceil(size / radix))
@@ -20,7 +17,7 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net
     max_bits = int(ceil(log(size, 2)))
 
     name = 'omega%dx%d_%d_%d_%d' % (size, size, radix, num_extra_stages, conf_net_depth)
-    if(is_net_branch):
+    if (is_net_branch):
         name = 'omega_branch%dx%d_%d_%d_%d' % (size, size, radix, num_extra_stages, conf_net_depth)
 
     m = Module(name)
@@ -31,9 +28,7 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net
     clk = m.Input('clk')
     rst = m.Input('rst')
 
-    en_pc_net = m.Input('en_pc_net', num_swicth_total)
-
-    en = m.Input('en', (num_stages + 1) * size)
+    en = m.Input('en')
 
     net_conf_bus_in = m.Input('net_conf_bus_in', 64)
 
@@ -64,7 +59,7 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net
         con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', Int(1, 1, 2)), ('in', pin1), ('out', net_conf_bus[i])]
         m.Instance(reg_pipe, 'net_conf_bus_reg%d' % i, param, con)
         param = [('SWICTH_NUMBER', i + 1), ('STAGE', PIPE_EXTRA + r)]
-        con = [('clk', clk), ('rst', rst), ('en_pc_net', en_pc_net[en_count]), ('conf_bus_in', net_conf_bus[i]),
+        con = [('clk', clk), ('rst', rst), ('en_pc_net', en), ('conf_bus_in', net_conf_bus[i]),
                ('swicth_conf_out', conf_out[i * swicth_conf_width:(i + 1) * swicth_conf_width])
                ]
         m.Instance(swicth_conf_control, 'swicth_conf_control_%d' % i, param, con)
@@ -79,17 +74,17 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net
         for j in range(size):
             if i == 0:
                 param = [('NUM_STAGES', PIPE_EXTRA + 1), ('DATA_WIDTH', WIDTH)]
-                con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en[en_count]), ('in', inputs[j]),
+                con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en), ('in', inputs[j]),
                        ('out', in_reg_wire[i + c][j])]
                 m.Instance(reg_pipe, 'reg_in_%d_%d' % (i, j), param, con)
             elif i == (num_stages + 1) - 1:
                 param = [('NUM_STAGES', PIPE_EXTRA + 1), ('DATA_WIDTH', WIDTH)]
-                con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en[en_count]), ('in', in_reg_wire[i + c][j]),
+                con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en), ('in', in_reg_wire[i + c][j]),
                        ('out', outputs[bit_rotate_left(j, int(ceil(log(radix, 2))), max_bits)])]
                 m.Instance(reg_pipe, 'reg_in_%d_%d' % (i, j), param, con)
             else:
                 param = [('NUM_STAGES', PIPE_EXTRA + 1), ('DATA_WIDTH', WIDTH)]
-                con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en[en_count]), ('in', in_reg_wire[i + c][j]),
+                con = [('clk', clk), ('rst', Int(0, 1, 2)), ('en', en), ('in', in_reg_wire[i + c][j]),
                        ('out', in_reg_wire[i + c + 1][j])]
                 m.Instance(reg_pipe, 'reg_in_%d_%d' % (i, j), param, con)
             en_count = en_count + 1
@@ -99,7 +94,8 @@ def make_omega(num_thread, size, num_extra_stages, radix, conf_net_depth, is_net
         for j in range(num_swicth_stages):
             param = [('WIDTH', WIDTH)]
             con0 = [('sel', conf_out[conf_idx * swicth_conf_width:(conf_idx + 1) * swicth_conf_width])]
-            con1 = [('in%d' % p, in_reg_wire[i][bit_rotate_rigth(j * radix + p, int(ceil(log(radix, 2))), max_bits)]) for p in range(radix)]
+            con1 = [('in%d' % p, in_reg_wire[i][bit_rotate_rigth(j * radix + p, int(ceil(log(radix, 2))), max_bits)])
+                    for p in range(radix)]
             con2 = [('out%d' % p, in_reg_wire[i + 1][j * radix + p]) for p in range(radix)]
             m.Instance(switch_box, 'sw_%d_%d' % (i / 2, j), param, con0 + con1 + con2)
             conf_idx = conf_idx + 1

@@ -1,0 +1,445 @@
+digraph fir{
+ 0 [ label = IN0 ]
+ 1 [ label = OUT1 ]
+ 2 [ label = MULi, VALUE = 41]
+ "2.41"[ label = 41 ]
+ 3 [ label = REG]
+ 4 [ label = MULi, VALUE = 24]
+ "4.24"[ label = 24 ]
+ 5 [ label = ADD]
+ 6 [ label = MULi, VALUE = 28]
+ "6.28"[ label = 28 ]
+ 7 [ label = ADD]
+ 8 [ label = MULi, VALUE = 20]
+ "8.20"[ label = 20 ]
+ 9 [ label = ADD]
+ 10 [ label = MULi, VALUE = 26]
+ "10.26"[ label = 26 ]
+ 11 [ label = ADD]
+ 12 [ label = MULi, VALUE = 28]
+ "12.28"[ label = 28 ]
+ 13 [ label = ADD]
+ 14 [ label = MULi, VALUE = 41]
+ "14.41"[ label = 41 ]
+ 15 [ label = ADD]
+ 16 [ label = MULi, VALUE = 26]
+ "16.26"[ label = 26 ]
+ 17 [ label = ADD]
+ 18 [ label = MULi, VALUE = 20]
+ "18.20"[ label = 20 ]
+ 19 [ label = ADD]
+ 20 [ label = MULi, VALUE = 13]
+ "20.13"[ label = 13 ]
+ 21 [ label = ADD]
+ 22 [ label = MULi, VALUE = 15]
+ "22.15"[ label = 15 ]
+ 23 [ label = ADD]
+ 24 [ label = MULi, VALUE = 3]
+ "24.3"[ label = 3 ]
+ 25 [ label = ADD]
+ 26 [ label = MULi, VALUE = 8]
+ "26.8"[ label = 8 ]
+ 27 [ label = ADD]
+ 28 [ label = MULi, VALUE = 26]
+ "28.26"[ label = 26 ]
+ 29 [ label = ADD]
+ 30 [ label = MULi, VALUE = 40]
+ "30.40"[ label = 40 ]
+ 31 [ label = ADD]
+ 32 [ label = MULi, VALUE = 33]
+ "32.33"[ label = 33 ]
+ 33 [ label = ADD]
+ 34 [ label = MULi, VALUE = 36]
+ "34.36"[ label = 36 ]
+ 35 [ label = ADD]
+ 36 [ label = MULi, VALUE = 27]
+ "36.27"[ label = 27 ]
+ 37 [ label = ADD]
+ 38 [ label = MULi, VALUE = 6]
+ "38.6"[ label = 6 ]
+ 39 [ label = ADD]
+ 40 [ label = MULi, VALUE = 26]
+ "40.26"[ label = 26 ]
+ 41 [ label = ADD]
+ 42 [ label = MULi, VALUE = 20]
+ "42.20"[ label = 20 ]
+ 43 [ label = ADD]
+ 44 [ label = MULi, VALUE = 32]
+ "44.32"[ label = 32 ]
+ 45 [ label = ADD]
+ 46 [ label = MULi, VALUE = 7]
+ "46.7"[ label = 7 ]
+ 47 [ label = ADD]
+ 48 [ label = MULi, VALUE = 11]
+ "48.11"[ label = 11 ]
+ 49 [ label = ADD]
+ 50 [ label = MULi, VALUE = 17]
+ "50.17"[ label = 17 ]
+ 51 [ label = ADD]
+ 52 [ label = MULi, VALUE = 13]
+ "52.13"[ label = 13 ]
+ 53 [ label = ADD]
+ 54 [ label = MULi, VALUE = 29]
+ "54.29"[ label = 29 ]
+ 55 [ label = ADD]
+ 56 [ label = MULi, VALUE = 7]
+ "56.7"[ label = 7 ]
+ 57 [ label = ADD]
+ 58 [ label = MULi, VALUE = 1]
+ "58.1"[ label = 1 ]
+ 59 [ label = ADD]
+ 60 [ label = MULi, VALUE = 24]
+ "60.24"[ label = 24 ]
+ 61 [ label = ADD]
+ 62 [ label = MULi, VALUE = 18]
+ "62.18"[ label = 18 ]
+ 63 [ label = ADD]
+ 64 [ label = MULi, VALUE = 5]
+ "64.5"[ label = 5 ]
+ 65 [ label = ADD]
+ 66 [ label = MULi, VALUE = 46]
+ "66.46"[ label = 46 ]
+ 67 [ label = ADD]
+ 68 [ label = MULi, VALUE = 32]
+ "68.32"[ label = 32 ]
+ 69 [ label = ADD]
+ 70 [ label = MULi, VALUE = 27]
+ "70.27"[ label = 27 ]
+ 71 [ label = ADD]
+ 72 [ label = MULi, VALUE = 32]
+ "72.32"[ label = 32 ]
+ 73 [ label = ADD]
+ 74 [ label = MULi, VALUE = 39]
+ "74.39"[ label = 39 ]
+ 75 [ label = ADD]
+ 76 [ label = MULi, VALUE = 28]
+ "76.28"[ label = 28 ]
+ 77 [ label = ADD]
+ 78 [ label = MULi, VALUE = 11]
+ "78.11"[ label = 11 ]
+ 79 [ label = ADD]
+ 80 [ label = MULi, VALUE = 17]
+ "80.17"[ label = 17 ]
+ 81 [ label = ADD]
+ 82 [ label = MULi, VALUE = 5]
+ "82.5"[ label = 5 ]
+ 83 [ label = ADD]
+ 84 [ label = MULi, VALUE = 20]
+ "84.20"[ label = 20 ]
+ 85 [ label = ADD]
+ 86 [ label = MULi, VALUE = 43]
+ "86.43"[ label = 43 ]
+ 87 [ label = ADD]
+ 88 [ label = MULi, VALUE = 7]
+ "88.7"[ label = 7 ]
+ 89 [ label = ADD]
+ 90 [ label = MULi, VALUE = 38]
+ "90.38"[ label = 38 ]
+ 91 [ label = ADD]
+ 92 [ label = MULi, VALUE = 12]
+ "92.12"[ label = 12 ]
+ 93 [ label = ADD]
+ 94 [ label = MULi, VALUE = 27]
+ "94.27"[ label = 27 ]
+ 95 [ label = ADD]
+ 96 [ label = MULi, VALUE = 42]
+ "96.42"[ label = 42 ]
+ 97 [ label = ADD]
+ 98 [ label = MULi, VALUE = 39]
+ "98.39"[ label = 39 ]
+ 99 [ label = ADD]
+ 100 [ label = MULi, VALUE = 5]
+ "100.5"[ label = 5 ]
+ 101 [ label = ADD]
+ 102 [ label = MULi, VALUE = 18]
+ "102.18"[ label = 18 ]
+ 103 [ label = ADD]
+ 104 [ label = MULi, VALUE = 9]
+ "104.9"[ label = 9 ]
+ 105 [ label = ADD]
+ 106 [ label = MULi, VALUE = 47]
+ "106.47"[ label = 47 ]
+ 107 [ label = ADD]
+ 108 [ label = MULi, VALUE = 26]
+ "108.26"[ label = 26 ]
+ 109 [ label = ADD]
+ 110 [ label = MULi, VALUE = 14]
+ "110.14"[ label = 14 ]
+ 111 [ label = ADD]
+ 112 [ label = MULi, VALUE = 10]
+ "112.10"[ label = 10 ]
+ 113 [ label = ADD]
+ 114 [ label = MULi, VALUE = 12]
+ "114.12"[ label = 12 ]
+ 115 [ label = ADD]
+ 116 [ label = MULi, VALUE = 4]
+ "116.4"[ label = 4 ]
+ 117 [ label = ADD]
+ 118 [ label = MULi, VALUE = 37]
+ "118.37"[ label = 37 ]
+ 119 [ label = ADD]
+ 120 [ label = MULi, VALUE = 28]
+ "120.28"[ label = 28 ]
+ 121 [ label = ADD]
+ 122 [ label = MULi, VALUE = 26]
+ "122.26"[ label = 26 ]
+ 123 [ label = ADD]
+ 124 [ label = MULi, VALUE = 17]
+ "124.17"[ label = 17 ]
+ 125 [ label = ADD]
+ 126 [ label = MULi, VALUE = 26]
+ "126.26"[ label = 26 ]
+ 127 [ label = ADD]
+ 0 -> 2
+ 0 -> 4
+ 0 -> 6
+ 0 -> 8
+ 0 -> 10
+ 0 -> 12
+ 0 -> 14
+ 0 -> 16
+ 0 -> 18
+ 0 -> 20
+ 0 -> 22
+ 0 -> 24
+ 0 -> 26
+ 0 -> 28
+ 0 -> 30
+ 0 -> 32
+ 0 -> 34
+ 0 -> 36
+ 0 -> 38
+ 0 -> 40
+ 0 -> 42
+ 0 -> 44
+ 0 -> 46
+ 0 -> 48
+ 0 -> 50
+ 0 -> 52
+ 0 -> 54
+ 0 -> 56
+ 0 -> 58
+ 0 -> 60
+ 0 -> 62
+ 0 -> 64
+ 0 -> 66
+ 0 -> 68
+ 0 -> 70
+ 0 -> 72
+ 0 -> 74
+ 0 -> 76
+ 0 -> 78
+ 0 -> 80
+ 0 -> 82
+ 0 -> 84
+ 0 -> 86
+ 0 -> 88
+ 0 -> 90
+ 0 -> 92
+ 0 -> 94
+ 0 -> 96
+ 0 -> 98
+ 0 -> 100
+ 0 -> 102
+ 0 -> 104
+ 0 -> 106
+ 0 -> 108
+ 0 -> 110
+ 0 -> 112
+ 0 -> 114
+ 0 -> 116
+ 0 -> 118
+ 0 -> 120
+ 0 -> 122
+ 0 -> 124
+ 0 -> 126
+ "2.41" -> 2
+ 2 -> 3
+ 3 -> 5
+ "4.24" -> 4
+ 4 -> 5
+ 5 -> 7
+ "6.28" -> 6
+ 6 -> 7
+ 7 -> 9
+ "8.20" -> 8
+ 8 -> 9
+ 9 -> 11
+ "10.26" -> 10
+ 10 -> 11
+ 11 -> 13
+ "12.28" -> 12
+ 12 -> 13
+ 13 -> 15
+ "14.41" -> 14
+ 14 -> 15
+ 15 -> 17
+ "16.26" -> 16
+ 16 -> 17
+ 17 -> 19
+ "18.20" -> 18
+ 18 -> 19
+ 19 -> 21
+ "20.13" -> 20
+ 20 -> 21
+ 21 -> 23
+ "22.15" -> 22
+ 22 -> 23
+ 23 -> 25
+ "24.3" -> 24
+ 24 -> 25
+ 25 -> 27
+ "26.8" -> 26
+ 26 -> 27
+ 27 -> 29
+ "28.26" -> 28
+ 28 -> 29
+ 29 -> 31
+ "30.40" -> 30
+ 30 -> 31
+ 31 -> 33
+ "32.33" -> 32
+ 32 -> 33
+ 33 -> 35
+ "34.36" -> 34
+ 34 -> 35
+ 35 -> 37
+ "36.27" -> 36
+ 36 -> 37
+ 37 -> 39
+ "38.6" -> 38
+ 38 -> 39
+ 39 -> 41
+ "40.26" -> 40
+ 40 -> 41
+ 41 -> 43
+ "42.20" -> 42
+ 42 -> 43
+ 43 -> 45
+ "44.32" -> 44
+ 44 -> 45
+ 45 -> 47
+ "46.7" -> 46
+ 46 -> 47
+ 47 -> 49
+ "48.11" -> 48
+ 48 -> 49
+ 49 -> 51
+ "50.17" -> 50
+ 50 -> 51
+ 51 -> 53
+ "52.13" -> 52
+ 52 -> 53
+ 53 -> 55
+ "54.29" -> 54
+ 54 -> 55
+ 55 -> 57
+ "56.7" -> 56
+ 56 -> 57
+ 57 -> 59
+ "58.1" -> 58
+ 58 -> 59
+ 59 -> 61
+ "60.24" -> 60
+ 60 -> 61
+ 61 -> 63
+ "62.18" -> 62
+ 62 -> 63
+ 63 -> 65
+ "64.5" -> 64
+ 64 -> 65
+ 65 -> 67
+ "66.46" -> 66
+ 66 -> 67
+ 67 -> 69
+ "68.32" -> 68
+ 68 -> 69
+ 69 -> 71
+ "70.27" -> 70
+ 70 -> 71
+ 71 -> 73
+ "72.32" -> 72
+ 72 -> 73
+ 73 -> 75
+ "74.39" -> 74
+ 74 -> 75
+ 75 -> 77
+ "76.28" -> 76
+ 76 -> 77
+ 77 -> 79
+ "78.11" -> 78
+ 78 -> 79
+ 79 -> 81
+ "80.17" -> 80
+ 80 -> 81
+ 81 -> 83
+ "82.5" -> 82
+ 82 -> 83
+ 83 -> 85
+ "84.20" -> 84
+ 84 -> 85
+ 85 -> 87
+ "86.43" -> 86
+ 86 -> 87
+ 87 -> 89
+ "88.7" -> 88
+ 88 -> 89
+ 89 -> 91
+ "90.38" -> 90
+ 90 -> 91
+ 91 -> 93
+ "92.12" -> 92
+ 92 -> 93
+ 93 -> 95
+ "94.27" -> 94
+ 94 -> 95
+ 95 -> 97
+ "96.42" -> 96
+ 96 -> 97
+ 97 -> 99
+ "98.39" -> 98
+ 98 -> 99
+ 99 -> 101
+ "100.5" -> 100
+ 100 -> 101
+ 101 -> 103
+ "102.18" -> 102
+ 102 -> 103
+ 103 -> 105
+ "104.9" -> 104
+ 104 -> 105
+ 105 -> 107
+ "106.47" -> 106
+ 106 -> 107
+ 107 -> 109
+ "108.26" -> 108
+ 108 -> 109
+ 109 -> 111
+ "110.14" -> 110
+ 110 -> 111
+ 111 -> 113
+ "112.10" -> 112
+ 112 -> 113
+ 113 -> 115
+ "114.12" -> 114
+ 114 -> 115
+ 115 -> 117
+ "116.4" -> 116
+ 116 -> 117
+ 117 -> 119
+ "118.37" -> 118
+ 118 -> 119
+ 119 -> 121
+ "120.28" -> 120
+ 120 -> 121
+ 121 -> 123
+ "122.26" -> 122
+ 122 -> 123
+ 123 -> 125
+ "124.17" -> 124
+ 124 -> 125
+ 125 -> 127
+ "126.26" -> 126
+ 126 -> 127
+ 127 -> 1
+}

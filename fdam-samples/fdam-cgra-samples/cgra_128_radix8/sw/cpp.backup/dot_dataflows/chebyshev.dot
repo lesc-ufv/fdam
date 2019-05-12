@@ -1,0 +1,43 @@
+digraph chebyshev{
+ 0 [ label = IN0 ]
+ 1 [ label = OUT1 ]
+ 2 [ label = REG]
+ 3 [ label = REG]
+ 4 [ label = REG]
+ 5 [ label = REG]
+ 6 [ label = REG]
+ 7 [ label = REG]
+ 8 [ label = REG]
+ 9 [ label = MULi, VALUE = 16]
+ "9.16"[ label = 16 ]
+ 10 [ label = MUL]
+ 11 [ label = SUBi, VALUE = 20]
+ "11.20"[ label = 20 ]
+ 12 [ label = MUL]
+ 13 [ label = MUL]
+ 14 [ label = ADDi, VALUE = 5]
+ "14.5"[ label = 5 ]
+ 15 [ label = MUL]
+ 0 -> 9
+ 0 -> 2
+ 2 -> 3
+ 2 -> 10
+ 3 -> 6
+ 3 -> 8
+ 4 -> 7
+ 4 -> 13
+ 5 -> 15
+ 6 -> 4
+ 7 -> 5
+ 8 -> 12
+ "9.16" -> 9
+ 9 -> 10
+ 10 -> 11
+ "11.20" -> 11
+ 11 -> 12
+ 12 -> 13
+ 13 -> 14
+ "14.5" -> 14
+ 14 -> 15
+ 15 -> 1
+}

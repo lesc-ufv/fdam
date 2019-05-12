@@ -192,6 +192,9 @@ void CgraArch::writeCgraProgram(const std::string &filePath) {
 void CgraArch::makeProgram() {
 
     int numThreads = CgraArch::getNumThreads();
+    CgraArch::cgra_program.initial_conf.clear();
+    CgraArch::cgra_program.input_map.clear();
+    CgraArch::cgra_program.output_map.clear();
 
     CgraArch::cgra_program.cgra_id = static_cast<unsigned short>(CgraArch::id);
     CgraArch::cgra_program.num_pe = static_cast<unsigned short>(CgraArch::num_pe);

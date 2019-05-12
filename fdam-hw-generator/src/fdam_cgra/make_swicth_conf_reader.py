@@ -5,7 +5,7 @@ from veriloggen import *
 
 def make_swicth_conf_reader(num_thread, swicth_conf_width, conf_net_depth, is_net_branch):
     name = 'swicth_conf_reader_%d_%d' % (swicth_conf_width, conf_net_depth)
-    if(is_net_branch):
+    if (is_net_branch):
         name = 'swicth_conf_reader_branch_%d_%d' % (swicth_conf_width, conf_net_depth)
 
     m = Module(name)

@@ -32,7 +32,7 @@ def make_conf_reader_pe(cgra_id, num_thread, data_width, conf_width, conf_depth)
     ignore_we = m.OutputReg('ignore_we')
     qtd_low = m.OutputReg('qtd_low', 32)
     qtd_we_low = m.OutputReg('qtd_we_low')
-    qtd_high= m.OutputReg('qtd_high', 32)
+    qtd_high = m.OutputReg('qtd_high', 32)
     qtd_we_high = m.OutputReg('qtd_we_high')
 
     CGRA_NOT_CONF = m.Localparam('CGRA_NOT_CONF', 0)

@@ -1,0 +1,71 @@
+digraph mibench{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = OUT3 ]
+ 4 [ label = REG]
+ 5 [ label = REG]
+ 6 [ label = REG]
+ 7 [ label = REG]
+ 8 [ label = REG]
+ 9 [ label = REG]
+ 10 [ label = REG]
+ 11 [ label = REG]
+ 12 [ label = REG]
+ 13 [ label = REG]
+ 14 [ label = MULi, VALUE = 9]
+ "14.9"[ label = 9 ]
+ 15 [ label = MULi, VALUE = 6]
+ "15.6"[ label = 6 ]
+ 16 [ label = MULi, VALUE = 2]
+ "16.2"[ label = 2 ]
+ 17 [ label = ADDi, VALUE = 1]
+ "17.1"[ label = 1 ]
+ 18 [ label = ADDi, VALUE = 43]
+ "18.43"[ label = 43 ]
+ 19 [ label = ADD]
+ 20 [ label = MUL]
+ 21 [ label = ADD]
+ 22 [ label = ADD]
+ 23 [ label = MUL]
+ 24 [ label = MUL]
+ 25 [ label = ADD]
+ 26 [ label = ADD]
+ 0 -> 16
+ 0 -> 6
+ 1 -> 9
+ 2 -> 14
+ 2 -> 15
+ 2 -> 4
+ 4 -> 5
+ 5 -> 20
+ 6 -> 7
+ 7 -> 8
+ 7 -> 21
+ 8 -> 23
+ 9 -> 10
+ 9 -> 19
+ 10 -> 11
+ 11 -> 24
+ 12 -> 13
+ 13 -> 26
+ "14.9" -> 14
+ 14 -> 17
+ "15.6" -> 15
+ 15 -> 18
+ "16.2" -> 16
+ 16 -> 19
+ "17.1" -> 17
+ 17 -> 20
+ "18.43" -> 18
+ 18 -> 21
+ 18 -> 22
+ 19 -> 22
+ 20 -> 12
+ 21 -> 23
+ 22 -> 24
+ 23 -> 25
+ 24 -> 25
+ 25 -> 26
+ 26 -> 3
+}

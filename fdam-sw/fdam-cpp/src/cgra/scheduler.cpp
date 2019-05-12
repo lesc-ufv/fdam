@@ -3,7 +3,12 @@
 
 Scheduler::Scheduler() = default;
 
-Scheduler::Scheduler(CgraArch *cgra) : cgraArch(cgra) {}
+Scheduler::Scheduler(CgraArch *cgra) : cgraArch(cgra) {
+    int num_thread = Scheduler::cgraArch->getNumThreads();
+    for(int i = 0; i < num_thread; i++){
+         Scheduler::cgraArch->reset(i);
+    }
+}
 
 Scheduler::~Scheduler() {
     Scheduler::dataflows.clear();
@@ -12,6 +17,7 @@ Scheduler::~Scheduler() {
 bool Scheduler::addDataFlow(DataFlow *df, int threadID, int groupID) {
     if (Scheduler::cgraArch) {
         if (threadID >= 0 && threadID <= (Scheduler::cgraArch->getNumThreads() - 1)) {
+            
             Scheduler::dataflows[threadID] = df;
             Scheduler::dataflow_group[df->getId()] = groupID;
             return true;

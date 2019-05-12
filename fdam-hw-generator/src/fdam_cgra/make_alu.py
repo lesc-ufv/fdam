@@ -68,7 +68,7 @@ def make_alu(cgra_id):
         result[MIN](Mux(in_a < in_b, in_a, in_b)),
         result[MAX](Mux(in_a > in_b, in_a, in_b)),
         result[MUX](Mux(branch_in, in_a, in_b)),
-        result[ABS](Mux(in_a[in_a.width-1], -in_a, in_a)),
+        result[ABS](Mux(in_a[in_a.width - 1], -in_a, in_a)),
     )
 
     m.Always(Posedge(clk))(

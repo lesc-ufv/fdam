@@ -1,0 +1,100 @@
+digraph sgfilter{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = OUT2 ]
+ 3 [ label = REG]
+ 4 [ label = REG]
+ 5 [ label = REG]
+ 6 [ label = REG]
+ 7 [ label = REG]
+ 8 [ label = REG]
+ 9 [ label = REG]
+ 10 [ label = REG]
+ 11 [ label = REG]
+ 12 [ label = REG]
+ 13 [ label = REG]
+ 14 [ label = REG]
+ 15 [ label = REG]
+ 16 [ label = REG]
+ 17 [ label = REG]
+ 18 [ label = MULi, VALUE = 92]
+ "18.92"[ label = 92 ]
+ 19 [ label = MULi, VALUE = -984]
+ "19.-984"[ label = -984 ]
+ 20 [ label = MULi, VALUE = -76]
+ "20.-76"[ label = -76 ]
+ 21 [ label = MULi, VALUE = 7]
+ "21.7"[ label = 7 ]
+ 22 [ label = SUBi, VALUE = 46]
+ "22.46"[ label = 46 ]
+ 23 [ label = SUBi, VALUE = 39]
+ "23.39"[ label = 39 ]
+ 24 [ label = ADD]
+ 25 [ label = MUL]
+ 26 [ label = MUL]
+ 27 [ label = ADDi, VALUE = 7]
+ "27.7"[ label = 7 ]
+ 28 [ label = SUBi, VALUE = 46]
+ "28.46"[ label = 46 ]
+ 29 [ label = MUL]
+ 30 [ label = MUL]
+ 31 [ label = ADD]
+ 32 [ label = ADDi, VALUE = 7]
+ "32.7"[ label = 7 ]
+ 33 [ label = MUL]
+ 34 [ label = ADD]
+ 35 [ label = SUBi, VALUE = 75]
+ "35.75"[ label = 75 ]
+ 0 -> 18
+ 0 -> 19
+ 0 -> 20
+ 0 -> 13
+ 0 -> 3
+ 1 -> 21
+ 1 -> 7
+ 3 -> 4
+ 4 -> 5
+ 4 -> 26
+ 5 -> 6
+ 6 -> 30
+ 7 -> 8
+ 8 -> 9
+ 9 -> 10
+ 9 -> 29
+ 10 -> 11
+ 11 -> 12
+ 12 -> 33
+ 13 -> 14
+ 14 -> 25
+ 15 -> 31
+ 16 -> 17
+ 17 -> 34
+ "18.92" -> 18
+ 18 -> 23
+ "19.-984" -> 19
+ 19 -> 22
+ "20.-76" -> 20
+ 20 -> 24
+ "21.7" -> 21
+ 21 -> 24
+ "22.46" -> 22
+ 22 -> 25
+ "23.39" -> 23
+ 23 -> 26
+ 24 -> 27
+ 25 -> 28
+ 26 -> 15
+ "27.7" -> 27
+ 27 -> 29
+ "28.46" -> 28
+ 28 -> 30
+ 29 -> 31
+ 30 -> 16
+ 31 -> 32
+ "32.7" -> 32
+ 32 -> 33
+ 33 -> 34
+ 34 -> 35
+ "35.75" -> 35
+ 35 -> 2
+}

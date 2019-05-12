@@ -225,15 +225,15 @@ void Cgra::syncExecute(long waitTime) {
             initial_conf_t conf1, conf2;
             qtd_conf_t qtd;
             qtd.qtd = (it2.second.second / cp->word_size);
-            conf1.pe_qtd_data_read_low_conf.conf_type = CGRA_CONF_SET_PE_QTD_LOW;
-            conf1.pe_qtd_data_read_low_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
-            conf1.pe_qtd_data_read_low_conf.thread_id = (unsigned long) it2.first;
-            conf1.pe_qtd_data_read_low_conf.qtd = qtd.qtd_low;
+            conf1.pe_qtd_data_write_low_conf.conf_type = CGRA_CONF_SET_PE_QTD_LOW;
+            conf1.pe_qtd_data_write_low_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
+            conf1.pe_qtd_data_write_low_conf.thread_id = (unsigned long) it2.first;
+            conf1.pe_qtd_data_write_low_conf.qtd = qtd.qtd_low;
 
-            conf2.pe_qtd_data_read_high_conf.conf_type = CGRA_CONF_SET_PE_QTD_HIGH;
-            conf2.pe_qtd_data_read_high_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
-            conf2.pe_qtd_data_read_high_conf.thread_id = (unsigned long) it2.first;
-            conf2.pe_qtd_data_read_high_conf.qtd = qtd.qtd_high;
+            conf2.pe_qtd_data_write_high_conf.conf_type = CGRA_CONF_SET_PE_QTD_HIGH;
+            conf2.pe_qtd_data_write_high_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
+            conf2.pe_qtd_data_write_high_conf.thread_id = (unsigned long) it2.first;
+            conf2.pe_qtd_data_write_high_conf.qtd = qtd.qtd_high;
 
             cp->initial_conf.push_back(conf1);
             cp->initial_conf.push_back(conf2);

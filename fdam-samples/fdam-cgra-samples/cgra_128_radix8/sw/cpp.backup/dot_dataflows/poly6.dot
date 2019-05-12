@@ -1,0 +1,262 @@
+digraph poly6{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = OUT3 ]
+ 4 [ label = MUL]
+ 5 [ label = MUL]
+ 6 [ label = MUL]
+ 7 [ label = MUL]
+ 8 [ label = MUL]
+ 9 [ label = MUL]
+ 10 [ label = MUL]
+ 11 [ label = MUL]
+ 12 [ label = MUL]
+ 13 [ label = MUL]
+ 14 [ label = MUL]
+ 15 [ label = MUL]
+ 16 [ label = MUL]
+ 17 [ label = MUL]
+ 18 [ label = MUL]
+ 19 [ label = MUL]
+ 20 [ label = MUL]
+ 21 [ label = MUL]
+ 22 [ label = MUL]
+ 23 [ label = MUL]
+ 24 [ label = SUB]
+ 25 [ label = SUB]
+ 26 [ label = SUB]
+ 27 [ label = SUB]
+ 28 [ label = SUB]
+ 29 [ label = ADD]
+ 30 [ label = ADD]
+ 31 [ label = ADDi, VALUE = 143]
+ "31.143"[ label = 143 ]
+ 32 [ label = ADDi, VALUE = 84]
+ "32.84"[ label = 84 ]
+ 33 [ label = MULi, VALUE = 254]
+ "33.254"[ label = 254 ]
+ 34 [ label = MULi, VALUE = 145]
+ "34.145"[ label = 145 ]
+ 35 [ label = MULi, VALUE = 141]
+ "35.141"[ label = 141 ]
+ 36 [ label = MULi, VALUE = 14]
+ "36.14"[ label = 14 ]
+ 37 [ label = MULi, VALUE = 4]
+ "37.4"[ label = 4 ]
+ 38 [ label = MULi, VALUE = 210]
+ "38.210"[ label = 210 ]
+ 39 [ label = MULi, VALUE = 100]
+ "39.100"[ label = 100 ]
+ 40 [ label = MULi, VALUE = 1]
+ "40.1"[ label = 1 ]
+ 41 [ label = SUBi, VALUE = 62]
+ "41.62"[ label = 62 ]
+ 42 [ label = SUBi, VALUE = 135]
+ "42.135"[ label = 135 ]
+ 43 [ label = SUBi, VALUE = 162]
+ "43.162"[ label = 162 ]
+ 44 [ label = SUBi, VALUE = 2]
+ "44.2"[ label = 2 ]
+ 45 [ label = SUBi, VALUE = 229]
+ "45.229"[ label = 229 ]
+ 46 [ label = SUBi, VALUE = 218]
+ "46.218"[ label = 218 ]
+ 47 [ label = SUBi, VALUE = 169]
+ "47.169"[ label = 169 ]
+ 48 [ label = REG]
+ 49 [ label = REG]
+ 50 [ label = REG]
+ 51 [ label = REG]
+ 52 [ label = REG]
+ 53 [ label = REG]
+ 54 [ label = REG]
+ 55 [ label = REG]
+ 56 [ label = REG]
+ 57 [ label = REG]
+ 58 [ label = REG]
+ 59 [ label = REG]
+ 60 [ label = REG]
+ 61 [ label = REG]
+ 62 [ label = REG]
+ 63 [ label = REG]
+ 64 [ label = REG]
+ 65 [ label = REG]
+ 66 [ label = REG]
+ 67 [ label = REG]
+ 68 [ label = REG]
+ 69 [ label = REG]
+ 70 [ label = REG]
+ 71 [ label = REG]
+ 72 [ label = REG]
+ 73 [ label = REG]
+ 74 [ label = REG]
+ 75 [ label = REG]
+ 76 [ label = REG]
+ 77 [ label = REG]
+ 78 [ label = REG]
+ 79 [ label = REG]
+ 80 [ label = REG]
+ 81 [ label = REG]
+ 82 [ label = REG]
+ 83 [ label = REG]
+ 84 [ label = REG]
+ 85 [ label = REG]
+ 86 [ label = REG]
+ 87 [ label = REG]
+ 88 [ label = REG]
+ 89 [ label = REG]
+ 90 [ label = REG]
+ 91 [ label = REG]
+ 92 [ label = REG]
+ 93 [ label = REG]
+ 94 [ label = REG]
+ 95 [ label = REG]
+ 96 [ label = REG]
+ 97 [ label = REG]
+ 98 [ label = REG]
+ 99 [ label = REG]
+ 100 [ label = REG]
+ 0 -> 90
+ 1 -> 52
+ 1 -> 31
+ 1 -> 33
+ 2 -> 39
+ 2 -> 40
+ 2 -> 38
+ 2 -> 37
+ 2 -> 45
+ 2 -> 36
+ 2 -> 47
+ 2 -> 58
+ 2 -> 35
+ 2 -> 42
+ 4 -> 27
+ 5 -> 26
+ 6 -> 43
+ 7 -> 24
+ 8 -> 67
+ 9 -> 12
+ 10 -> 81
+ 11 -> 28
+ 12 -> 29
+ 13 -> 65
+ 14 -> 23
+ 15 -> 25
+ 16 -> 21
+ 17 -> 30
+ 18 -> 77
+ 19 -> 15
+ 20 -> 48
+ 21 -> 83
+ 22 -> 41
+ 23 -> 4
+ 24 -> 3
+ 25 -> 5
+ 26 -> 88
+ 27 -> 7
+ 28 -> 14
+ 29 -> 16
+ 30 -> 11
+ "31.143" -> 31
+ 31 -> 34
+ "32.84" -> 32
+ 32 -> 57
+ "33.254" -> 33
+ 33 -> 22
+ "34.145" -> 34
+ 34 -> 9
+ "35.141" -> 35
+ 35 -> 32
+ "36.14" -> 36
+ 36 -> 44
+ "37.4" -> 37
+ 37 -> 46
+ "38.210" -> 38
+ 38 -> 72
+ "39.100" -> 39
+ 39 -> 69
+ "40.1" -> 40
+ 40 -> 22
+ "41.62" -> 41
+ 41 -> 19
+ "42.135" -> 42
+ 42 -> 6
+ "43.162" -> 43
+ 43 -> 18
+ "44.2" -> 44
+ 44 -> 20
+ "45.229" -> 45
+ 45 -> 13
+ "46.218" -> 46
+ 46 -> 8
+ "47.169" -> 47
+ 47 -> 63
+ 48 -> 49
+ 49 -> 50
+ 50 -> 51
+ 51 -> 26
+ 52 -> 53
+ 52 -> 13
+ 53 -> 54
+ 54 -> 55
+ 54 -> 12
+ 54 -> 19
+ 55 -> 56
+ 55 -> 15
+ 56 -> 16
+ 56 -> 61
+ 56 -> 11
+ 57 -> 10
+ 58 -> 59
+ 58 -> 6
+ 59 -> 9
+ 59 -> 8
+ 59 -> 20
+ 59 -> 60
+ 60 -> 10
+ 60 -> 17
+ 60 -> 18
+ 61 -> 5
+ 61 -> 62
+ 62 -> 14
+ 63 -> 64
+ 64 -> 17
+ 65 -> 66
+ 66 -> 30
+ 67 -> 68
+ 68 -> 25
+ 69 -> 70
+ 70 -> 71
+ 71 -> 29
+ 72 -> 73
+ 73 -> 74
+ 74 -> 75
+ 75 -> 76
+ 76 -> 21
+ 77 -> 78
+ 78 -> 79
+ 79 -> 80
+ 80 -> 23
+ 81 -> 82
+ 82 -> 28
+ 83 -> 84
+ 84 -> 85
+ 85 -> 86
+ 86 -> 87
+ 87 -> 24
+ 88 -> 89
+ 89 -> 27
+ 90 -> 91
+ 91 -> 92
+ 92 -> 93
+ 93 -> 94
+ 94 -> 95
+ 95 -> 96
+ 96 -> 97
+ 97 -> 98
+ 98 -> 4
+ 98 -> 99
+ 99 -> 100
+ 100 -> 7
+}

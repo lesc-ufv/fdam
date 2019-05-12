@@ -1,0 +1,180 @@
+digraph poly8{
+ 0 [ label = IN0 ]
+ 1 [ label = IN1 ]
+ 2 [ label = IN2 ]
+ 3 [ label = OUT3 ]
+ 4 [ label = MUL]
+ 5 [ label = MUL]
+ 6 [ label = MUL]
+ 7 [ label = MUL]
+ 8 [ label = MUL]
+ 9 [ label = MUL]
+ 10 [ label = MUL]
+ 11 [ label = MUL]
+ 12 [ label = MUL]
+ 13 [ label = MUL]
+ 14 [ label = SUB]
+ 15 [ label = SUB]
+ 16 [ label = ADD]
+ 17 [ label = ADD]
+ 18 [ label = ADD]
+ 19 [ label = ADD]
+ 20 [ label = ADD]
+ 21 [ label = ADD]
+ 22 [ label = ADDi, VALUE = 90]
+ "22.90"[ label = 90 ]
+ 23 [ label = ADDi, VALUE = 38]
+ "23.38"[ label = 38 ]
+ 24 [ label = ADDi, VALUE = 50]
+ "24.50"[ label = 50 ]
+ 25 [ label = ADDi, VALUE = 200]
+ "25.200"[ label = 200 ]
+ 26 [ label = MULi, VALUE = 155]
+ "26.155"[ label = 155 ]
+ 27 [ label = MULi, VALUE = 77]
+ "27.77"[ label = 77 ]
+ 28 [ label = MULi, VALUE = 123]
+ "28.123"[ label = 123 ]
+ 29 [ label = MULi, VALUE = 138]
+ "29.138"[ label = 138 ]
+ 30 [ label = MULi, VALUE = 168]
+ "30.168"[ label = 168 ]
+ 31 [ label = MULi, VALUE = 46]
+ "31.46"[ label = 46 ]
+ 32 [ label = SUBi, VALUE = 171]
+ "32.171"[ label = 171 ]
+ 33 [ label = SUBi, VALUE = 171]
+ "33.171"[ label = 171 ]
+ 34 [ label = SUBi, VALUE = 171]
+ "34.171"[ label = 171 ]
+ 35 [ label = SUBi, VALUE = 107]
+ "35.107"[ label = 107 ]
+ 36 [ label = REG]
+ 37 [ label = REG]
+ 38 [ label = REG]
+ 39 [ label = REG]
+ 40 [ label = REG]
+ 41 [ label = REG]
+ 42 [ label = REG]
+ 43 [ label = REG]
+ 44 [ label = REG]
+ 45 [ label = REG]
+ 46 [ label = REG]
+ 47 [ label = REG]
+ 48 [ label = REG]
+ 49 [ label = REG]
+ 50 [ label = REG]
+ 51 [ label = REG]
+ 52 [ label = REG]
+ 53 [ label = REG]
+ 54 [ label = REG]
+ 55 [ label = REG]
+ 56 [ label = REG]
+ 57 [ label = REG]
+ 58 [ label = REG]
+ 59 [ label = REG]
+ 60 [ label = REG]
+ 61 [ label = REG]
+ 62 [ label = REG]
+ 63 [ label = REG]
+ 64 [ label = REG]
+ 65 [ label = REG]
+ 66 [ label = REG]
+ 67 [ label = REG]
+ 0 -> 36
+ 1 -> 45
+ 1 -> 22
+ 1 -> 27
+ 1 -> 15
+ 2 -> 15
+ 2 -> 55
+ 2 -> 28
+ 2 -> 29
+ 2 -> 30
+ 2 -> 31
+ 2 -> 33
+ 4 -> 16
+ 5 -> 17
+ 6 -> 14
+ 7 -> 49
+ 8 -> 20
+ 9 -> 21
+ 10 -> 19
+ 11 -> 18
+ 12 -> 60
+ 13 -> 25
+ 14 -> 5
+ 15 -> 10
+ 16 -> 3
+ 17 -> 9
+ 18 -> 8
+ 19 -> 6
+ 20 -> 17
+ 21 -> 4
+ "22.90" -> 22
+ 22 -> 26
+ "23.38" -> 23
+ 23 -> 18
+ "24.50" -> 24
+ 24 -> 19
+ "25.200" -> 25
+ 25 -> 57
+ "26.155" -> 26
+ 26 -> 11
+ "27.77" -> 27
+ 27 -> 32
+ "28.123" -> 28
+ 28 -> 54
+ "29.138" -> 29
+ 29 -> 24
+ "30.168" -> 30
+ 30 -> 35
+ "31.46" -> 31
+ 31 -> 34
+ "32.171" -> 32
+ 32 -> 7
+ "33.171" -> 33
+ 33 -> 12
+ "34.171" -> 34
+ 34 -> 58
+ "35.107" -> 35
+ 35 -> 13
+ 36 -> 37
+ 37 -> 38
+ 38 -> 39
+ 39 -> 40
+ 40 -> 5
+ 40 -> 41
+ 41 -> 42
+ 42 -> 9
+ 42 -> 43
+ 43 -> 44
+ 44 -> 4
+ 45 -> 46
+ 45 -> 10
+ 46 -> 47
+ 47 -> 48
+ 47 -> 6
+ 48 -> 8
+ 49 -> 50
+ 50 -> 51
+ 51 -> 52
+ 52 -> 53
+ 53 -> 21
+ 54 -> 23
+ 55 -> 56
+ 55 -> 12
+ 56 -> 7
+ 56 -> 13
+ 57 -> 20
+ 58 -> 59
+ 59 -> 14
+ 60 -> 61
+ 61 -> 62
+ 62 -> 63
+ 63 -> 64
+ 64 -> 65
+ 65 -> 66
+ 66 -> 67
+ 67 -> 16
+}

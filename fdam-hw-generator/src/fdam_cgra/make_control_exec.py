@@ -1,13 +1,7 @@
 from veriloggen import *
 
-from fdam_cgra.make_omega import make_omega
 
-
-def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix, extra_stagies):
-    net = make_omega(8, num_pe * 2, extra_stagies, net_radix, 8, False)
-    en_net_bits = net.get_ports().get('en').width
-    en_pc_net_bits = net.get_ports().get('en_pc_net').width
-
+def make_control_exec(cgra_id, num_pe_io_in, num_pe_io_out):
     m = Module('cgra%d_control_exec' % cgra_id)
     clk = m.Input('clk')
     rst = m.Input('rst')
@@ -26,9 +20,7 @@ def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix, e
     read_fifo_done = m.Input('read_fifo_done', num_pe_io_in)
     write_fifo_done = m.Input('write_fifo_done', num_pe_io_out)
 
-    en_pe = m.OutputReg('en_pe', num_pe)
-    en_net = m.OutputReg('en_net', en_net_bits)
-    en_pc_net = m.OutputReg('en_pc_net', en_pc_net_bits)
+    en = m.OutputReg('en')
 
     en_fecth_data = m.OutputReg('en_fecth_data', num_pe_io_in)
 
@@ -46,8 +38,8 @@ def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix, e
     en_write = m.Reg('en_write', num_pe_io_out)
     en_read1 = m.Reg('en_read1', num_pe_io_in)
     en_write1 = m.Reg('en_write1', num_pe_io_out)
-    en_process = m.Reg('en_process', num_pe + en_net_bits + en_pc_net_bits)
-    en_process1 = m.Reg('en_process1', num_pe + en_net_bits + en_pc_net_bits)
+    en_process = m.Reg('en_process')
+    en_process1 = m.Reg('en_process1')
     available_pop_masked = m.Reg('available_pop_masked', num_pe_io_in)
     available_push_masked = m.Reg('available_push_masked', num_pe_io_out)
     available_queues = m.Reg('available_queues')
@@ -62,9 +54,7 @@ def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix, e
         en_write(0),
         en_read1(0),
         en_write1(0),
-        en_pe(0),
-        en_net(0),
-        en_pc_net(0),
+        en(0),
         fsm_state(FSM_IDLE),
         en_fecth_data(Int(0, en_fecth_data.width, 16)),
         done(0)
@@ -91,27 +81,15 @@ def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix, e
             en_write(0),
             en_read1(0),
             en_write1(0),
-            en_pe(0),
-            en_net(0),
-            en_pc_net(0)
+            en(0)
         ).Else(
             en_read(Or(available_read, read_fifo_done)),
             en_write(Or(available_write, write_fifo_done)),
             en_read1(And(en_read, read_fifo_mask)),
             en_write1(And(en_write, write_fifo_mask)),
-            For(i(0), i < en_process.width, i.inc())(
-                en_process[i](And(Uor(en_read1), Uor(en_write1))),
-                en_process1[i](And(en_process[i], fsm_state[0]))
-            ),
-            For(i(0), i < en_pe.width, i.inc())(
-                en_pe[i](en_process1[i])
-            ),
-            For(i(0), i < en_net.width, i.inc())(
-                en_net[i](en_process1[i + en_pe.width])
-            ),
-            For(i(0), i < en_pc_net.width, i.inc())(
-                en_pc_net[i](en_process1[i + en_pe.width + en_net.width])
-            )
+            en_process(And(Uor(en_read1), Uor(en_write1))),
+            en_process1(And(en_process, fsm_state[0])),
+            en(en_process1)
         )
     )
 
@@ -138,7 +116,6 @@ def make_control_exec(cgra_id, num_pe, num_pe_io_in, num_pe_io_out, net_radix, e
                         fsm_state(FSM_DONE)
                     )
                 ),
-
                 When(FSM_DONE)(
                     done(1)
                 )

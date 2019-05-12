@@ -7,7 +7,7 @@ from common.make_program_counter import make_program_counter
 from common.make_reg_pipe import make_reg_pipe
 from common.utils import make_pe_list
 from fdam_cgra.make_omega import make_omega
-from make_pe import make_pe
+from fdam_cgra.make_pe import make_pe
 
 
 def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, extra_stagies, conf_depth):
@@ -20,7 +20,7 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
     conf_bus_width = 64
     num_thread = int(ceil(log(num_pe * 2, net_radix)) + extra_stagies) + 1 + PIPELINE_PE
 
-    pes_en = m.Input('pes_en', num_pe)
+    en = m.Input('en')
     conf_bus_in = m.Input('conf_bus_in', conf_bus_width)
 
     num_stages1 = int(ceil(log(num_pe * 2, net_radix))) + extra_stagies
@@ -30,22 +30,20 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
     net = make_omega(num_thread, num_pe * 2, extra_stagies, net_radix, conf_depth, False, True)
     net_branch = make_omega(num_thread, num_pe, stagies_extra, net_radix, conf_depth, True, True)
 
-    net_en = m.Input('net_en', net.get_ports().get('en').width)
-    en_pc_net = m.Input('en_pc_net', net.get_ports().get('en_pc_net').width)
-
     fifo_in_re = m.Output('fifo_in_re', num_pe_in)
     fifo_in_data = m.Input('fifo_in_data', data_width * num_pe_in)
     fifo_out_we = m.Output('fifo_out_we', num_pe_out)
     fifo_out_data = m.Output('fifo_out_data', data_width * num_pe_out)
     m.EmbeddedCode('')
 
-    conf_bus = [m.Wire('conf_bus_%d' % i, conf_bus_width) for i in range(num_pe + 2)]
-    pe2neta = [m.Wire('pe2neta_%d' % i, data_width) for i in range(num_pe)]
-    pe2netb = [m.Wire('pe2netb_%d' % i, data_width) for i in range(num_pe)]
-    net2pea = [m.Wire('net2pea_%d' % i, data_width) for i in range(num_pe)]
-    net2peb = [m.Wire('net2peb_%d' % i, data_width) for i in range(num_pe)]
-    pe2net_branch = [m.Wire('pe2net_branch_%d' % i) for i in range(num_pe)]
-    net_branch2pe = [m.Wire('net_branch2peb_%d' % i) for i in range(num_pe)]
+    conf_bus = m.Wire('conf_bus', conf_bus_width, num_pe + 2)
+    pe2neta = m.Wire('pe2neta', data_width, num_pe)
+    pe2netb = m.Wire('pe2netb', data_width, num_pe)
+    net2pea = m.Wire('net2pea', data_width, num_pe)
+    net2peb = m.Wire('net2peb', data_width, num_pe)
+    pe2net_branch = m.Wire('pe2net_branch', num_pe)
+    net_branch2pe = m.Wire('net_branch2peb', num_pe)
+
     m.EmbeddedCode('')
 
     reg_pipe = make_reg_pipe()
@@ -65,7 +63,7 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
     for p in pelist.keys():
         if pelist[p] == 1:
             params_pe = [('PE_ID', p + 1)]
-            con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[p]), ('conf_bus_in', conf_bus[p]),
+            con_pe = [('clk', clk), ('rst', rst), ('en', en), ('conf_bus_in', conf_bus[p]),
                       ('branch_in', net_branch2pe[p]),
                       ('branch_out', pe2net_branch[p]),
                       ('fifo_re', fifo_in_re[fin]),
@@ -77,7 +75,7 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
 
         elif pelist[p] == 2:
             params_pe = [('PE_ID', p + 1)]
-            con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[p]),
+            con_pe = [('clk', clk), ('rst', rst), ('en', en),
                       ('conf_bus_in', conf_bus[p]),
                       ('branch_in', net_branch2pe[p]),
                       ('branch_out', pe2net_branch[p]),
@@ -90,7 +88,7 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
             fout = fout + 1
         else:
             params_pe = [('PE_ID', p + 1)]
-            con_pe = [('clk', clk), ('rst', rst), ('en', pes_en[p]),
+            con_pe = [('clk', clk), ('rst', rst), ('en', en),
                       ('conf_bus_in', conf_bus[p]),
                       ('branch_in', net_branch2pe[p]),
                       ('branch_out', pe2net_branch[p]),
@@ -106,7 +104,7 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
         m.Instance(reg_pipe, 'conf_bus_reg_%d' % i, param_reg_pipe, con_reg_pipe)
 
     params = [('WIDTH', data_width), ('PIPE_EXTRA', 0)]
-    con = [('clk', clk), ('rst', rst), ('en_pc_net', en_pc_net), ('en', net_en), ('net_conf_bus_in', conf_bus[num_pe])]
+    con = [('clk', clk), ('rst', rst), ('en', en), ('net_conf_bus_in', conf_bus[num_pe])]
     i, j = 0, 0
     for k in range(0, num_pe * 2, 2):
         con.append(('in%d' % k, pe2neta[i]))
@@ -124,8 +122,7 @@ def make_cgra(cgra_id, num_pe, num_pe_in, num_pe_out, data_width, net_radix, ext
     m.Instance(net, 'net', params, con)
 
     params = [('WIDTH', 1), ('PIPE_EXTRA', 0)]
-    con = [('clk', clk), ('rst', rst), ('en_pc_net', en_pc_net[0:net_branch.get_ports().get('en_pc_net').width]),
-           ('en', net_en[0:net_branch.get_ports().get('en').width]), ('net_conf_bus_in', conf_bus[num_pe])]
+    con = [('clk', clk), ('rst', rst), ('en', en), ('net_conf_bus_in', conf_bus[num_pe])]
     i = 0
     for k in range(0, num_pe):
         con.append(('in%d' % k, pe2net_branch[i]))
