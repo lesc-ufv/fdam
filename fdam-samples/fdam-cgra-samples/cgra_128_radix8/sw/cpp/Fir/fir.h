@@ -1,3 +1,10 @@
+//
+// Created by lucas on 22/05/19.
+//
+
+#ifndef FIR_FIR_H
+#define FIR_FIR_H
+
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -16,12 +23,14 @@ using namespace std::chrono;
 #define TAPS 63
 
 
-int fir(int idx);
+int fir(int idx, unsigned short *coef, int taps);
 
-int fir_openmp(int idx);
+int fir_openmp(int idx, unsigned short *coef, int taps);
 
-int fir_cgra(int idx, int copies);
+int fir_cgra(int idx, int copies, unsigned short *coef,int taps);
 
-DataFlow *createDataFlow(int id, int copies);
+DataFlow *createDataFlow(int id, int copies, unsigned short *coef, int taps);
 
 int main(int argc, char *argv[]);
+
+#endif //FIR_FIR_H

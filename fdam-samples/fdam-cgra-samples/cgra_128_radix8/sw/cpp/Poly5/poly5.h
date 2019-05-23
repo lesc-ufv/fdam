@@ -2,8 +2,8 @@
 // Created by lucas on 22/05/19.
 //
 
-#ifndef CHEBYSHEV_CHEBYSHEV_H
-#define CHEBYSHEV_CHEBYSHEV_H
+#ifndef POLY5_POLY5_H
+#define POLY5_POLY5_H
 
 #include <chrono>
 #include <cstdio>
@@ -22,14 +22,14 @@ using namespace std::chrono;
 #define NUM_THREAD (8)
 #define SAMPLES (1)
 
-int chebyshev(int idx);
+int poly5(int idx);
 
-int chebyshev_openmp(int idx);
+int poly5_openmp(int idx);
 
-int chebyshev_cgra(int idx, int copies);
+int poly5_cgra(int idx,int copies);
 
 DataFlow *createDataFlow(int id, int copies);
 
 int main(int argc, char *argv[]);
 
-#endif //CHEBYSHEV_CHEBYSHEV_H
+#endif //POLY5_POLY5_H

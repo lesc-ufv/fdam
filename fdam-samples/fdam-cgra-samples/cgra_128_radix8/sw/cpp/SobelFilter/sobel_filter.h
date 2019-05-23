@@ -2,8 +2,8 @@
 // Created by lucas on 22/05/19.
 //
 
-#ifndef CHEBYSHEV_CHEBYSHEV_H
-#define CHEBYSHEV_CHEBYSHEV_H
+#ifndef SOBEL_FILTER_SOBEL_FILTER_H
+#define SOBEL_FILTER_SOBEL_FILTER_H
 
 #include <chrono>
 #include <cstdio>
@@ -22,14 +22,14 @@ using namespace std::chrono;
 #define NUM_THREAD (8)
 #define SAMPLES (1)
 
-int chebyshev(int idx);
+int sobel_filter(int idx);
 
-int chebyshev_openmp(int idx);
+int sobel_filter_openmp(int idx);
 
-int chebyshev_cgra(int idx, int copies);
+int sobel_filter_cgra(int idx, int copies);
 
 DataFlow *createDataFlow(int id, int copies);
 
 int main(int argc, char *argv[]);
 
-#endif //CHEBYSHEV_CHEBYSHEV_H
+#endif //SOBEL_FILTER_SOBEL_FILTER_H

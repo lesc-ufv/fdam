@@ -115,11 +115,13 @@ int chebyshev_cgra(int idx, int copies) {
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
 
         auto data_size = (size_t) (DATA_SIZE / ((NUM_THREAD) * copies));
+        auto data_size_bytes = sizeof(unsigned short) * data_size;
+        
         int k = 0;
         for (int i = 0; i < NUM_THREAD; ++i) {
             for (int j = 0, c = 0; j < copies; ++j) {
-                cgraHw->setCgraProgramInputStreamByID(i, c, &data_in[k * data_size], data_size);
-                cgraHw->setCgraProgramOutputStreamByID(i, c + 1, &data_out[k * data_size], data_size);
+                cgraHw->setCgraProgramInputStreamByID(i, c, &data_in[k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramOutputStreamByID(i, c + 1, &data_out[k * data_size], data_size_bytes);
                 c = c + 2;
                 k++;
             }

@@ -1,15 +1,13 @@
 //
 // Created by lucas on 22/05/19.
 //
-
-#ifndef CHEBYSHEV_CHEBYSHEV_H
-#define CHEBYSHEV_CHEBYSHEV_H
+#ifndef MIBENCH_MIBENCH_H
+#define MIBENCH_MIBENCH_H
 
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <omp.h>
-
 #include <fdam/cgra/data_flow.h>
 #include <fdam/cgra/scheduler.h>
 #include <fdam/cgra/cgra.h>
@@ -22,14 +20,14 @@ using namespace std::chrono;
 #define NUM_THREAD (8)
 #define SAMPLES (1)
 
-int chebyshev(int idx);
+int mibench(int idx);
 
-int chebyshev_openmp(int idx);
+int mibench_openmp(int idx);
 
-int chebyshev_cgra(int idx, int copies);
+int mibench_cgra(int idx, int copies);
 
 DataFlow *createDataFlow(int id, int copies);
 
 int main(int argc, char *argv[]);
 
-#endif //CHEBYSHEV_CHEBYSHEV_H
+#endif //MIBENCH_MIBENCH_H

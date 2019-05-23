@@ -14,9 +14,9 @@ int main(int argc, char *argv[]){
       coef[k] = k+1;
      } 
    
-     fir(idx,TAPS);
+     fir(idx,coef,TAPS);
      fir_openmp(idx,coef,TAPS);
-     fir_cgra(idx,1,coef,TAPS)
+     fir_cgra(idx,1,coef,TAPS);
      
      delete coef;
      
@@ -51,7 +51,7 @@ int fir(int idx, unsigned short *coef, int taps){
       diff += high_resolution_clock::now() - s;
    }
    
-   double cpuExecTime = (diff.count() * 1000)/SAMPLES; 
+   double cpuExecTime = (diff.count() * 1000)/SAMPLES;
 
    printf("Time(ms) 1 Thread: %5.2lf\n",cpuExecTime);
    
@@ -96,7 +96,7 @@ int fir_openmp(int idx, unsigned short *coef, int taps){
       diff += high_resolution_clock::now() - s;
    }
    
-   double cpuExecTime = (diff.count() * 1000)/SAMPLES; 
+   double cpuExecTime = (diff.count() * 1000)/SAMPLES;
 
    printf("Time(ms) %d Thread: %5.2lf\n",NUM_THREAD,cpuExecTime);
 
@@ -114,6 +114,7 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
     auto cgraHw = new Cgra();
     Scheduler scheduler(cgraArch);
     std::vector<DataFlow *> dfs;
+
     unsigned short *data_in, *data_out;
     data_in = new unsigned short[DATA_SIZE];
     data_out = new unsigned short[DATA_SIZE];
@@ -125,7 +126,7 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
     }
 
     for (int i = 0; i < NUM_THREAD; ++i) {
-        dfs.push_back(createDataFlow(i, copies));
+        dfs.push_back(createDataFlow(i, copies,coef,taps));
         scheduler.addDataFlow(dfs[i], i, 0);
         cgraArch->getNetBranch(i)->createRouteTable();
         cgraArch->getNet(i)->createRouteTable();
@@ -136,11 +137,13 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
 
         auto data_size = (size_t) (DATA_SIZE / ((NUM_THREAD) * copies));
+        auto sf = (sizeof(unsigned short));
+
         int k = 0;
         for (int i = 0; i < NUM_THREAD; ++i) {
             for (int j = 0, c = 0; j < copies; ++j) {
-                cgraHw->setCgraProgramInputStreamByID(i, c, &data_in[k * data_size], data_size);
-                cgraHw->setCgraProgramOutputStreamByID(i, c + 1, &data_out[k * data_size], data_size);
+                cgraHw->setCgraProgramInputStreamByID(i, c, &data_in[k * data_size], sf*data_size);
+                cgraHw->setCgraProgramOutputStreamByID(i, c + 1, &data_out[k * data_size], sf*data_size);
                 c = c + 2;
                 k++;
             }
@@ -149,11 +152,11 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
         high_resolution_clock::time_point s;
         duration<double> diff = {};
 
-        for (int i = 0; i < SAMPLE; i++) {
+        for (int i = 0; i < SAMPLES; i++) {
             cgraHw->syncExecute(0);
             diff += high_resolution_clock::now() - s;
         }
-        double cpuExecTime = (diff.count() * 1000) / SAMPLE;
+        double cpuExecTime = (diff.count() * 1000) / SAMPLES;
 
         printf("Time(ms) CGRA: %5.2lf\n", cpuExecTime);
 
