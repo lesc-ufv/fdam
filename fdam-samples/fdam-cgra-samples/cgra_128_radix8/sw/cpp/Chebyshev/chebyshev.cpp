@@ -65,7 +65,6 @@ int chebyshev_openmp(int idx) {
     high_resolution_clock::time_point s;
     duration<double> diff = {};
     for (int i = 0; i < SAMPLES; i++) {
-
         s = high_resolution_clock::now();
 #pragma omp parallel
 #pragma omp for
