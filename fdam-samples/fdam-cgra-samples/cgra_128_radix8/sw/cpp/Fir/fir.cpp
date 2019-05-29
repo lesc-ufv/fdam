@@ -59,8 +59,7 @@ int fir(int idx, unsigned short *coef, int taps){
 
    delete data_in;
    delete data_out;
-   delete coef;
-   
+
    return v;
 
 }
