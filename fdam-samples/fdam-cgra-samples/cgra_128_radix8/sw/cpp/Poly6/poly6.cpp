@@ -181,6 +181,7 @@ int poly6_cgra(int idx, int copies) {
         duration<double> diff = {};
 
         for (int i = 0; i < SAMPLES; i++) {
+            s = high_resolution_clock::now();
             cgraHw->syncExecute(0);
             diff += high_resolution_clock::now() - s;
         }
