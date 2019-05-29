@@ -118,7 +118,7 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
     unsigned short *data_in, *data_out;
     data_in = new unsigned short[DATA_SIZE];
     data_out = new unsigned short[DATA_SIZE];
-    int r, v = 0;
+    int r = 0, v = 0, tries = 0;
 
     for (int k = 0; k < DATA_SIZE; ++k) {
         data_in[k] = k;
@@ -131,7 +131,12 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
         cgraArch->getNetBranch(i)->createRouteTable();
         cgraArch->getNet(i)->createRouteTable();
     }
-    r = scheduler.scheduling();
+
+    do {
+        r = scheduler.scheduling();
+        tries++;
+    } while (r != SCHEDULE_SUCCESS && tries < 1000);
+
     if (r == SCHEDULE_SUCCESS) {
 
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
@@ -149,20 +154,13 @@ int fir_cgra(int idx, int copies, unsigned short *coef,int taps) {
             }
         }
 
-        high_resolution_clock::time_point s;
-        duration<double> diff = {};
-        cgraHw->prepareInputData();
-        for (int i = 0; i < SAMPLES; i++) {
-            s = high_resolution_clock::now();
+        double cgraExecTime = 0;
+        for (int i = 0; i < SAMPLES; i++){
             cgraHw->syncExecute(0);
-            diff += high_resolution_clock::now() - s;
+            cgraExecTime += cgraHw->getTimeExec();
         }
-        cgraHw->prepareOutputData();
-        
-        double cpuExecTime = (diff.count() * 1000) / SAMPLES;
-
-        printf("Time(ms) CGRA: %5.2lf\n", cpuExecTime);
-
+        cgraExecTime /= SAMPLES;
+        printf("Time(ms) CGRA: %5.2lf\n", cgraExecTime);
         v = data_out[idx];
 
     } else {

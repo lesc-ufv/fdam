@@ -137,6 +137,7 @@ int chebyshev_cgra(int idx, int copies) {
         }
         cgraExecTime /= SAMPLES;
         printf("Time(ms) CGRA: %5.2lf\n", cgraExecTime);
+
         v = data_out[idx];
 
     } else {

@@ -106,7 +106,7 @@ int poly5_cgra(int idx,int copies){
     Scheduler scheduler(cgraArch);
     std::vector<DataFlow *> dfs;
     unsigned short *a, *b, *c, *out;
-    int r, v = 0;
+    int r = 0, v = 0, tries = 0;
 
     a = new unsigned short[DATA_SIZE];
     b = new unsigned short[DATA_SIZE];
@@ -126,7 +126,12 @@ int poly5_cgra(int idx,int copies){
         cgraArch->getNetBranch(i)->createRouteTable();
         cgraArch->getNet(i)->createRouteTable();
     }
-    r = scheduler.scheduling();
+    
+    do {
+        r = scheduler.scheduling();
+        tries++;
+    } while (r != SCHEDULE_SUCCESS && tries < 1000);
+    
     if (r == SCHEDULE_SUCCESS) {
 
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
@@ -143,20 +148,13 @@ int poly5_cgra(int idx,int copies){
                 k++;
             }
         }
-
-        high_resolution_clock::time_point s;
-        duration<double> diff = {};
-        cgraHw->prepareInputData();
-        for (int i = 0; i < SAMPLES; i++) {
-            s = high_resolution_clock::now();
+        double cgraExecTime = 0;
+        for (int i = 0; i < SAMPLES; i++){
             cgraHw->syncExecute(0);
-            diff += high_resolution_clock::now() - s;
+            cgraExecTime += cgraHw->getTimeExec();
         }
-        cgraHw->prepareOutputData();
-        double cpuExecTime = (diff.count() * 1000) / SAMPLES;
-
-        printf("Time(ms) CGRA: %5.2lf\n", cpuExecTime);
-
+        cgraExecTime /= SAMPLES;
+        printf("Time(ms) CGRA: %5.2lf\n", cgraExecTime);
         v = out[idx];
 
     } else {
