@@ -125,19 +125,18 @@ int chebyshev_cgra(int idx, int copies) {
                 k++;
             }
         }
-
         high_resolution_clock::time_point s;
         duration<double> diff = {};
-
+        cgraHw->prepareInputData();
         for (int i = 0; i < SAMPLES; i++) {
             s = high_resolution_clock::now();
             cgraHw->syncExecute(0);
             diff += high_resolution_clock::now() - s;
         }
-        double cpuExecTime = (diff.count() * 1000) / SAMPLES;
+        cgraHw->prepareOutputData();
 
-        printf("Time(ms) CGRA: %5.2lf\n", cpuExecTime);
-
+        double cgraExecTime = (diff.count() * 1000) / SAMPLES;
+        printf("Time(ms) CGRA: %5.2lf\n", cgraExecTime);
         v = data_out[idx];
 
     } else {
