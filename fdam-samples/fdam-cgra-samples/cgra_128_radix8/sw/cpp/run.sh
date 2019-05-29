@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-#for simulation
-sim="_"$1
+#for simulation type = ase
+#for harp type = harp
+
+type="_"$1
 do_build=$2
 
 echo "Run Chebyshev ..."
@@ -15,7 +17,7 @@ then
     make -j7
 else
     cd build
-    ./chebyshev$sim
+    ./chebyshev$type
 fi
 
 cd ../../
@@ -30,7 +32,7 @@ then
     make -j7
 else
     cd build
-    ./fir$sim
+    ./fir$type
 fi
 
 cd ../../
@@ -45,7 +47,7 @@ then
     make -j7
 else
     cd build
-    ./kmeans$sim
+    ./kmeans$type
 fi
 
 cd ../../
@@ -60,7 +62,7 @@ then
     make -j7
 else
     cd build
-    ./mibench$sim
+    ./mibench$type
 fi
 
 cd ../../
@@ -75,7 +77,7 @@ then
     make -j7
 else
     cd build
-    ./paeth$sim
+    ./paeth$type
 fi
 
 cd ../../
@@ -90,7 +92,7 @@ then
     make -j7
 else
     cd build
-    ./poly5$sim
+    ./poly5$type
 fi
 
 cd ../../
@@ -105,7 +107,7 @@ then
     make -j7
 else
     cd build
-    ./poly6$sim
+    ./poly6$type
 fi
 
 cd ../../
@@ -120,7 +122,7 @@ then
     make -j7
 else
     cd build
-    ./poly8$sim
+    ./poly8$type
 fi
 
 cd ../../
@@ -135,7 +137,7 @@ then
     make -j7
 else
     cd build
-    ./qspline$sim
+    ./qspline$type
 fi
 
 cd ../../
@@ -150,7 +152,7 @@ then
     make -j7
 else
     cd build
-    ./sgfilter$sim
+    ./sgfilter$type
 fi
 
 cd ../../
@@ -165,5 +167,5 @@ then
     make -j7
 else
     cd build
-    ./sobel_filter$sim
+    ./sobel_filter$type
 fi

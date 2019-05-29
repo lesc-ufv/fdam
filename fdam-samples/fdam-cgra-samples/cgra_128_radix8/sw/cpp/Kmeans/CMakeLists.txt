@@ -28,9 +28,8 @@ find_library(LIB_FDAM NAMES fdam REQUIRED)
 file(GLOB CPP_SRCS *.cpp)
 file(GLOB H_SRCS *.h)
 
-add_executable(kmeans ${CPP_SRCS} ${H_SRCS})
+add_executable(kmeans_harp ${CPP_SRCS} ${H_SRCS})
+target_link_libraries(kmeans_harp ${LIB_FDAM} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
+
 add_executable(kmeans_ase ${CPP_SRCS} ${H_SRCS})
-
 target_link_libraries(kmeans_ase ${LIB_FDAM} ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
-target_link_libraries(kmeans ${LIB_FDAM} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
-

@@ -28,8 +28,8 @@ find_library(LIB_FDAM NAMES fdam REQUIRED)
 file(GLOB CPP_SRCS *.cpp)
 file(GLOB H_SRCS *.h)
 
-add_executable(sgfilter ${CPP_SRCS} ${H_SRCS})
-add_executable(sgfilter_ase ${CPP_SRCS} ${H_SRCS})
+add_executable(sgfilter_harp ${CPP_SRCS} ${H_SRCS})
+target_link_libraries(sgfilter_harp ${LIB_FDAM} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
 
-target_link_libraries(sgfilter ${LIB_FDAM} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
+add_executable(sgfilter_ase ${CPP_SRCS} ${H_SRCS})
 target_link_libraries(sgfilter_ase ${LIB_FDAM} ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
