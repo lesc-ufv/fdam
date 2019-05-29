@@ -1,7 +1,7 @@
 #include <fdam/cgra/cgra.h>
 
 Cgra::Cgra() {
-    Cgra::sizeConf = 0;
+    Cgra::timeExecCgra = 0;
     Cgra::cgra_program = nullptr;
     Cgra::accManagement = new AccManagement();
 }
@@ -150,7 +150,7 @@ bool Cgra::readProgramFile(std::string filePath) {
             myfile.read((char *) &threadID, sizeof(int));
             myfile.read((char *) &id_pe, sizeof(int));
             myfile.read((char *) &id_op, sizeof(int));
-            Cgra::cgra_program->map_pe_to_op[std::pair<int, int>(threadID, id_pe)] = id_op;
+            Cgra::cgra_program->map_pe_to_op[std::pair<int, int>(threadID,id_pe)] = id_op;
         }
         myfile.close();
     } else {
@@ -160,7 +160,7 @@ bool Cgra::readProgramFile(std::string filePath) {
     return true;
 }
 
-void Cgra::prepareInputData() {
+void Cgra::syncExecute(long waitTime) {
     auto cp = makeCopy(*Cgra::cgra_program);
     std::map<int, int> pe_in_map;
     std::map<int, int> pe_out_map;
@@ -225,15 +225,15 @@ void Cgra::prepareInputData() {
             initial_conf_t conf1, conf2;
             qtd_conf_t qtd;
             qtd.qtd = (it2.second.second / cp->word_size);
-            conf1.pe_qtd_data_write_low_conf.conf_type = CGRA_CONF_SET_PE_QTD_LOW;
-            conf1.pe_qtd_data_write_low_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
-            conf1.pe_qtd_data_write_low_conf.thread_id = (unsigned long) it2.first;
-            conf1.pe_qtd_data_write_low_conf.qtd = qtd.qtd_low;
+            conf1.pe_qtd_data_read_low_conf.conf_type = CGRA_CONF_SET_PE_QTD_LOW;
+            conf1.pe_qtd_data_read_low_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
+            conf1.pe_qtd_data_read_low_conf.thread_id = (unsigned long) it2.first;
+            conf1.pe_qtd_data_read_low_conf.qtd = qtd.qtd_low;
 
-            conf2.pe_qtd_data_write_high_conf.conf_type = CGRA_CONF_SET_PE_QTD_HIGH;
-            conf2.pe_qtd_data_write_high_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
-            conf2.pe_qtd_data_write_high_conf.thread_id = (unsigned long) it2.first;
-            conf2.pe_qtd_data_write_high_conf.qtd = qtd.qtd_high;
+            conf2.pe_qtd_data_read_high_conf.conf_type = CGRA_CONF_SET_PE_QTD_HIGH;
+            conf2.pe_qtd_data_read_high_conf.pe_id = (unsigned long) out_pe_map[it.first] + 1;
+            conf2.pe_qtd_data_read_high_conf.thread_id = (unsigned long) it2.first;
+            conf2.pe_qtd_data_read_high_conf.qtd = qtd.qtd_high;
 
             cp->initial_conf.push_back(conf1);
             cp->initial_conf.push_back(conf2);
@@ -244,13 +244,12 @@ void Cgra::prepareInputData() {
     cp->cgra_intial_conf.qtd_conf = static_cast<unsigned int>(cp->initial_conf.size());
     size_t cgra_intial_conf_bytes = sizeof(cgra_intial_conf_t);
     size_t conf_bytes = cp->cgra_intial_conf.qtd_conf * sizeof(initial_conf_t);
-
+//  printf("INITIAL CONF SIZE: %d\n",cgra_intial_conf_bytes);
+//  printf("CONF SIZE: %d\n",conf_bytes);
     auto cgra_intial_conf_bytes_align = static_cast<size_t >((std::ceil(cgra_intial_conf_bytes / 64.0)) * 64.0);
     auto conf_bytes_align = static_cast<size_t>((std::ceil(conf_bytes / 64.0)) * 64.0);
 
-    Cgra::sizeConf = cgra_intial_conf_bytes_align + conf_bytes_align;
-
-    total_size_in[0] += Cgra::sizeConf;
+    total_size_in[0] += cgra_intial_conf_bytes_align + conf_bytes_align;
 
     Accelerator &acc = Cgra::accManagement->getAccelerator((cp->cgra_id));
 
@@ -342,63 +341,14 @@ void Cgra::prepareInputData() {
             }
         }
     }
-    freeProgram(cp);
-}
-
-void Cgra::prepareOutputData() {
-
-    Accelerator &acc = Cgra::accManagement->getAccelerator((Cgra::cgra_program->cgra_id));
-
-    auto cp = Cgra::cgra_program;
-
-    std::map<int, int> pe_out_map;
-    std::map<int, int> out_pe_map;
-    std::map<int, unsigned long> ignore_out[cp->num_pe_io_out];
-    unsigned long ignore_out_min = INT64_MAX;
-    size_t total_size_out[cp->num_pe_io_out];
-    auto pe_list = Cgra::makeListPe(cp->num_pe, cp->num_pe_io_in, cp->num_pe_io_out);
-
-    for (int j = 0; j < cp->num_pe_io_out; ++j) {
-        total_size_out[j] = 0;
-    }
-
-    int outId = 0;
-    for (auto p:pe_list) {
-        if (p.second == PE_OUT) {
-            pe_out_map[p.first] = outId;
-            out_pe_map[outId] = p.first;
-            outId++;
-        }
-    }
-
-    for (const auto &it:Cgra::output_queue) {
-        for (auto it2:it.second) {
-            total_size_out[it.first] += it2.second.second;
-        }
-    }
-
-    for (int k = 0; k < cp->cgra_intial_conf.qtd_conf; ++k) {
-        unsigned long pe_id = cp->initial_conf[k].pe_store_ignore_conf.pe_id - 1;
-        unsigned long threadID = cp->initial_conf[k].pe_store_ignore_conf.thread_id;
-        unsigned long ignore = cp->initial_conf[k].pe_store_ignore_conf.store_ignore;
-        outId = pe_out_map[pe_id];
-        if (cp->initial_conf[k].pe_store_ignore_conf.conf_type == CGRA_CONF_SET_PE_IGNORE) {
-            if (pe_list[pe_id] == PE_OUT) {
-                ignore_out[outId][threadID] = ignore;
-                if (ignore < ignore_out_min) {
-                    ignore_out_min = ignore;
-                }
-            }
-        }
-    }
-
-    for (int j = 0; j < cp->num_pe_io_out; ++j) {
-        for (auto i : ignore_out[j]) {
-            if (i.second > 0)
-                i.second -= ignore_out_min;
-        }
-    }
-    int ws = cp->word_size;
+    high_resolution_clock::time_point s;
+    duration<double> diff = {};
+    s = high_resolution_clock::now();
+    acc.start();
+    acc.waitDone(waitTime);
+    diff = high_resolution_clock::now() - s;
+    Cgra::timeExecCgra = diff.count() * 1000;
+    acc.reset();
     for (const auto &it:Cgra::output_queue) {
         auto queue_ptr = (unsigned char *) acc.getOutputQueue((unsigned char) it.first);
         auto len = total_size_out[it.first];
@@ -423,14 +373,7 @@ void Cgra::prepareOutputData() {
             }
         }
     }
-    acc.reset();
-}
-
-void Cgra::syncExecute(long waitTime) {
-
-    Accelerator &acc = Cgra::accManagement->getAccelerator((Cgra::cgra_program->cgra_id));
-    acc.start();
-    acc.waitDone(waitTime);
+    freeProgram(cp);
 }
 
 std::map<int, int> Cgra::makeListPe(int num_pe, int num_pe_in, int num_pe_out) {
@@ -514,6 +457,6 @@ void Cgra::freeProgram(cgra_program_t *cp) {
     }
 }
 
-size_t Cgra::getConfSize() {
-    return Cgra::sizeConf;
+double Cgra::getTimeExec() {
+    return Cgra::timeExecCgra;
 }

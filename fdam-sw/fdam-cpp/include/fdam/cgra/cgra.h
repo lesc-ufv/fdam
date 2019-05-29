@@ -15,7 +15,7 @@ using namespace std;
 class Cgra {
 
 private:
-    size_t sizeConf;
+    double timeExecCgra;
     // key = Input ID, Value = key = ThreadID value =  ( Pointer Data, Size Data)
     std::map<int, std::map<int, std::pair<unsigned char *, size_t>>> input_queue;
     // key = Output ID, Value = key = ThreadID value =  ( Pointer Data, Size Data)
@@ -53,21 +53,14 @@ public:
 
     bool setCgraProgramOutputStreamByName(std::string dataFlowName, int outputStreamID, const void *outputStreamData,
                                           size_t size);
-    
-    void prepareInputData();
-    
-    void prepareOutputData();
-    
+
     void syncExecute(long waitTime);
 
     cgra_program_t *getCgraProgram();
-    
+
     AccManagement *getAccManagement();
 
     double getTimeExec();
-
-    size_t getConfSize();
-
 };
 
 #endif //CGRA_H
