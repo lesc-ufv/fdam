@@ -123,7 +123,7 @@ int sgfilter_cgra(int idx, int copies) {
             for (int j = 0; j < copies; ++j) {
                 cgraHw->setCgraProgramInputStreamByID(i, (j * 3), &a[k * data_size], data_size_bytes);
                 cgraHw->setCgraProgramInputStreamByID(i, (j * 3) + 1, &b[k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramOutputStreamByID(i, (j * 3) + 3, &out[k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramOutputStreamByID(i, (j * 3) + 2, &out[k * data_size], data_size_bytes);
                 k++;
             }
         }

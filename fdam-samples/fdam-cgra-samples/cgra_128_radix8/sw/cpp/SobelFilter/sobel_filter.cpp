@@ -41,10 +41,22 @@ int sobel_filter(int idx) {
         s = high_resolution_clock::now();
         for (int k = 0; k < DATA_SIZE; ++k) {
             short sum_h = 0, sum_v = 0;
-            for (int j = 0; j < 8; j++) {
-                sum_h += data_in[j][k] * sobel_h[j];
-                sum_v += data_in[j][k] * sobel_v[j];
-            }
+            sum_h += data_in[0][k] * sobel_h[0];
+            sum_v += data_in[0][k] * sobel_v[0];
+            sum_h += data_in[1][k] * sobel_h[1];
+            sum_v += data_in[1][k] * sobel_v[1];
+            sum_h += data_in[2][k] * sobel_h[2];
+            sum_v += data_in[2][k] * sobel_v[2];
+            sum_h += data_in[3][k] * sobel_h[3];
+            sum_v += data_in[3][k] * sobel_v[3];
+            sum_h += data_in[4][k] * sobel_h[4];
+            sum_v += data_in[4][k] * sobel_v[4];
+            sum_h += data_in[5][k] * sobel_h[5];
+            sum_v += data_in[5][k] * sobel_v[5];
+            sum_h += data_in[6][k] * sobel_h[6];
+            sum_v += data_in[6][k] * sobel_v[6];
+            sum_h += data_in[7][k] * sobel_h[7];
+            sum_v += data_in[7][k] * sobel_v[7];
             data_out[k] = (sum_h * sum_h) + (sum_v * sum_v);
         }
         diff += high_resolution_clock::now() - s;
@@ -99,10 +111,22 @@ int sobel_filter_openmp(int idx) {
 #pragma omp for
         for (int k = 0; k < DATA_SIZE; ++k) {
             short sum_h = 0, sum_v = 0;
-            for (int j = 0; j < 8; j++) {
-                sum_h += data_in[j][k] * sobel_h[j];
-                sum_v += data_in[j][k] * sobel_v[j];
-            }
+            sum_h += data_in[0][k] * sobel_h[0];
+            sum_v += data_in[0][k] * sobel_v[0];
+            sum_h += data_in[1][k] * sobel_h[1];
+            sum_v += data_in[1][k] * sobel_v[1];
+            sum_h += data_in[2][k] * sobel_h[2];
+            sum_v += data_in[2][k] * sobel_v[2];
+            sum_h += data_in[3][k] * sobel_h[3];
+            sum_v += data_in[3][k] * sobel_v[3];
+            sum_h += data_in[4][k] * sobel_h[4];
+            sum_v += data_in[4][k] * sobel_v[4];
+            sum_h += data_in[5][k] * sobel_h[5];
+            sum_v += data_in[5][k] * sobel_v[5];
+            sum_h += data_in[6][k] * sobel_h[6];
+            sum_v += data_in[6][k] * sobel_v[6];
+            sum_h += data_in[7][k] * sobel_h[7];
+            sum_v += data_in[7][k] * sobel_v[7];
             data_out[k] = (sum_h * sum_h) + (sum_v * sum_v);
         }
         diff += high_resolution_clock::now() - s;
@@ -129,7 +153,7 @@ int sobel_filter_cgra(int idx, int copies) {
     auto cgraHw = new Cgra();
     Scheduler scheduler(cgraArch);
     std::vector<DataFlow *> dfs;
-    int r = 0, v = 0,tries = 0;
+    int r = 0, v = 0, tries = 0;
 
     auto data_in = new short *[8];
     auto data_out = new short[DATA_SIZE];
@@ -155,7 +179,7 @@ int sobel_filter_cgra(int idx, int copies) {
         r = scheduler.scheduling();
         tries++;
     } while (r != SCHEDULE_SUCCESS && tries < 1000);
-    
+
     if (r == SCHEDULE_SUCCESS) {
 
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
@@ -165,15 +189,20 @@ int sobel_filter_cgra(int idx, int copies) {
         int k = 0;
         for (int i = 0; i < NUM_THREAD; ++i) {
             for (int j = 0; j < copies; ++j) {
-                for (int l = 0; l < 8; ++l) {
-                    cgraHw->setCgraProgramInputStreamByID(i, (j * 4) + l, &data_in[l][k * data_size], data_size_bytes);
-                }
-                cgraHw->setCgraProgramOutputStreamByID(i, (j * 4) + 3, &data_out[k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies),     &data_in[0][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 1, &data_in[1][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 2, &data_in[2][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 3, &data_in[3][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 4, &data_in[4][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 5, &data_in[5][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 6, &data_in[6][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 7, &data_in[7][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramOutputStreamByID(i,(j * copies) + 8, &data_out[k * data_size], data_size_bytes);
                 k++;
             }
         }
         double cgraExecTime = 0;
-        for (int i = 0; i < SAMPLES; i++){
+        for (int i = 0; i < SAMPLES; i++) {
             cgraHw->syncExecute(0);
             cgraExecTime += cgraHw->getTimeExec();
         }
@@ -269,3 +298,4 @@ DataFlow *createDataFlow(int id, int copies) {
     df->connect(add, output[0], output[0]->getPortA());
     return df;
 }
+

@@ -28,8 +28,8 @@ find_library(LIB_FDAM NAMES fdam REQUIRED)
 file(GLOB CPP_SRCS *.cpp)
 file(GLOB H_SRCS *.h)
 
-add_executable(poly5_cgra ${CPP_SRCS} ${H_SRCS})
-target_link_libraries(poly5_cgra ${LIB_FDAM} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
+add_executable(poly5_harp ${CPP_SRCS} ${H_SRCS})
+target_link_libraries(poly5_harp ${LIB_FDAM} ${LIB_OPAE} ${LIB_UUID} ${LIB_MPF})
 
 add_executable(poly5_ase ${CPP_SRCS} ${H_SRCS})
 target_link_libraries(poly5_ase ${LIB_FDAM} ${LIB_OPAE_ASE} ${LIB_UUID} ${LIB_MPF})
