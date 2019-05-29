@@ -423,6 +423,7 @@ void Cgra::prepareOutputData() {
             }
         }
     }
+    acc.reset();
 }
 
 void Cgra::syncExecute(long waitTime) {
@@ -430,7 +431,6 @@ void Cgra::syncExecute(long waitTime) {
     Accelerator &acc = Cgra::accManagement->getAccelerator((Cgra::cgra_program->cgra_id));
     acc.start();
     acc.waitDone(waitTime);
-    acc.reset();
 }
 
 std::map<int, int> Cgra::makeListPe(int num_pe, int num_pe_in, int num_pe_out) {

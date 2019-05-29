@@ -95,7 +95,7 @@ int chebyshev_cgra(int idx, int copies) {
     unsigned short *data_in, *data_out;
     data_in = new unsigned short[DATA_SIZE];
     data_out = new unsigned short[DATA_SIZE];
-    int r, v = 0;
+    int r, v, tries = 0;
 
     for (int k = 0; k < DATA_SIZE; ++k) {
         data_in[k] = k;
@@ -108,14 +108,19 @@ int chebyshev_cgra(int idx, int copies) {
         cgraArch->getNetBranch(i)->createRouteTable();
         cgraArch->getNet(i)->createRouteTable();
     }
-    r = scheduler.scheduling();
+
+    do {
+        r = scheduler.scheduling();
+        tries++;
+    } while (r != SCHEDULE_SUCCESS && tries < 1000);
+
     if (r == SCHEDULE_SUCCESS) {
 
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
 
         auto data_size = (size_t) (DATA_SIZE / ((NUM_THREAD) * copies));
         auto data_size_bytes = sizeof(unsigned short) * data_size;
-        
+
         int k = 0;
         for (int i = 0; i < NUM_THREAD; ++i) {
             for (int j = 0, c = 0; j < copies; ++j) {
@@ -127,13 +132,14 @@ int chebyshev_cgra(int idx, int copies) {
         }
         high_resolution_clock::time_point s;
         duration<double> diff = {};
-        cgraHw->prepareInputData();
+
         for (int i = 0; i < SAMPLES; i++) {
+            cgraHw->prepareInputData();
             s = high_resolution_clock::now();
             cgraHw->syncExecute(0);
             diff += high_resolution_clock::now() - s;
+            cgraHw->prepareOutputData();
         }
-        cgraHw->prepareOutputData();
 
         double cgraExecTime = (diff.count() * 1000) / SAMPLES;
         printf("Time(ms) CGRA: %5.2lf\n", cgraExecTime);

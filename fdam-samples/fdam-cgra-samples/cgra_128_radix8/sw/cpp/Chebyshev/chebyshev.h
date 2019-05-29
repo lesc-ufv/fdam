@@ -18,9 +18,9 @@
 using namespace std;
 using namespace std::chrono;
 
-#define DATA_SIZE (1 << 6)
+#define DATA_SIZE (1 << 5)
 #define NUM_THREAD (8)
-#define SAMPLES (1)
+#define SAMPLES (2)
 
 int chebyshev(int idx);
 
