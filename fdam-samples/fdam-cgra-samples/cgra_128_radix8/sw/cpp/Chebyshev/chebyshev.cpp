@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
 
     chebyshev(idx);
     chebyshev_openmp(idx);
-    chebyshev_cgra(idx, 4);
+    chebyshev_cgra(idx, 8);
 
     return 0;
 }
