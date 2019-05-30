@@ -63,7 +63,7 @@ int kmeans(int idx, int num_clusters, int num_dim) {
 
     double cpuExecTime = (diff.count() * 1000) / SAMPLES;
 
-    printf("Time(ms) 1 Thread: %5.2lf\n", cpuExecTime);
+    printf("Time(ms) CPU 1 Thread: %5.2lf\n", cpuExecTime);
 
     int v = data_out[idx];
 
@@ -119,7 +119,7 @@ int kmeans_openmp(int idx, int num_clusters, int num_dim) {
 
     double cpuExecTime = (diff.count() * 1000) / SAMPLES;
 
-    printf("Time(ms) %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
+    printf("Time(ms) CPU %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
 
     int v = data_out[idx];
 

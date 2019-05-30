@@ -43,7 +43,7 @@ int sgfilter(int idx) {
         diff += high_resolution_clock::now() - s;
     }
     double cpuExecTime = (diff.count() * 1000) / SAMPLES;
-    printf("Time(ms) 1 Thread: %5.2lf\n", cpuExecTime);
+    printf("Time(ms) CPU 1 Thread: %5.2lf\n", cpuExecTime);
 
     int v = OUT[idx];
 
@@ -78,7 +78,7 @@ int sgfilter_openmp(int idx) {
         diff += high_resolution_clock::now() - s;
     }
     double cpuExecTime = (diff.count() * 1000) / SAMPLES;
-    printf("Time(ms) %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
+    printf("Time(ms) CPU %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
 
     int v = OUT[idx];
 

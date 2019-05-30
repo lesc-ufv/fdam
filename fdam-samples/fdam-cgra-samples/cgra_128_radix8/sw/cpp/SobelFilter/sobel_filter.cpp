@@ -4,18 +4,18 @@ int main(int argc, char *argv[]) {
 
     int idx = 0;
     int test = 0;
-     
-    if(argc > 1)
+
+    if (argc > 1)
         test = atoi(argv[1]);
-     
-    if(argc > 2)
+
+    if (argc > 2)
         idx = atoi(argv[2]);
 
-    if(test & 1)
+    if (test & 1)
         sobel_filter(idx);
-    if(test & 2)
+    if (test & 2)
         sobel_filter_openmp(idx);
-    if(test & 4)
+    if (test & 4)
         sobel_filter_cgra(idx, 1);
 
     return 0;
@@ -23,65 +23,61 @@ int main(int argc, char *argv[]) {
 
 int sobel_filter(int idx) {
 
-    short sobel_h[] = {-1, 0, 1, -2, 2, -1, 0, 1};
-    short sobel_v[] = {1, 2, 1, 0, 0, -1, -2, -1};
+    int v = 0;
+    int gray_size = DATA_SIZE;
+    int width = (int) sqrt(DATA_SIZE);
+    byte sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    byte sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 
-    short **data_in, *data_out;
+    byte **gray;
+    byte **contour_img_cpu;
+    gray = new byte *[NUM_THREAD];
+    contour_img_cpu = new byte *[NUM_THREAD];
+    auto **sobel_h_res = new byte *[NUM_THREAD];
+    auto **sobel_v_res = new byte *[NUM_THREAD];
 
-    data_in = new short *[8];
-    data_out = new short[DATA_SIZE];
+    for (int i = 0; i < NUM_THREAD; ++i) {
+        gray[i] = new byte[gray_size];
+        contour_img_cpu[i] = new byte[gray_size];
+        sobel_h_res[i] = new byte[DATA_SIZE];
+        sobel_v_res[i] = new byte[DATA_SIZE];
 
-    for (int i = 0; i < 8; i++) {
-        data_in[i] = new short[DATA_SIZE];
-        for (int k = 0; k < DATA_SIZE; ++k) {
-            data_in[i][k] = k;
+        for (int j = 0; j < DATA_SIZE; ++j) {
+            gray[i][j] = j;
         }
     }
 
-    for (int k = 0; k < DATA_SIZE; ++k) {
-        data_out[k] = 0;
-    }
+    omp_set_num_threads(NUM_THREAD);
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-
-    for (int i = 0; i < SAMPLES; i++) {
+    for (int l = 0; l < SAMPLES; ++l) {
         s = high_resolution_clock::now();
-        for (int k = 0; k < DATA_SIZE; ++k) {
-            short sum_h = 0, sum_v = 0;
-            sum_h += data_in[0][k] * sobel_h[0];
-            sum_v += data_in[0][k] * sobel_v[0];
-            sum_h += data_in[1][k] * sobel_h[1];
-            sum_v += data_in[1][k] * sobel_v[1];
-            sum_h += data_in[2][k] * sobel_h[2];
-            sum_v += data_in[2][k] * sobel_v[2];
-            sum_h += data_in[3][k] * sobel_h[3];
-            sum_v += data_in[3][k] * sobel_v[3];
-            sum_h += data_in[4][k] * sobel_h[4];
-            sum_v += data_in[4][k] * sobel_v[4];
-            sum_h += data_in[5][k] * sobel_h[5];
-            sum_v += data_in[5][k] * sobel_v[5];
-            sum_h += data_in[6][k] * sobel_h[6];
-            sum_v += data_in[6][k] * sobel_v[6];
-            sum_h += data_in[7][k] * sobel_h[7];
-            sum_v += data_in[7][k] * sobel_v[7];
-            data_out[k] = (sum_h * sum_h) + (sum_v * sum_v);
+        for (int i = 0; i < NUM_THREAD; ++i) {
+            itConv(gray[i], gray_size, width, sobel_h, sobel_h_res[i]);
+            itConv(gray[i], gray_size, width, sobel_v, sobel_v_res[i]);
+            contour(sobel_h_res[i], sobel_v_res[i], gray_size, contour_img_cpu[i]);
         }
         diff += high_resolution_clock::now() - s;
     }
 
     double cpuExecTime = (diff.count() * 1000) / SAMPLES;
 
-    printf("Time(ms) 1 Thread: %5.2lf\n", cpuExecTime);
+    printf("Time(ms) CPU %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
 
-    int v = data_out[idx];
+    v = contour_img_cpu[0][idx];
 
-    for (int i = 0; i < 8; i++) {
-        delete data_in[i];
+    for (int k = 0; k < NUM_THREAD; ++k) {
+        delete gray[k];
+        delete contour_img_cpu[k];
+        delete sobel_h_res[k];
+        delete sobel_v_res[k];
     }
 
-    delete data_in;
-    delete data_out;
+    delete gray;
+    delete contour_img_cpu;
+    delete[]sobel_h_res;
+    delete[]sobel_v_res;
 
     return v;
 
@@ -89,69 +85,63 @@ int sobel_filter(int idx) {
 
 int sobel_filter_openmp(int idx) {
 
-    short sobel_h[] = {-1, 0, 1, -2, 2, -1, 0, 1};
-    short sobel_v[] = {1, 2, 1, 0, 0, -1, -2, -1};
+    int v = 0;
+    int gray_size = DATA_SIZE;
+    int width = (int) sqrt(DATA_SIZE);
+    byte sobel_h[] = {-1, 0, 1, -2, 0, 2, -1, 0, 1};
+    byte sobel_v[] = {1, 2, 1, 0, 0, 0, -1, -2, -1};
 
-    short **data_in, *data_out;
+    byte **gray;
+    byte **contour_img_cpu;
+    gray = new byte *[NUM_THREAD];
+    contour_img_cpu = new byte *[NUM_THREAD];
+    auto **sobel_h_res = new byte *[NUM_THREAD];
+    auto **sobel_v_res = new byte *[NUM_THREAD];
 
-    data_in = new short *[8];
-    data_out = new short[DATA_SIZE];
+    for (int i = 0; i < NUM_THREAD; ++i) {
+        gray[i] = new byte[gray_size];
+        contour_img_cpu[i] = new byte[gray_size];
+        sobel_h_res[i] = new byte[DATA_SIZE];
+        sobel_v_res[i] = new byte[DATA_SIZE];
 
-    for (int i = 0; i < 8; i++) {
-        data_in[i] = new short[DATA_SIZE];
-        for (int k = 0; k < DATA_SIZE; ++k) {
-            data_in[i][k] = k;
+        for (int j = 0; j < DATA_SIZE; ++j) {
+            gray[i][j] = j;
         }
-    }
-
-    for (int k = 0; k < DATA_SIZE; ++k) {
-        data_out[k] = 0;
     }
 
     omp_set_num_threads(NUM_THREAD);
 
     high_resolution_clock::time_point s;
     duration<double> diff = {};
-
-    for (int i = 0; i < SAMPLES; i++) {
+    for (int l = 0; l < SAMPLES; ++l) {
         s = high_resolution_clock::now();
 #pragma omp parallel
 #pragma omp for
-        for (int k = 0; k < DATA_SIZE; ++k) {
-            short sum_h = 0, sum_v = 0;
-            sum_h += data_in[0][k] * sobel_h[0];
-            sum_v += data_in[0][k] * sobel_v[0];
-            sum_h += data_in[1][k] * sobel_h[1];
-            sum_v += data_in[1][k] * sobel_v[1];
-            sum_h += data_in[2][k] * sobel_h[2];
-            sum_v += data_in[2][k] * sobel_v[2];
-            sum_h += data_in[3][k] * sobel_h[3];
-            sum_v += data_in[3][k] * sobel_v[3];
-            sum_h += data_in[4][k] * sobel_h[4];
-            sum_v += data_in[4][k] * sobel_v[4];
-            sum_h += data_in[5][k] * sobel_h[5];
-            sum_v += data_in[5][k] * sobel_v[5];
-            sum_h += data_in[6][k] * sobel_h[6];
-            sum_v += data_in[6][k] * sobel_v[6];
-            sum_h += data_in[7][k] * sobel_h[7];
-            sum_v += data_in[7][k] * sobel_v[7];
-            data_out[k] = (sum_h * sum_h) + (sum_v * sum_v);
+        for (int i = 0; i < NUM_THREAD; ++i) {
+            itConv(gray[i], gray_size, width, sobel_h, sobel_h_res[i]);
+            itConv(gray[i], gray_size, width, sobel_v, sobel_v_res[i]);
+            contour(sobel_h_res[i], sobel_v_res[i], gray_size, contour_img_cpu[i]);
         }
         diff += high_resolution_clock::now() - s;
     }
 
     double cpuExecTime = (diff.count() * 1000) / SAMPLES;
 
-    printf("Time(ms) %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
+    printf("Time(ms) CPU %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
 
-    int v = data_out[idx];
+    v = contour_img_cpu[0][idx];
 
-    for (int i = 0; i < 8; i++) {
-        delete data_in[i];
+    for (int k = 0; k < NUM_THREAD; ++k) {
+        delete gray[k];
+        delete contour_img_cpu[k];
+        delete sobel_h_res[k];
+        delete sobel_v_res[k];
     }
 
-    delete data_in;
-    delete data_out;
+    delete gray;
+    delete contour_img_cpu;
+    delete[]sobel_h_res;
+    delete[]sobel_v_res;
 
     return v;
 }
@@ -197,7 +187,7 @@ int sobel_filter_cgra(int idx, int copies) {
         int k = 0;
         for (int i = 0; i < NUM_THREAD; ++i) {
             for (int j = 0; j < copies; ++j) {
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies),     &data_in[0][k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramInputStreamByID(i, (j * copies), &data_in[0][k * data_size], data_size_bytes);
                 cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 1, &data_in[1][k * data_size], data_size_bytes);
                 cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 2, &data_in[2][k * data_size], data_size_bytes);
                 cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 3, &data_in[3][k * data_size], data_size_bytes);
@@ -205,7 +195,7 @@ int sobel_filter_cgra(int idx, int copies) {
                 cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 5, &data_in[5][k * data_size], data_size_bytes);
                 cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 6, &data_in[6][k * data_size], data_size_bytes);
                 cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 7, &data_in[7][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramOutputStreamByID(i,(j * copies) + 8, &data_out[k * data_size], data_size_bytes);
+                cgraHw->setCgraProgramOutputStreamByID(i, (j * copies) + 8, &data_out[k * data_size], data_size_bytes);
                 k++;
             }
         }
@@ -307,3 +297,47 @@ DataFlow *createDataFlow(int id, int copies) {
     return df;
 }
 
+void itConv(byte *buffer, int buffer_size, int width, byte *op, byte *res) {
+    byte op_mem[SOBEL_OP_SIZE];
+    memset(op_mem, 0, SOBEL_OP_SIZE);
+    for (int i = 0; i < buffer_size; i++) {
+        makeOpMemCPU(buffer, buffer_size, width, i, op_mem);
+        res[i] = (convolution(op_mem, op, SOBEL_OP_SIZE));
+    }
+}
+
+byte convolution(byte *X, byte *Y, int c_size) {
+    byte sum = 0;
+    for (int i = 0; i < c_size; i++) {
+        sum += X[i] * Y[c_size - i - 1];
+    }
+
+    return sum;
+}
+
+void makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, byte *op_mem) {
+
+    int bottom = cindex - width < 0;
+    int top = cindex + width >= buffer_size;
+    int left = cindex % width == 0;
+    int right = (cindex + 1) % width == 0;
+    byte zero = 0;
+
+    op_mem[0] = !bottom && !left ? buffer[cindex - width - 1] : zero;
+    op_mem[1] = !bottom ? buffer[cindex - width] : zero;
+    op_mem[2] = !bottom && !right ? buffer[cindex - width + 1] : zero;
+
+    op_mem[3] = !left ? buffer[cindex - 1] : zero;
+    op_mem[4] = buffer[cindex];
+    op_mem[5] = !right ? buffer[cindex + 1] : zero;
+
+    op_mem[6] = !top && !left ? buffer[cindex + width - 1] : zero;
+    op_mem[7] = !top ? buffer[cindex + width] : zero;
+    op_mem[8] = !top && !right ? buffer[cindex + width + 1] : zero;
+}
+
+void contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img) {
+    for (int i = 0; i < gray_size; i++) {
+        contour_img[i] = 255 - (byte) sqrt(pow2(sobel_h[i]) + pow2(sobel_v[i]));
+    }
+}

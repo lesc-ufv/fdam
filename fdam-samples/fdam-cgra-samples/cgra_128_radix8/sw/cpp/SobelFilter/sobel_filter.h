@@ -21,6 +21,9 @@ using namespace std::chrono;
 #define DATA_SIZE (1 << 23)
 #define NUM_THREAD (8)
 #define SAMPLES (100)
+#define SOBEL_OP_SIZE 9
+#define pow2(x) (x)*(x)
+typedef short byte;
 
 int sobel_filter(int idx);
 
@@ -29,6 +32,14 @@ int sobel_filter_openmp(int idx);
 int sobel_filter_cgra(int idx, int copies);
 
 DataFlow *createDataFlow(int id, int copies);
+
+void itConv(byte *buffer, int buffer_size, int width, byte *op, byte *res);
+
+byte convolution(byte *X, byte *Y, int c_size);
+
+void makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, byte *op_mem);
+
+void contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img);
 
 int main(int argc, char *argv[]);
 

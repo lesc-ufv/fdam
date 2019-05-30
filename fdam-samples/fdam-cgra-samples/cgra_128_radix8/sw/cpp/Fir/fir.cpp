@@ -60,7 +60,7 @@ int fir(int idx, unsigned short *coef, int taps){
    
    double cpuExecTime = (diff.count() * 1000)/SAMPLES;
 
-   printf("Time(ms) 1 Thread: %5.2lf\n",cpuExecTime);
+   printf("Time(ms) CPU 1 Thread: %5.2lf\n",cpuExecTime);
    
    int v = data_out[idx];  
 
@@ -104,7 +104,7 @@ int fir_openmp(int idx, unsigned short *coef, int taps){
    
    double cpuExecTime = (diff.count() * 1000)/SAMPLES;
 
-   printf("Time(ms) %d Thread: %5.2lf\n",NUM_THREAD,cpuExecTime);
+   printf("Time(ms) CPU %d Thread: %5.2lf\n",NUM_THREAD,cpuExecTime);
 
    int v = data_out[idx];  
 

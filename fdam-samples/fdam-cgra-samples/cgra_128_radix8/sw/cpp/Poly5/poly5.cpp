@@ -51,7 +51,7 @@ int poly5(int idx) {
     }
     double cpuExecTime = (diff.count() * 1000) / 100;
 
-    printf("Time(ms) 1 Thread: %5.2lf\n", cpuExecTime);
+    printf("Time(ms) CPU 1 Thread: %5.2lf\n", cpuExecTime);
 
     int v = out[idx];
 
@@ -96,7 +96,7 @@ int poly5_openmp(int idx) {
     }
     double cpuExecTime = (diff.count() * 1000) / 100;
 
-    printf("Time(ms) %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
+    printf("Time(ms) CPU %d Thread: %5.2lf\n", NUM_THREAD, cpuExecTime);
 
     int v = out[idx];
 
