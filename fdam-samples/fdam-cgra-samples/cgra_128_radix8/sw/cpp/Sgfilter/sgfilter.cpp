@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
-    if (argc > 1)
-        idx = atoi(argv[1]);
+    int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+    if(argc > 2)
+        idx = atoi(argv[2]);
 
-    sgfilter(idx);
-    sgfilter_openmp(idx);
-    sgfilter_cgra(idx, 3);
+    if(test & 1)
+        sgfilter(idx);
+    if(test & 2)
+        sgfilter_openmp(idx);
+    if(test & 4)    
+        sgfilter_cgra(idx, 3);
 
     return 0;
 }

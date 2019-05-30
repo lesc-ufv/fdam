@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
-    if (argc > 1)
-        idx = atoi(argv[1]);
+    int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+    if(argc > 2)
+        idx = atoi(argv[2]);
 
-    mibench(idx);
-    mibench_openmp(idx);
-    mibench_cgra(idx, 2);
+    if(test & 1)
+        mibench(idx);
+    if(test & 2)
+        mibench_openmp(idx);
+    if(test & 4)
+        mibench_cgra(idx, 2);
 
     return 0;
 }

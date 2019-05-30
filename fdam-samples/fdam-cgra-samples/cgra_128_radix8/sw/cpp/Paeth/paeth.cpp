@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
-    if (argc > 1)
-        idx = atoi(argv[1]);
-
-    paeth(idx);
-    paeth_openmp(idx);
-    paeth_cgra(idx, 2);
+    int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+    if(argc > 2)
+        idx = atoi(argv[2]);
+    
+    if(test & 1)
+        paeth(idx);
+    if(test & 2)
+        paeth_openmp(idx);
+    if(test & 4)
+        paeth_cgra(idx, 2);
 
     return 0;
 }

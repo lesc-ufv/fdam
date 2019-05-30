@@ -20,7 +20,7 @@ using namespace std::chrono;
 
 #define DATA_SIZE (1 << 26)
 #define NUM_THREAD (8)
-#define SAMPLES (10)
+#define SAMPLES (100)
 
 int chebyshev(int idx);
 

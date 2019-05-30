@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
-    if (argc > 1)
-        idx = atoi(argv[1]);
+    int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+    if(argc > 2)
+        idx = atoi(argv[2]);
 
-    poly5(idx);
-    poly5_openmp(idx);
-    poly5_cgra(idx,2);
+    if(test & 1)
+        poly5(idx);
+    if(test & 2)
+        poly5_openmp(idx);
+    if(test & 4)
+        poly5_cgra(idx,2);
 
     return 0;
 }

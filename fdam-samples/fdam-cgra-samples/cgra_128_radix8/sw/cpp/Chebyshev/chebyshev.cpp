@@ -3,12 +3,18 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
+    int test= 0;
     if (argc > 1)
-        idx = atoi(argv[1]);
-
-    chebyshev(idx);
-    chebyshev_openmp(idx);
-    chebyshev_cgra(idx, 8);
+        test = atoi(argv[1]);
+    if (argc > 2)
+        idx = atoi(argv[2]);
+    
+    if(test & 1)
+        chebyshev(idx);
+    if(test & 2)
+        chebyshev_openmp(idx);
+    if(test & 4)
+        chebyshev_cgra(idx, 8);
 
     return 0;
 }

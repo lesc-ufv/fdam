@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
-    if (argc > 1)
-        idx = atoi(argv[1]);
-
-    poly8(idx);
-    poly8_openmp(idx);
-    poly8_cgra(idx, 1);
+    int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+    if(argc > 2)
+        idx = atoi(argv[2]);
+    
+    if(test & 1)
+        poly8(idx);
+    if(test & 2)
+        poly8_openmp(idx);
+    if(test & 4)    
+        poly8_cgra(idx, 1);
 
     return 0;
 }

@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     int idx = 0;
-    if (argc > 1)
-        idx = atoi(argv[1]);
+    int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+    if(argc > 2)
+        idx = atoi(argv[2]);
 
-    kmeans(idx, 5, 8);
-    kmeans_openmp(idx, 5, 8);
-    kmeans_cgra(idx, 5, 8);
+    if(test & 1)
+        kmeans(idx, 5, 8);
+    if(test & 2)
+        kmeans_openmp(idx, 5, 8);
+    if(test & 4)
+        kmeans_cgra(idx, 5, 8);
 
     return 0;
 }

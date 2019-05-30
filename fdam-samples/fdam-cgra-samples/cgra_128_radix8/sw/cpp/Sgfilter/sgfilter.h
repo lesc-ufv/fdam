@@ -20,7 +20,7 @@ using namespace std::chrono;
 
 #define DATA_SIZE ((1 << 24)+9175040)
 #define NUM_THREAD (8)
-#define SAMPLES (2)
+#define SAMPLES (100)
 
 int sgfilter(int idx);
 

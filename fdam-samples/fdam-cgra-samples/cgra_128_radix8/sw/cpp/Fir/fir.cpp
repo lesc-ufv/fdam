@@ -4,8 +4,13 @@
 int main(int argc, char *argv[]){
       
      int idx = 0;
-     if(argc > 1)
-        idx = atoi(argv[1]);
+     int test = 0;
+     
+    if(argc > 1)
+        test = atoi(argv[1]);
+     
+     if(argc > 2)
+        idx = atoi(argv[2]);
      
      unsigned short *coef;
      coef = new unsigned short[TAPS];
@@ -13,10 +18,12 @@ int main(int argc, char *argv[]){
      for (int k = 0; k < TAPS; ++k){
       coef[k] = k+1;
      } 
-   
-     fir(idx,coef,TAPS);
-     fir_openmp(idx,coef,TAPS);
-     fir_cgra(idx,1,coef,TAPS);
+     if(test & 1)
+        fir(idx,coef,TAPS);
+     if(test & 2)
+        fir_openmp(idx,coef,TAPS);
+     if(test & 4)
+        fir_cgra(idx,1,coef,TAPS);
      
      delete coef;
      
