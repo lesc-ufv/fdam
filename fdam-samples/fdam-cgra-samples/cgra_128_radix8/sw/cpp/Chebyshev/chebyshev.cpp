@@ -112,7 +112,7 @@ int chebyshev_cgra(int idx, int copies) {
     do {
         r = scheduler.scheduling();
         tries++;
-    } while (r != SCHEDULE_SUCCESS && tries < 1000);
+    } while (r != SCHEDULE_SUCCESS && tries < 10000);
 
     if (r == SCHEDULE_SUCCESS) {
 

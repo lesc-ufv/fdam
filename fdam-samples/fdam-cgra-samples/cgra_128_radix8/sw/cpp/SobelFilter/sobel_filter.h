@@ -20,7 +20,7 @@ using namespace std::chrono;
 
 #define DATA_SIZE (1 << 23)
 #define NUM_THREAD (8)
-#define SAMPLES (3)
+#define SAMPLES (2)
 
 int sobel_filter(int idx);
 

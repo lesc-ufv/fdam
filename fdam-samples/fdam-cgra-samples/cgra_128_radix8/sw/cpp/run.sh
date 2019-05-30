@@ -5,6 +5,12 @@
 
 type="_"$1
 do_build=$2
+bitstream_cgra="$FDAM_BASEDIR/fdam-samples/fdam-cgra-samples/cgra_128_radix8/hw/synth/cgra_128_radix8.gbs"
+
+if test "$do_build" == "exec"
+then 
+   fpgaconf $bitstream_cgra
+fi
 
 echo "Run Chebyshev ..."
 cd Chebyshev/
