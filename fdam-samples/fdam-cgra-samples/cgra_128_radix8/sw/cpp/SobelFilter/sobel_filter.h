@@ -18,7 +18,7 @@
 using namespace std;
 using namespace std::chrono;
 
-#define DATA_SIZE (1 << 23)
+#define DATA_SIZE (1333*1333)
 #define NUM_THREAD (8)
 #define SAMPLES (100)
 #define SOBEL_OP_SIZE 9
