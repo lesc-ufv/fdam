@@ -18,9 +18,9 @@
 using namespace std;
 using namespace std::chrono;
 
-#define DATA_SIZE (32*32)
+#define DATA_SIZE (1333*1333)
 #define NUM_THREAD (8)
-#define SAMPLES (1)
+#define SAMPLES (100)
 #define SOBEL_OP_SIZE 9
 #define pow2(x) (x)*(x)
 typedef short byte;
