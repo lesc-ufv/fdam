@@ -23,7 +23,7 @@ using namespace std::chrono;
 #define SAMPLES (100)
 #define SOBEL_OP_SIZE 9
 #define pow2(x) (x)*(x)
-typedef short byte;
+typedef int byte;
 
 int sobel_filter(int idx);
 

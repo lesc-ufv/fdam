@@ -236,9 +236,11 @@ int sobel_filter_cgra(int idx, int copies) {
     delete contour_img_cpu;
     delete inputs;
     delete output;
+
     for (auto df:dfs) {
         delete df;
     }
+
     dfs.clear();
     return v;
 }
