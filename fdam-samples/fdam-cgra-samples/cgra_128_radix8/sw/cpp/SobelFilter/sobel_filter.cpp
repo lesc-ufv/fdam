@@ -147,23 +147,39 @@ int sobel_filter_openmp(int idx) {
 }
 
 int sobel_filter_cgra(int idx, int copies) {
+
     auto cgraArch = new CgraArch(0, 128, 8, 8, 8, 1, 2);
     auto cgraHw = new Cgra();
     Scheduler scheduler(cgraArch);
     std::vector<DataFlow *> dfs;
     int r = 0, v = 0, tries = 0;
 
-    auto data_in = new short *[8];
-    auto data_out = new short[DATA_SIZE];
+    int gray_size = DATA_SIZE;
+    int width = (int) sqrt(DATA_SIZE);
 
-    for (int i = 0; i < 8; i++) {
-        data_in[i] = new short[DATA_SIZE];
-        for (int k = 0; k < DATA_SIZE; ++k) {
-            data_in[i][k] = k;
+    short ***inputs;
+    short **output;
+
+    byte **gray;
+    byte **contour_img_cpu;
+
+    gray = new byte *[NUM_THREAD];
+    contour_img_cpu = new byte *[NUM_THREAD];
+    inputs = new short **[NUM_THREAD];
+    output = new short *[NUM_THREAD];
+
+    for (int i = 0; i < NUM_THREAD; ++i) {
+        gray[i] = new byte[gray_size];
+        contour_img_cpu[i] = new byte[gray_size];
+        for (int j = 0; j < DATA_SIZE; ++j) {
+            gray[i][j] = j;
         }
-    }
-    for (int k = 0; k < DATA_SIZE; ++k) {
-        data_out[k] = k;
+        inputs[i] = new short *[8];
+        output[i] = new short[gray_size];
+        for (int k = 0; k < 8; ++k) {
+            inputs[i][k] = new short[gray_size];
+        }
+        makeOpMemCGRA(gray[i], gray_size, width, inputs[i]);
     }
 
     for (int i = 0; i < NUM_THREAD; ++i) {
@@ -181,23 +197,11 @@ int sobel_filter_cgra(int idx, int copies) {
     if (r == SCHEDULE_SUCCESS) {
 
         cgraHw->loadCgraProgram(cgraArch->getCgraProgram());
-
-        auto data_size = (size_t) (DATA_SIZE / ((NUM_THREAD) * copies));
-        auto data_size_bytes = sizeof(unsigned short) * data_size;
-        int k = 0;
-        for (int i = 0; i < NUM_THREAD; ++i) {
-            for (int j = 0; j < copies; ++j) {
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies), &data_in[0][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 1, &data_in[1][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 2, &data_in[2][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 3, &data_in[3][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 4, &data_in[4][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 5, &data_in[5][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 6, &data_in[6][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramInputStreamByID(i, (j * copies) + 7, &data_in[7][k * data_size], data_size_bytes);
-                cgraHw->setCgraProgramOutputStreamByID(i, (j * copies) + 8, &data_out[k * data_size], data_size_bytes);
-                k++;
+        for (int m = 0; m < NUM_THREAD; ++m) {
+            for (int i = 0; i < 8; ++i) {
+                cgraHw->setCgraProgramInputStreamByID(m, i, inputs[m][i], sizeof(short) * gray_size);
             }
+            cgraHw->setCgraProgramOutputStreamByID(m, 8, output[m], sizeof(short) * gray_size);
         }
         double cgraExecTime = 0;
         for (int i = 0; i < SAMPLES; i++) {
@@ -206,21 +210,30 @@ int sobel_filter_cgra(int idx, int copies) {
         }
         cgraExecTime /= SAMPLES;
         printf("Time(ms) CGRA: %5.2lf\n", cgraExecTime);
-        v = data_out[idx];
-
-    } else {
-        printf("Scheduler Error: %d\n", r);
     }
 
-    delete cgraArch;
-    delete cgraHw;
-
-    delete[] data_in;
-    delete[] data_out;
-
-    for (auto df:dfs) {
-        delete df;
+    for (int n = 0; n < NUM_THREAD; ++n) {
+        for (int j = 0; j < gray_size; ++j) {
+            contour_img_cpu[n][j] = (byte) (255 - sqrt(output[n][j]));
+        }
     }
+
+    v = contour_img_cpu[0][idx];
+
+    for (int l = 0; l < NUM_THREAD; ++l) {
+        for (int k = 0; k < 8; ++k) {
+            delete inputs[l][k];
+        }
+        delete gray[l];
+        delete contour_img_cpu[l];
+        delete inputs[l];
+        delete output[l];
+    }
+    delete gray;
+    delete contour_img_cpu;
+    delete inputs;
+    delete output;
+
     return v;
 }
 
@@ -334,6 +347,28 @@ void makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, by
     op_mem[6] = !top && !left ? buffer[cindex + width - 1] : zero;
     op_mem[7] = !top ? buffer[cindex + width] : zero;
     op_mem[8] = !top && !right ? buffer[cindex + width + 1] : zero;
+}
+
+void makeOpMemCGRA(byte *buffer, int buffer_size, int width, short **op_mem) {
+    for (int cindex = 0; cindex < buffer_size; cindex++) {
+        int bottom = cindex - width < 0;
+        int top = cindex + width >= buffer_size;
+        int left = cindex % width == 0;
+        int right = (cindex + 1) % width == 0;
+        short zero = 0;
+
+        op_mem[0][cindex] = !bottom && !left ? (short) buffer[cindex - width - 1] : zero;
+        op_mem[1][cindex] = !bottom ? (short) buffer[cindex - width] : zero;
+        op_mem[2][cindex] = !bottom && !right ? (short) buffer[cindex - width + 1] : zero;
+
+        op_mem[3][cindex] = !left ? (short) buffer[cindex - 1] : zero;
+        //op_mem[4][cindex] = buffer[cindex];
+        op_mem[4][cindex] = !right ? (short) buffer[cindex + 1] : zero;
+
+        op_mem[5][cindex] = !top && !left ? (short) buffer[cindex + width - 1] : zero;
+        op_mem[6][cindex] = !top ? (short) buffer[cindex + width] : zero;
+        op_mem[7][cindex] = !top && !right ? (short) buffer[cindex + width + 1] : zero;
+    }
 }
 
 void contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img) {

@@ -39,6 +39,8 @@ byte convolution(byte *X, byte *Y, int c_size);
 
 void makeOpMemCPU(const byte *buffer, int buffer_size, int width, int cindex, byte *op_mem);
 
+void makeOpMemCGRA(byte *buffer, int buffer_size, int width, short **op_mem);
+
 void contour(const byte *sobel_h, const byte *sobel_v, int gray_size, byte *contour_img);
 
 int main(int argc, char *argv[]);
