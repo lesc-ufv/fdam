@@ -18,6 +18,7 @@ CgraArch::CgraArch(int id, int num_pe, int num_pe_in, int num_pe_out, int net_ra
     }
 
     auto pe_list = CgraArch::makeListPe(num_pe, num_pe_in, num_pe_out);
+    
     int inId = 0;
     int outId = 0;
     for (auto p:pe_list) {

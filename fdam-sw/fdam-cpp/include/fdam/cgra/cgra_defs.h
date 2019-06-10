@@ -108,6 +108,7 @@ typedef struct pe_qtd_data_write_high_conf_t {
     unsigned long thread_id:8;
     unsigned long qtd:32;
 } pe_qtd_data_write_high_conf_t;
+
 typedef struct net_pc_max_conf_t {
     unsigned long conf_type:8;
     unsigned long switch_number:16;
@@ -140,10 +141,12 @@ typedef struct initial_conf_t {
         pe_pc_loop_conf_t pe_pc_loop_conf;
         pe_store_ignore_conf_t pe_store_ignore_conf;
         pe_load_ignore_conf_t pe_load_ignore_conf;
+        
         pe_qtd_data_read_low_conf_t pe_qtd_data_read_low_conf;
         pe_qtd_data_write_low_conf_t pe_qtd_data_write_low_conf;
         pe_qtd_data_read_high_conf_t pe_qtd_data_read_high_conf;
         pe_qtd_data_write_high_conf_t pe_qtd_data_write_high_conf;
+        
         net_switch_conf_t net_switch_conf;
         net_pc_max_conf_t net_pc_max_conf;
         net_pc_loop_conf_t net_pc_loop_conf;
@@ -160,6 +163,7 @@ typedef struct cgra_program_t {
     unsigned short num_extra_stage;
     unsigned short word_size;
     cgra_intial_conf_t cgra_intial_conf;
+    
     std::vector<initial_conf_t> initial_conf;
     //key = id thread,id dataflow,id operador, dataflow name | value cgraArch in queue id
     std::map<std::tuple<int, int, int, std::string>, int> input_map;
@@ -168,6 +172,7 @@ typedef struct cgra_program_t {
     //key = id thread, id pe, value = id op
     std::map< std::pair<int, int>, int> map_pe_to_op;
 } cgra_program_t;
+
 
 typedef enum {
     PE_BASIC,

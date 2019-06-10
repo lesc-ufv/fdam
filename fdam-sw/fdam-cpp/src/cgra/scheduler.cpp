@@ -182,7 +182,7 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
     for (int j = 0; j < mapping.size(); ++j) {
         mapping_op[mapping[j]] = j;
     }
-
+    printf("TRY\n");
     for (int i = 0; i < mapping.size(); ++i) {
         if (mapping[i] != -1) {
             op_src = Scheduler::dataflows[threadID]->getOp(mapping[i]);
@@ -204,6 +204,7 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
                                     if (!net_branch->addRoute(pe_src->getId(), pe_dst->getId())) {
                                         return i;
                                     }
+                                    //printf("1 %d %d\n",pe_src->getId(),pe_dst->getId());
                                     pe_src->setOperator(op_src, threadID);
                                     pe_dst->setOperator(op_dst, threadID);
 
@@ -219,13 +220,18 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
                                     else {
                                         return i;
                                     }
+                                    
                                     if (pe_src->getOut(threadID) == PORT_A) {
                                         if (!net->addRoute(pe_src_port_a, pe_dst_port_in)) {
                                             return i;
+                                        }else{
+                                            //printf("%d %d\n",pe_src_port_a,pe_dst_port_in);
                                         }
                                     } else if (pe_src->getOut(threadID) == PORT_B) {
                                         if (!net->addRoute(pe_src_port_b, pe_dst_port_in)) {
                                             return i;
+                                        }else{
+                                             //printf("%d %d\n",pe_src_port_b,pe_dst_port_in);
                                         }
                                     } else {
                                         if (!net->addRoute(pe_src_port_a, pe_dst_port_in)) {
@@ -233,9 +239,11 @@ int Scheduler::placeAndRoute(std::vector<int> &mapping, int threadID) {
                                                 return i;
                                             } else {
                                                 pe_src->setOut(PORT_B, threadID);
+                                                //printf("%d %d\n",pe_src_port_b,pe_dst_port_in);
                                             }
                                         } else {
                                             pe_src->setOut(PORT_A, threadID);
+                                            //printf("%d %d\n",pe_src_port_a,pe_dst_port_in);
                                         }
                                     }
                                     pe_src->setOperator(op_src, threadID);

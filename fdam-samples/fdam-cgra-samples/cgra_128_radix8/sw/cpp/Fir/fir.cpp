@@ -33,15 +33,15 @@ int main(int argc, char *argv[]){
 int fir(int idx, unsigned short *coef, int taps){
 
    unsigned short *data_in, *data_out;
-   
+
    data_in = new unsigned short[DATA_SIZE+taps];
    data_out = new unsigned short[DATA_SIZE+taps];
-   
-   
+
+
    for (int k = 0; k < DATA_SIZE; ++k){
       data_in[k] = k;
       data_out[k] = 0;
-   }   
+   }
    
    high_resolution_clock::time_point s;
    duration<double> diff = {};

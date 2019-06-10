@@ -415,9 +415,9 @@ bool Accelerator::isDoneInputQueue(unsigned char idQueue) const {
     int col = idQueue >> 6;
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
-    doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
+    doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)] >> bit;
 
-    return (doneDword & (1UL << bit)) == 1UL;
+    return (doneDword & 1UL) == 1UL;
 }
 
 bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
@@ -429,9 +429,9 @@ bool Accelerator::isDoneOutputQueue(unsigned char idQueue) const {
     int col = idQueue >> 6;
     int bit = idQueue % 64;
     unsigned long doneDword = 0;
-    doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)];
+    doneDword = doneVet[GET_INDEX(dsmNumCL - 1, col, 8)] >> bit;
 
-    return (doneDword & (1UL << bit)) == 1UL;
+    return (doneDword & 1UL) == 1UL;
 }
 
 void Accelerator::waitDone(long long timeWaitMax) {

@@ -211,5 +211,5 @@ OPAE_SVC_WRAPPER::probeForASE() {
     fpgaDestroyProperties(&filter);
 
     // ASE's device ID is 0xa5ea5e
-    return ((FPGA_OK == r) && (0xa5ea5e == device_id));
+    return ((FPGA_OK == r) && (0xa5e == device_id));
 }
