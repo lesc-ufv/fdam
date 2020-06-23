@@ -1,0 +1,34 @@
+#!/bin/sh
+
+TOOL='-t VCS'
+
+for i in "$@"
+do
+case $i in
+  -h|--help)
+  echo ''
+  echo 'Usage: sh setup_ase [OPTION]'
+  echo ''
+  echo '-h  , --help         show arguments'
+  echo '-t  , --tool={VCS,QUESTA,MODELSIM} '
+  exit 0
+  shift # past argument=value
+  ;;
+  -t=*|--tool=*)
+  TOOL="-t ${i#*=}"
+  shift # past argument=value
+  ;;
+  *)
+  # unknown option
+  echo ''
+  echo 'setup_ase: invalid option!'
+  echo ''
+  echo "Try: 'sh setup_ase --help' for more information."
+  exit 1
+  ;;
+esac
+done
+
+rm -rf afu_sim
+python2 $FDAM_BASEDIR/hw/src/update_sources.py
+afu_sim_setup --sources=sources.txt afu_sim $TOOL

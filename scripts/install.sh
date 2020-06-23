@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 echo '----------------------------------------------------------------------------'
 echo 'Welcome to FDAM Setup Wizard.'
 echo ''
@@ -18,7 +20,7 @@ MYPATH=$MYPATH/..
 # read command line args
 SUDO=''
 INSTALL_DIR='/usr/local/'
-JOBS=''
+JOBS='-j2'
 
 for i in "$@"
 do
@@ -83,8 +85,8 @@ echo "cleaning up..."
 echo ""
 rm -rf $MYPATH/opae-sdk/mybuild
 rm -rf $MYPATH/intel-fpga-bbb/mybuild
-rm -rf $MYPATH/fdam-sw/fdam-cpp/mybuild
-rm -rf $MYPATH/fdam-sw/fdam-java/mybuild
+rm -rf $MYPATH/sw/cpp/mybuild
+rm -rf $MYPATH/sw/java/mybuild
 echo "end of cleaning up!"
 echo ""
 
@@ -110,8 +112,8 @@ echo ""
 
 echo "installing fdam-cpp..."
 echo ""
-mkdir $MYPATH/fdam-sw/fdam-cpp/mybuild
-cd $MYPATH/fdam-sw/fdam-cpp/mybuild
+mkdir $MYPATH/sw/cpp/mybuild
+cd $MYPATH/sw/cpp/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
 make $JOBS
 $SUDO make install
@@ -120,12 +122,15 @@ echo ""
 
 echo "installing fdam-java..."
 echo ""
-mkdir $MYPATH/fdam-sw/fdam-java/mybuild
-cd $MYPATH/fdam-sw/fdam-java/mybuild
+mkdir $MYPATH/sw/java/mybuild
+cd $MYPATH/sw/java/mybuild
 cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
 make $JOBS
 $SUDO make install 
 echo "end of installing fdam-java"
+echo ""
+
+echo "Installation completed successfully!"
 echo ""
 
 cd $CALLPATH
