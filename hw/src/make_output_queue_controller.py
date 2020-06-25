@@ -1,6 +1,6 @@
 from veriloggen import *
 
-from common.make_fifo import make_fifo
+from make_fifo import make_fifo
 
 
 def make_output_queue_controller(conf_receiver):

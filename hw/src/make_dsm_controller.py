@@ -1,6 +1,6 @@
 from veriloggen import *
 
-from common.make_acc_counter import make_acc_counter
+from make_acc_counter import make_acc_counter
 
 
 def make_dsm_controller(conf_receiver):

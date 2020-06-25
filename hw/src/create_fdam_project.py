@@ -2,7 +2,7 @@ import os
 import shutil
 import traceback
 
-from common.utils import *
+from utils import *
 from make_acc_management import make_acc_management
 
 try:
@@ -21,13 +21,13 @@ def create_fdam_project_cli():
     print("###################################################")
     end_green_fontcolor()
     while True:
-        prj_name = raw_input('Project name: ')
+        prj_name = input('Project name: ')
         if prj_name != '': break
 
     while True:
-        prj_path = raw_input('Project path[%s/fdam-samples/fdam-acc-samples ]: ' % FDAM_BASEDIR)
+        prj_path = input('Project path[%s/samples/]: ' % FDAM_BASEDIR)
         if prj_path == '':
-            prj_path = FDAM_BASEDIR + '/fdam-samples/fdam-acc-samples'
+            prj_path = FDAM_BASEDIR + '/samples/'
             if not os.path.exists(prj_path + '/' + prj_name):
                 break
             else:
@@ -42,17 +42,8 @@ def create_fdam_project_cli():
             else:
                 print('This project already exists!')
 
-    isDebug = False
-    # while True:
-    # d = raw_input('Debug project[yes/no]: ')
-    # if d == 'yes':
-    # isDebug =  True
-    # break
-    # elif d == 'no':
-    # break
-
     while True:
-        n = raw_input('Number of accelerators: ')
+        n = input('Number of accelerators: ')
         try:
             num_acc = int(n)
             if num_acc > 0:
@@ -64,19 +55,19 @@ def create_fdam_project_cli():
     for i in range(num_acc):
         while True:
             try:
-                nin, nout = map(int, raw_input('Number of input and output queues for acc %d [in out]:' % i).split())
+                nin, nout = map(int, input('Number of input and output queues for acc %d [in out]:' % i).split())
                 if nin > 0 and nout > 0:
                     break
             except:
                 pass
         acc_array.append((nin, nout, None))
 
-    return [prj_name, prj_path, isDebug, acc_array]
+    return [prj_name, prj_path, False, acc_array]
 
 
 def create_dir_project(path_project, numAcc):
     FDAM_BASEDIR = os.environ['FDAM_BASEDIR']
-    cmd = 'cp -r %s/fdam-hw-generator/fdam-model ' % FDAM_BASEDIR + path_project
+    cmd = 'cp -r %s/hw/template ' % FDAM_BASEDIR + path_project
     result = commands_getoutput(cmd)
 
     if len(result) != 0:

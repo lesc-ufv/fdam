@@ -4,14 +4,9 @@ from __future__ import print_function
 import os
 import sys
 
-if sys.version_info < (2, 7):
-    pass
-else:
-    pass
-
 try:
     FDAM_BASEDIR = os.environ['FDAM_BASEDIR']
-    sys.path.insert(0, FDAM_BASEDIR + '/fdam-hw-generator')
+    sys.path.insert(0, FDAM_BASEDIR + '/hw')
 except:
     print("\033[1;31m")
     print("FDAM environment not configured, run the source command in the setup.fdam file in the scripts folder!")

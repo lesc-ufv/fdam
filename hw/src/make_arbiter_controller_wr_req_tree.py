@@ -1,10 +1,10 @@
 from veriloggen import *
 
-from common.make_arbiter import make_arbiter
-from common.make_fifo import make_fifo
-from common.make_reg_tree_pipeline import make_reg_tree_pipeline
-from common.make_select import make_select_tree
-from common.utils import numBits
+from make_arbiter import make_arbiter
+from make_fifo import make_fifo
+from make_reg_tree_pipeline import make_reg_tree_pipeline
+from make_select import make_select_tree
+from utils import numBits
 
 
 def make_arbiter_controller_wr_req_tree(radix, num_input):

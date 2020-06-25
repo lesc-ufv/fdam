@@ -1,6 +1,6 @@
 from veriloggen import *
 
-from common.make_reg_tree_pipeline import make_reg_tree_pipeline
+from make_reg_tree_pipeline import make_reg_tree_pipeline
 from make_acc_user import make_acc_user
 
 

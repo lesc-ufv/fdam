@@ -2,7 +2,7 @@ import traceback
 
 from veriloggen import *
 
-from common.make_reg_tree_pipeline import make_reg_tree_pipeline
+from make_reg_tree_pipeline import make_reg_tree_pipeline
 from make_acc import make_acc
 from make_arbiter_controller_rd_req_tree import make_arbiter_controller_rd_req_tree
 from make_arbiter_controller_wr_req_tree import make_arbiter_controller_wr_req_tree
