@@ -7,9 +7,13 @@ echo 'Welcome to FDAM Setup Wizard.'
 echo ''
 echo '----------------------------------------------------------------------------'
 
-CALLPATH=`pwd`
-MYPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-FDAM_ROOT=$MYPATH/..
+if echo "$SHELL" | grep 'bash' >/dev/null 2>&1 ; then
+  MYPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+else
+  MYPATH="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
+fi
+
+FDAM_ROOT=`cd $MYPATH/.. && pwd`
 
 # read command line args
 SUDO=''
