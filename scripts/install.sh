@@ -64,77 +64,74 @@ cd $INSTALL_DIR
 INSTALL_DIR=`pwd`
 cd $CALLPATH
 
-echo $INSTALL_DIR
+echo ''
+echo 'checking libraries ...'
+echo ''
 
-# 
-# echo ''
-# echo 'checking libraries ...'
-# echo ''
-# 
-# check_lib() {
-#   LIB_FILE=$1.'so'
-#   CHECK=$(ldconfig -p | grep ${LIB_FILE})
-# 
-#   if [[ ${CHECK} != *${LIB_FILE}* ]]
-#   then
-#     tput setaf 1; echo 'Error: '${LIB_FILE}' is not installed!'
-#     exit 1
-#   fi
-# }
-# 
-# check_lib libuuid
-# check_lib libjson-c
-# 
-# echo "cleaning up..."
-# echo ""
-# rm -rf $FDAM_ROOT/opae-sdk/mybuild
-# rm -rf $FDAM_ROOT/intel-fpga-bbb/mybuild
-# rm -rf $FDAM_ROOT/sw/cpp/mybuild
-# rm -rf $FDAM_ROOT/sw/java/mybuild
-# echo "end of cleaning up!"
-# echo ""
-# 
-# echo "installing opae-sdk ..."
-# echo ""
-# mkdir $FDAM_ROOT/opae-sdk/mybuild
-# cd  $FDAM_ROOT/opae-sdk/mybuild
-# cmake .. -DBUILD_ASE=1 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-# make $JOBS
-# $SUDO make install
-# echo "end of installing opae-sdk"
-# echo ""
-# 
-# echo "installing intel-fpga-bbb..."
-# echo ""
-# mkdir $FDAM_ROOT/intel-fpga-bbb/mybuild
-# cd $FDAM_ROOT/intel-fpga-bbb/mybuild
-# cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-# make $JOBS
-# $SUDO make install
-# echo "end of installing intel-fpga-bbb"
-# echo ""
-# 
-# echo "installing fdam-cpp..."
-# echo ""
-# mkdir $FDAM_ROOT/sw/cpp/mybuild
-# cd $FDAM_ROOT/sw/cpp/mybuild
-# cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-# make $JOBS
-# $SUDO make install
-# echo "end of installing fdam-cpp"
-# echo ""
-# 
-# echo "installing fdam-java..."
-# echo ""
-# mkdir $FDAM_ROOT/sw/java/mybuild
-# cd $FDAM_ROOT/sw/java/mybuild
-# cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
-# make $JOBS
-# $SUDO make install 
-# echo "end of installing fdam-java"
-# echo ""
-# 
-# echo "Installation completed successfully!"
-# echo ""
-# 
-# cd $CALLPATH
+check_lib() {
+  LIB_FILE=$1.'so'
+  CHECK=$(ldconfig -p | grep ${LIB_FILE})
+
+  if [[ ${CHECK} != *${LIB_FILE}* ]]
+  then
+    tput setaf 1; echo 'Error: '${LIB_FILE}' is not installed!'
+    exit 1
+  fi
+}
+
+check_lib libuuid
+check_lib libjson-c
+
+echo "cleaning up..."
+echo ""
+rm -rf $FDAM_ROOT/opae-sdk/mybuild
+rm -rf $FDAM_ROOT/intel-fpga-bbb/mybuild
+rm -rf $FDAM_ROOT/sw/cpp/mybuild
+rm -rf $FDAM_ROOT/sw/java/mybuild
+echo "end of cleaning up!"
+echo ""
+
+echo "installing opae-sdk ..."
+echo ""
+mkdir $FDAM_ROOT/opae-sdk/mybuild
+cd  $FDAM_ROOT/opae-sdk/mybuild
+cmake .. -DBUILD_ASE=1 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+make $JOBS
+$SUDO make install
+echo "end of installing opae-sdk"
+echo ""
+
+echo "installing intel-fpga-bbb..."
+echo ""
+mkdir $FDAM_ROOT/intel-fpga-bbb/mybuild
+cd $FDAM_ROOT/intel-fpga-bbb/mybuild
+cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+make $JOBS
+$SUDO make install
+echo "end of installing intel-fpga-bbb"
+echo ""
+
+echo "installing fdam-cpp..."
+echo ""
+mkdir $FDAM_ROOT/sw/cpp/mybuild
+cd $FDAM_ROOT/sw/cpp/mybuild
+cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+make $JOBS
+$SUDO make install
+echo "end of installing fdam-cpp"
+echo ""
+
+echo "installing fdam-java..."
+echo ""
+mkdir $FDAM_ROOT/sw/java/mybuild
+cd $FDAM_ROOT/sw/java/mybuild
+cmake .. -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+make $JOBS
+$SUDO make install 
+echo "end of installing fdam-java"
+echo ""
+
+echo "Installation completed successfully!"
+echo ""
+
+cd $CALLPATH
