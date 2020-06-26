@@ -1,29 +1,21 @@
 #!/usr/bin/env bash
 
-
 if echo "$SHELL" | grep 'bash' >/dev/null 2>&1 ; then
   MYPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 else
   MYPATH="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 fi
 
-
 # TODO
 export JAVA_HOME=""
+export CLASSPATH=$JAVA_HOME/lib:$JAVA_HOME/jre/lib
+export PATH=$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin
+
 export SR_503_RELEASE_DIR="/media/lucas/3CF6B349F6B301E6/UFV/Projetos/Projetos-Pos-Graduacao/Doutorado/fdam/SR-5.0.3-Release"
 
 export FDAM_BASEDIR=`cd $MYPATH/.. && pwd`
 export OPAE_BASEDIR=$FDAM_BASEDIR/opae-sdk
 export FPGA_BBB_CCI_SRC=$FDAM_BASEDIR/intel-fpga-bbb
-
-export FDAM_INSTALLDIR=$FDAM_BASEDIR/installation
-export OPAE_INSTALLDIR=$FDAM_INSTALLDIR
-export FPGA_BBB_CCI_INSTALLDIR=$FDAM_INSTALLDIR
-
-export CLASSPATH=$JAVA_HOME/lib:$JAVA_HOME/jre/lib
-export PATH=$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin
-export PATH=$PATH:$OPAE_INSTALLDIR/bin:$FPGA_BBB_CCI_INSTALLDIR/bin:$FDAM_INSTALLDIR/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPAE_INSTALLDIR/lib:$OPAE_INSTALLDIR/lib64:$FPGA_BBB_CCI_INSTALLDIR/lib:$FPGA_BBB_CCI_INSTALLDIR/lib64:$FDAM_INSTALLDIR/lib:$FDAM_INSTALLDIR/lib64
 export PYTHONPATH=$PYTHONPATH:$FDAM_BASEDIR/hw/src
- 
 source $MYPATH/setup.eda
+source $MYPATH/fdam.env

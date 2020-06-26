@@ -131,6 +131,14 @@ $SUDO make install
 echo "end of installing fdam-java"
 echo ""
 
+echo "#!/usr/bin/env bash
+
+export FDAM_INSTALLDIR=$INSTALL_DIR
+export OPAE_INSTALLDIR=$INSTALL_DIR
+export FPGA_BBB_CCI_INSTALLDIR=$INSTALL_DIR
+export PATH=$PATH:$OPAE_INSTALLDIR/bin:$FPGA_BBB_CCI_INSTALLDIR/bin:$INSTALL_DIR/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPAE_INSTALLDIR/lib:$OPAE_INSTALLDIR/lib64:$FPGA_BBB_CCI_INSTALLDIR/lib:$FPGA_BBB_CCI_INSTALLDIR/lib64:$INSTALL_DIR/lib:$INSTALL_DIR/lib64" > $MYPATH/fdam.env
+
 echo "Installation completed successfully!"
 echo ""
 

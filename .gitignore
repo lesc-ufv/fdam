@@ -14,3 +14,4 @@
 **/*.rgb
 **/*.gray
 **/*.vscode
+**/*.env
