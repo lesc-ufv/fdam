@@ -105,7 +105,7 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 
 
 ##
-## Build FPGA library if libfpga header files are present
+## Build FDAM library if libfpga header files are present
 ##
 check_include_file("opae/fpga.h" OPAE_PRESENT)
 if (OPAE_PRESENT OR OPAELIB_HDRS_PRESENT)
