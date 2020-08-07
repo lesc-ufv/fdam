@@ -90,6 +90,8 @@ public:
 
     bool IsSimulated();
 
+    double getCycleTime();
+    
     void printHwInfo();
 };
 

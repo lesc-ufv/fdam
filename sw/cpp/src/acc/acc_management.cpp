@@ -141,6 +141,10 @@ bool AccManagement::IsSimulated() {
     return AccManagement::fpga->hwIsSimulated();
 }
 
+double AccManagement::getCycleTime(){
+    return 1.0 / (AccManagement::csrs->getAFUMHz() * 1000000.0);
+}
+
 void AccManagement::printHwInfo() {
 
     double totalClocks = AccManagement::readCSR(REG_CLOCK_COUNT);
