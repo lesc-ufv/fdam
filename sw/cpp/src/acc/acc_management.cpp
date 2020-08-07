@@ -152,7 +152,7 @@ void AccManagement::printHwInfo() {
     auto throughput = Mb / totalTime;
 
     MSG("INFO: Accelerator Management");
-    MSG("INFO: TARGET:" << (AccManagement::fpga->hwIsSimulated() ? " [simulated]" : "[real device]"));
+    MSG("INFO: TARGET:" << (AccManagement::isSimulated() ? " [simulated]" : "[real device]"));
     MSG("INFO: Frequency: " << std::dec << AccManagement::csrs->getAFUMHz() << " MHz");
     MSG("INFO: Number of accelerators: " << AccManagement::getNumAccelerators());
     MSG("INFO: Total number of input queues: " << AccManagement::getNumInputQueue());
