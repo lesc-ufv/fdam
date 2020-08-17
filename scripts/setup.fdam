@@ -11,7 +11,7 @@ export JAVA_HOME=""
 export CLASSPATH=$JAVA_HOME/lib:$JAVA_HOME/jre/lib
 export PATH=$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin
 
-export SR_503_RELEASE_DIR="/media/lucas/3CF6B349F6B301E6/UFV/Projetos/Projetos-Pos-Graduacao/Doutorado/fdam/SR-5.0.3-Release"
+export SR_503_RELEASE_DIR=""
 
 export FDAM_BASEDIR=`cd $MYPATH/.. && pwd`
 export OPAE_BASEDIR=$FDAM_BASEDIR/opae-sdk
